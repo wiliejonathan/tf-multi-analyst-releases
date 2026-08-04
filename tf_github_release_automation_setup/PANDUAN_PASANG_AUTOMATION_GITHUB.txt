@@ -1,0 +1,28 @@
+AUTOMATION GITHUB — TF MULTI-ANALYST SCANNER
+
+Tujuan:
+- latest.json diperbarui otomatis setiap Release dipublikasikan, diedit, ditarik, atau dihapus.
+- Pemeriksaan cadangan berjalan setiap 5 menit.
+- Customer membaca latest.json tanpa menghabiskan kuota GitHub REST API publik.
+
+FILE YANG DIPASANG KE REPOSITORY:
+1. .github/workflows/update-latest-json.yml
+2. latest.json
+
+LANGKAH SINGKAT:
+1. Buka repository:
+   https://github.com/wiliejonathan/tf-multi-analyst-releases
+2. Upload isi paket ini dengan struktur folder tetap.
+3. Buka tab Actions.
+4. Pilih workflow "Update latest release manifest".
+5. Klik Run workflow.
+6. Setelah selesai, buka latest.json di halaman utama repository.
+7. Pastikan available=true dan informasi release terbaru tampil.
+
+Setelah setup satu kali ini, proses update berikutnya cukup:
+- buat Draft Release;
+- upload ZIP bernama tf_multi_analyst_extension_revXXX.zip;
+- tes;
+- Publish release.
+
+Workflow akan memperbarui latest.json otomatis.
