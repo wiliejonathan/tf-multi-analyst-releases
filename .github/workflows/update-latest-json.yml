@@ -1,0 +1,122 @@
+name: Update latest release manifest
+
+on:
+  release:
+    types: [published, edited, deleted, unpublished]
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-latest-release-manifest
+  cancel-in-progress: true
+
+jobs:
+  update-manifest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build latest.json from the latest published release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import re
+          import urllib.error
+          import urllib.request
+          from pathlib import Path
+
+          repository = os.environ["GH_REPOSITORY"]
+          token = os.environ["GH_TOKEN"]
+          api_url = f"https://api.github.com/repos/{repository}/releases/latest"
+          request = urllib.request.Request(
+              api_url,
+              headers={
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": f"Bearer {token}",
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "User-Agent": "tf-multi-analyst-release-manifest",
+              },
+          )
+
+          output = {
+              "schema": 1,
+              "available": False,
+              "reason": "RELEASE_NOT_AVAILABLE",
+          }
+
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  release = json.load(response)
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+              release = None
+
+          if release:
+              tag = str(release.get("tag_name") or "").strip()
+              numbers = re.findall(r"\d+", tag)
+              revision = int(numbers[-1]) if numbers else 0
+              expected_name = f"tf_multi_analyst_extension_rev{revision}.zip" if revision else ""
+              asset = next(
+                  (
+                      item
+                      for item in release.get("assets", [])
+                      if str(item.get("name") or "") == expected_name
+                      and str(item.get("state") or "uploaded") == "uploaded"
+                  ),
+                  None,
+              )
+
+              if revision and asset:
+                  output = {
+                      "schema": 1,
+                      "available": True,
+                      "revision": revision,
+                      "tag_name": tag,
+                      "release_url": release.get("html_url") or "",
+                      "published_at": release.get("published_at") or "",
+                      "asset": {
+                          "id": asset.get("id") or 0,
+                          "name": asset.get("name") or "",
+                          "url": asset.get("browser_download_url") or "",
+                          "size": asset.get("size") or 0,
+                          "digest": asset.get("digest") or "",
+                          "updated_at": asset.get("updated_at") or "",
+                      },
+                  }
+              else:
+                  output = {
+                      "schema": 1,
+                      "available": False,
+                      "reason": "ASSET_NOT_ATTACHED",
+                      "revision": revision,
+                      "tag_name": tag,
+                      "release_url": release.get("html_url") or "",
+                  }
+
+          Path("latest.json").write_text(
+              json.dumps(output, ensure_ascii=False, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
+      - name: Commit latest.json when it changed
+        run: |
+          if git diff --quiet -- latest.json; then
+            echo "latest.json tidak berubah."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add latest.json
+          git commit -m "chore: update latest release manifest"
+          git push
