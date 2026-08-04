@@ -18,8 +18,11 @@ jobs:
   update-manifest:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout main branch
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
 
       - name: Build latest.json from the latest published release
         env:
@@ -115,8 +118,10 @@ jobs:
             echo "latest.json tidak berubah."
             exit 0
           fi
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add latest.json
           git commit -m "chore: update latest release manifest"
-          git push
+          git pull --rebase origin main
+          git push origin HEAD:main
