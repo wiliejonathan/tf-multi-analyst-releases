@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 216,
-  "tag_name": "v1.14.216",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.14.216",
-  "published_at": "2026-08-23T14:02:01Z",
+  "revision": 217,
+  "tag_name": "v1.14.217",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.14.217",
+  "published_at": "2026-08-24T07:59:44Z",
   "asset": {
-    "id": 526277099,
-    "name": "tf_multi_analyst_extension_rev216.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.14.216/tf_multi_analyst_extension_rev216.zip",
-    "size": 632539,
-    "digest": "sha256:1f1f3a1658b98bcd8dec27c748f3c377350217179f67dd99740efaf0c32e6468",
-    "updated_at": "2026-08-23T14:01:59Z"
+    "id": 527274754,
+    "name": "tf_multi_analyst_extension_rev217.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.14.217/tf_multi_analyst_extension_rev217.zip",
+    "size": 634954,
+    "digest": "sha256:d90794e39bf978bb2afb1b225ac04e7f98b489af65ec8aab5442069b101b61d8",
+    "updated_at": "2026-08-24T07:59:25Z"
   }
 }
