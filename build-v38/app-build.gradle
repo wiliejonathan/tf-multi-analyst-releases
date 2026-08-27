@@ -1,0 +1,24 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.skillfusion.tfmultianalystmobil3'
+    compileSdk 35
+    signingConfigs {
+        release {
+            storeFile file('tfv23.jks')
+            storePassword 'TFv23-Store-2026!'
+            keyAlias 'tfv23'
+            keyPassword 'TFv23-Store-2026!'
+            v1SigningEnabled true
+            v2SigningEnabled true
+        }
+    }
+    defaultConfig {
+        applicationId "com.skillfusion.tfmultianalystmobil4"
+        minSdk 24
+        targetSdk 35
+        versionCode 38
+        versionName "1.0.38"
+    }
+    buildTypes { release { signingConfig signingConfigs.release; minifyEnabled false; shrinkResources false } }
+}
+dependencies {}
