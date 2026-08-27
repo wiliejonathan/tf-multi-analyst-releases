@@ -70,7 +70,6 @@ jobs:
           cp v23small/native/MainActivity.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
           cp v23small/native/tfv23.jks android_project/app/tfv23.jks
 
-          # Same stable V24 package/signing so V25 installs as an update to V24.
           sed -i 's/applicationId "com.skillfusion.tfmultianalystmobil3"/applicationId "com.skillfusion.tfmultianalystmobil4"/' android_project/app/build.gradle
           sed -i "s/keyPassword 'TFv23-Key-2026!'/keyPassword 'TFv23-Store-2026!'/" android_project/app/build.gradle
           sed -i 's/versionCode 23/versionCode 25/' android_project/app/build.gradle
@@ -92,88 +91,7 @@ jobs:
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < dashboard.patch
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < build-v23/excel-native.patch
 
-          # V25: freeze requested columns during horizontal table scrolling.
-          cat >> android_project/app/src/main/assets/www/mobile-overrides.css <<'CSS'
-
-/* ============================================================
-   V25 - FROZEN/STICKY COLUMNS
-   Table 1: Nama Analis stays visible on horizontal scroll.
-   Table 3: checkbox/ticker + Nama Analis stay visible.
-   ============================================================ */
-
-/* Table 1 — freeze first column (Nama Analis). */
-#section-summary #summary-table thead th:first-child,
-#section-summary #summary-table tbody td:first-child{
-  position:sticky!important;
-  left:0!important;
-  background:#0f172a!important;
-  background-clip:padding-box!important;
-  box-shadow:2px 0 0 rgba(56,189,248,.16), 7px 0 12px rgba(2,6,23,.38)!important;
-}
-#section-summary #summary-table thead th:first-child{
-  z-index:72!important;
-}
-#section-summary #summary-table tbody td:first-child{
-  z-index:34!important;
-}
-#section-summary #summary-table tbody tr:nth-child(odd) td:first-child{
-  background:#0f172a!important;
-}
-#section-summary #summary-table tbody tr:nth-child(even) td:first-child{
-  background:#111b31!important;
-}
-
-/* Table 3 — freeze checkbox/ticker as first sticky column. */
-#section-history #history-table th.tf-history-cb-head,
-#section-history #history-table td.tf-history-cb-cell{
-  position:sticky!important;
-  left:0!important;
-  width:32px!important;
-  min-width:32px!important;
-  max-width:32px!important;
-  background:#0f172a!important;
-  background-clip:padding-box!important;
-}
-#section-history #history-table th.tf-history-cb-head{
-  top:0!important;
-  z-index:94!important;
-}
-#section-history #history-table td.tf-history-cb-cell{
-  z-index:64!important;
-}
-
-/* Table 3 — Nama Analis becomes the second frozen column. It naturally
-   remains in its original place at scrollLeft=0, then locks beside the
-   checkbox once the date columns scroll underneath it. */
-#section-history #history-table th[data-history-col="analyst"],
-#section-history #history-table td[data-history-col="analyst"]{
-  position:sticky!important;
-  left:32px!important;
-  min-width:150px!important;
-  background:#0f172a!important;
-  background-clip:padding-box!important;
-  box-shadow:2px 0 0 rgba(56,189,248,.18), 8px 0 14px rgba(2,6,23,.42)!important;
-}
-#section-history #history-table th[data-history-col="analyst"]{
-  top:0!important;
-  z-index:93!important;
-}
-#section-history #history-table td[data-history-col="analyst"]{
-  z-index:63!important;
-}
-#section-history #history-table tbody tr:nth-child(odd) td.tf-history-cb-cell,
-#section-history #history-table tbody tr:nth-child(odd) td[data-history-col="analyst"]{
-  background:#0f172a!important;
-}
-#section-history #history-table tbody tr:nth-child(even) td.tf-history-cb-cell,
-#section-history #history-table tbody tr:nth-child(even) td[data-history-col="analyst"]{
-  background:#111b31!important;
-}
-#section-history #history-table tbody tr.tf-withdraw-row td.tf-history-cb-cell,
-#section-history #history-table tbody tr.tf-withdraw-row td[data-history-col="analyst"]{
-  background:#251326!important;
-}
-CSS
+          echo 'LyogPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgIFYyNSAtIEZST1pFTi9TVElDS1kgQ09MVU1OUwogICBUYWJsZSAxOiBOYW1hIEFuYWxpcyBzdGF5cyB2aXNpYmxlIG9uIGhvcml6b250YWwgc2Nyb2xsLgogICBUYWJsZSAzOiBjaGVja2JveC90aWNrZXIgKyBOYW1hIEFuYWxpcyBzdGF5IHZpc2libGUuCiAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAqLwoKLyogVGFibGUgMSDigJQgZnJlZXplIGZpcnN0IGNvbHVtbiAoTmFtYSBBbmFsaXMpLiAqLwojc2VjdGlvbi1zdW1tYXJ5ICNzdW1tYXJ5LXRhYmxlIHRoZWFkIHRoOmZpcnN0LWNoaWxkLAojc2VjdGlvbi1zdW1tYXJ5ICNzdW1tYXJ5LXRhYmxlIHRib2R5IHRkOmZpcnN0LWNoaWxkewogIHBvc2l0aW9uOnN0aWNreSFpbXBvcnRhbnQ7CiAgbGVmdDowIWltcG9ydGFudDsKICBiYWNrZ3JvdW5kOiMwZjE3MmEhaW1wb3J0YW50OwogIGJhY2tncm91bmQtY2xpcDpwYWRkaW5nLWJveCFpbXBvcnRhbnQ7CiAgYm94LXNoYWRvdzoycHggMCAwIHJnYmEoNTYsMTg5LDI0OCwuMTYpLCA3cHggMCAxMnB4IHJnYmEoMiw2LDIzLC4zOCkhaW1wb3J0YW50Owp9CiNzZWN0aW9uLXN1bW1hcnkgI3N1bW1hcnktdGFibGUgdGhlYWQgdGg6Zmlyc3QtY2hpbGR7CiAgei1pbmRleDo3MiFpbXBvcnRhbnQ7Cn0KI3NlY3Rpb24tc3VtbWFyeSAjc3VtbWFyeS10YWJsZSB0Ym9keSB0ZDpmaXJzdC1jaGlsZHsKICB6LWluZGV4OjM0IWltcG9ydGFudDsKfQojc2VjdGlvbi1zdW1tYXJ5ICNzdW1tYXJ5LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZChvZGQpIHRkOmZpcnN0LWNoaWxkewogIGJhY2tncm91bmQ6IzBmMTcyYSFpbXBvcnRhbnQ7Cn0KI3NlY3Rpb24tc3VtbWFyeSAjc3VtbWFyeS10YWJsZSB0Ym9keSB0cjpudGgtY2hpbGQoZXZlbikgdGQ6Zmlyc3QtY2hpbGR7CiAgYmFja2dyb3VuZDojMTExYjMxIWltcG9ydGFudDsKfQoKLyogVGFibGUgMyDigJQgZnJlZXplIGNoZWNrYm94L3RpY2tlciBhcyBmaXJzdCBzdGlja3kgY29sdW1uLiAqLwojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRoLnRmLWhpc3RvcnktY2ItaGVhZCwKI3NlY3Rpb24taGlzdG9yeSAjaGlzdG9yeS10YWJsZSB0ZC50Zi1oaXN0b3J5LWNiLWNlbGx7CiAgcG9zaXRpb246c3RpY2t5IWltcG9ydGFudDsKICBsZWZ0OjAhaW1wb3J0YW50OwogIHdpZHRoOjMycHghaW1wb3J0YW50OwogIG1pbi13aWR0aDozMnB4IWltcG9ydGFudDsKICBtYXgtd2lkdGg6MzJweCFpbXBvcnRhbnQ7CiAgYmFja2dyb3VuZDojMGYxNzJhIWltcG9ydGFudDsKICBiYWNrZ3JvdW5kLWNsaXA6cGFkZGluZy1ib3ghaW1wb3J0YW50Owp9CiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGgudGYtaGlzdG9yeS1jYi1oZWFkewogIHRvcDowIWltcG9ydGFudDsKICB6LWluZGV4Ojk0IWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRkLnRmLWhpc3RvcnktY2ItY2VsbHsKICB6LWluZGV4OjY0IWltcG9ydGFudDsKfQoKLyogVGFibGUgMyDigJQgTmFtYSBBbmFsaXMgYmVjb21lcyB0aGUgc2Vjb25kIGZyb3plbiBjb2x1bW4uICovCiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGhbZGF0YS1oaXN0b3J5LWNvbD0iYW5hbHlzdCJdLAojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRkW2RhdGEtaGlzdG9yeS1jb2w9ImFuYWx5c3QiXXsKICBwb3NpdGlvbjpzdGlja3khaW1wb3J0YW50OwogIGxlZnQ6MzJweCFpbXBvcnRhbnQ7CiAgbWluLXdpZHRoOjE1MHB4IWltcG9ydGFudDsKICBiYWNrZ3JvdW5kOiMwZjE3MmEhaW1wb3J0YW50OwogIGJhY2tncm91bmQtY2xpcDpwYWRkaW5nLWJveCFpbXBvcnRhbnQ7CiAgYm94LXNoYWRvdzoycHggMCAwIHJnYmEoNTYsMTg5LDI0OCwuMTgpLCA4cHggMCAxNHB4IHJnYmEoMiw2LDIzLC40MikhaW1wb3J0YW50Owp9CiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGhbZGF0YS1oaXN0b3J5LWNvbD0iYW5hbHlzdCJdewogIHRvcDowIWltcG9ydGFudDsKICB6LWluZGV4OjkzIWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRkW2RhdGEtaGlzdG9yeS1jb2w9ImFuYWx5c3QiXXsKICB6LWluZGV4OjYzIWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZChvZGQpIHRkLnRmLWhpc3RvcnktY2ItY2VsbCwKI3NlY3Rpb24taGlzdG9yeSAjaGlzdG9yeS10YWJsZSB0Ym9keSB0cjpudGgtY2hpbGQob2RkKSB0ZFtkYXRhLWhpc3RvcnktY29sPSJhbmFseXN0Il17CiAgYmFja2dyb3VuZDojMGYxNzJhIWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZChldmVuKSB0ZC50Zi1oaXN0b3J5LWNiLWNlbGwsCiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGJvZHkgdHI6bnRoLWNoaWxkKGV2ZW4pIHRkW2RhdGEtaGlzdG9yeS1jb2w9ImFuYWx5c3QiXXsKICBiYWNrZ3JvdW5kOiMxMTFiMzEhaW1wb3J0YW50Owp9CiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGJvZHkgdHIudGYtd2l0aGRyYXctcm93IHRkLnRmLWhpc3RvcnktY2ItY2VsbCwKI3NlY3Rpb24taGlzdG9yeSAjaGlzdG9yeS10YWJsZSB0Ym9keSB0ci50Zi13aXRoZHJhdy1yb3cgdGRbZGF0YS1oaXN0b3J5LWNvbD0iYW5hbHlzdCJdewogIGJhY2tncm91bmQ6IzI1MTMyNiFpbXBvcnRhbnQ7Cn0K' | base64 -d >> android_project/app/src/main/assets/www/mobile-overrides.css
 
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/mobile-app-shell.js
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/assets/dashboard-mobile.js
