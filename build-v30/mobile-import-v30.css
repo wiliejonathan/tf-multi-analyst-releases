@@ -1,0 +1,61 @@
+/* ============================================================
+   V30 - RELIABLE MOBILE JSON IMPORT (Android + iOS/PWA)
+   ============================================================ */
+.tf-mobile-import-picker{
+  position:relative!important;
+  overflow:hidden!important;
+  width:100%!important;
+  min-height:52px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  text-align:center!important;
+  cursor:pointer!important;
+  user-select:none!important;
+  -webkit-user-select:none!important;
+  -webkit-tap-highlight-color:transparent!important;
+  touch-action:manipulation!important;
+}
+.tf-mobile-import-picker>span{
+  position:relative!important;
+  z-index:1!important;
+  pointer-events:none!important;
+}
+.tf-mobile-import-picker input[type="file"]{
+  position:absolute!important;
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:52px!important;
+  margin:0!important;
+  padding:0!important;
+  opacity:.001!important;
+  cursor:pointer!important;
+  z-index:3!important;
+  font-size:100px!important;
+  border:0!important;
+  background:transparent!important;
+  color:transparent!important;
+  -webkit-appearance:none!important;
+  appearance:none!important;
+}
+.tf-mobile-data-controls.tf-mobile-data-sheet.open{
+  pointer-events:auto!important;
+  visibility:visible!important;
+}
+.tf-mobile-data-controls.tf-mobile-data-sheet.open .tf-mobile-actions,
+.tf-mobile-data-controls.tf-mobile-data-sheet.open .tf-mobile-import-picker,
+.tf-mobile-data-controls.tf-mobile-data-sheet.open #tf-mobile-clear-btn{
+  pointer-events:auto!important;
+}
+.tf-mobile-import-busy .tf-mobile-data-sheet{
+  pointer-events:none!important;
+}
+.tf-mobile-import-loading{
+  z-index:2147483500!important;
+}
+@supports (-webkit-touch-callout:none){
+  .tf-mobile-import-picker input[type="file"]{
+    opacity:.01!important;
+  }
+}
