@@ -1,4 +1,4 @@
-name: Build TF Analyzer V27
+name: Build TF Analyzer V28
 on:
   push:
     branches: [chatgpt-build-v23]
@@ -29,12 +29,10 @@ jobs:
               for i in range(len(c)):
                   s=c[:i]+c[i+1:]
                   if hashlib.sha256(s.encode()).hexdigest()==expected:
-                      fixed=s
-                      break
+                      fixed=s; break
               if fixed is None: raise SystemExit('Unable to repair chunk_03')
               c=fixed
-          parts=[]
-          for i in range(7): parts.append(c if i==3 else open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read())
+          parts=[c if i==3 else open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read() for i in range(7)]
           data=base64.b64decode(''.join(parts),validate=True)
           lzma.decompress(data)
           open('v23small.tar.xz','wb').write(data)
@@ -47,12 +45,9 @@ jobs:
           mkdir -p rev224
           unzip -q rev224.zip -d rev224
 
-      - name: Assemble V27 Android project
+      - name: Assemble V28 Android project
         run: |
-          mkdir -p android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3
-          mkdir -p android_project/app/src/main/assets/www/assets
-          mkdir -p android_project/app/src/main/res/values
-          mkdir -p android_project/app/src/main/res/drawable
+          mkdir -p android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3 android_project/app/src/main/assets/www/assets android_project/app/src/main/res/values android_project/app/src/main/res/drawable
           cp v23small/native/root-build.gradle android_project/build.gradle
           cp v23small/native/settings.gradle android_project/settings.gradle
           cp v23small/native/gradle.properties android_project/gradle.properties
@@ -63,15 +58,18 @@ jobs:
           cp v23small/native/tfv23.jks android_project/app/tfv23.jks
           sed -i 's/applicationId "com.skillfusion.tfmultianalystmobil3"/applicationId "com.skillfusion.tfmultianalystmobil4"/' android_project/app/build.gradle
           sed -i "s/keyPassword 'TFv23-Key-2026!'/keyPassword 'TFv23-Store-2026!'/" android_project/app/build.gradle
-          sed -i 's/versionCode 23/versionCode 27/' android_project/app/build.gradle
-          sed -i 's/versionName "1.0.23"/versionName "1.0.27"/' android_project/app/build.gradle
+          sed -i 's/versionCode 23/versionCode 28/' android_project/app/build.gradle
+          sed -i 's/versionName "1.0.23"/versionName "1.0.28"/' android_project/app/build.gradle
           keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
+
           cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
           cp v23small/mobile/mobile-overrides.css android_project/app/src/main/assets/www/mobile-overrides.css
           cp v23small/mobile/mobile-chrome-shim.js android_project/app/src/main/assets/www/mobile-chrome-shim.js
           cp v23small/mobile/mobile-data-bridge.js android_project/app/src/main/assets/www/mobile-data-bridge.js
           cp v23small/mobile/mobile-app-shell.js android_project/app/src/main/assets/www/mobile-app-shell.js
           cp build-v27/mobile-license-dual-slot.js android_project/app/src/main/assets/www/mobile-license-gate.js
+          cat build-v28/mobile-device-approval.b64.* | base64 -d > android_project/app/src/main/assets/www/mobile-device-approval.js
+
           cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
           cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
           cp rev224/icon128.png android_project/app/src/main/res/drawable/tf_icon.png
@@ -81,27 +79,31 @@ jobs:
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < build-v23/excel-native.patch
           cat build-v26/v25-frozen.css >> android_project/app/src/main/assets/www/mobile-overrides.css
           cat build-v26/mobile-license-gate.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v28/mobile-device-approval.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+
           python3 - <<'PY'
           from pathlib import Path
           p=Path('android_project/app/src/main/assets/www/index.html')
-          s=p.read_text()
-          s=s.replace('<html lang="id" data-tf-server-authorized="1" data-tf-license="valid">','<html lang="id">')
+          s=p.read_text().replace('<html lang="id" data-tf-server-authorized="1" data-tf-license="valid">','<html lang="id">')
           old='<script src="mobile-chrome-shim.js"></script>\n<script src="assets/dashboard-mobile.js"></script>\n<script src="mobile-data-bridge.js"></script>\n<script src="mobile-app-shell.js"></script>'
           if old not in s: raise SystemExit('Expected mobile script block not found')
-          p.write_text(s.replace(old,'<script src="mobile-license-gate.js"></script>'))
+          p.write_text(s.replace(old,'<script src="mobile-license-gate.js"></script>\n<script src="mobile-device-approval.js"></script>'))
           PY
+
           node --check android_project/app/src/main/assets/www/mobile-license-gate.js
-          grep -q "deviceType:'MOBILE'" android_project/app/src/main/assets/www/mobile-license-gate.js
-          grep -q "V25 - FROZEN/STICKY COLUMNS" android_project/app/src/main/assets/www/mobile-overrides.css
-          grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/mobile-app-shell.js
-          grep -q "ACTION_CREATE_DOCUMENT" android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          node --check android_project/app/src/main/assets/www/mobile-device-approval.js
+          grep -q 'PERMINTAAN DEVICE MOBILE' android_project/app/src/main/assets/www/mobile-device-approval.js
+          grep -q 'device-request-decision' android_project/app/src/main/assets/www/mobile-device-approval.js
+          grep -q 'V25 - FROZEN/STICKY COLUMNS' android_project/app/src/main/assets/www/mobile-overrides.css
+          grep -q 'AndroidSave.saveBase64' android_project/app/src/main/assets/www/mobile-app-shell.js
+          grep -q 'ACTION_CREATE_DOCUMENT' android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
           test -s android_project/app/src/main/assets/www/icon32.png
 
-      - name: Build signed V27 release APK
+      - name: Build signed V28 release APK
         working-directory: android_project
         run: gradle assembleRelease --no-daemon --stacktrace
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TF_Analyzer_V27_DUAL_SLOT
+          name: TF_Analyzer_V28_MOBILE_APPROVAL_POPUP
           path: android_project/app/build/outputs/apk/release/app-release.apk
