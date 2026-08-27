@@ -1,4 +1,4 @@
-name: Build TF Analyzer V32
+name: Build TF Analyzer V33
 on:
   push:
     branches: [chatgpt-build-v23]
@@ -45,7 +45,7 @@ jobs:
           mkdir -p rev224
           unzip -q rev224.zip -d rev224
 
-      - name: Assemble V32 Android project
+      - name: Assemble V33 Android project
         run: |
           mkdir -p android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3 android_project/app/src/main/assets/www/assets android_project/app/src/main/res/values android_project/app/src/main/res/drawable
           cp v23small/native/root-build.gradle android_project/build.gradle
@@ -58,8 +58,8 @@ jobs:
           cp v23small/native/tfv23.jks android_project/app/tfv23.jks
           sed -i 's/applicationId "com.skillfusion.tfmultianalystmobil3"/applicationId "com.skillfusion.tfmultianalystmobil4"/' android_project/app/build.gradle
           sed -i "s/keyPassword 'TFv23-Key-2026!'/keyPassword 'TFv23-Store-2026!'/" android_project/app/build.gradle
-          sed -i 's/versionCode 23/versionCode 32/' android_project/app/build.gradle
-          sed -i 's/versionName "1.0.23"/versionName "1.0.32"/' android_project/app/build.gradle
+          sed -i 's/versionCode 23/versionCode 33/' android_project/app/build.gradle
+          sed -i 's/versionName "1.0.23"/versionName "1.0.33"/' android_project/app/build.gradle
           keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
 
           cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
@@ -68,9 +68,11 @@ jobs:
           cp build-v31/mobile-data-bridge-v31.js android_project/app/src/main/assets/www/mobile-data-bridge.js
           cp build-v30/mobile-import-fix-v30.js android_project/app/src/main/assets/www/mobile-import-fix-v30.js
           cp v23small/mobile/mobile-app-shell.js android_project/app/src/main/assets/www/mobile-app-shell.js
+          cp build-v33/mobile-remote-v33.js android_project/app/src/main/assets/www/mobile-remote.js
           cp build-v32/mobile-license-gate-v32.js android_project/app/src/main/assets/www/mobile-license-gate.js
           cat build-v28/mobile-device-approval.b64.* | base64 -d > android_project/app/src/main/assets/www/mobile-device-approval.js
-          sed -i "s/mobileVersion:'1.0.27'/mobileVersion:'1.0.32'/g; s/mobileVersion:'1.0.28'/mobileVersion:'1.0.32'/g; s/mobileVersion:'1.0.29'/mobileVersion:'1.0.32'/g; s/mobileVersion:'1.0.30'/mobileVersion:'1.0.32'/g; s/mobileVersion:'1.0.31'/mobileVersion:'1.0.32'/g" android_project/app/src/main/assets/www/mobile-device-approval.js || true
+          sed -i "s/mobileVersion:'1.0.27'/mobileVersion:'1.0.33'/g; s/mobileVersion:'1.0.28'/mobileVersion:'1.0.33'/g; s/mobileVersion:'1.0.29'/mobileVersion:'1.0.33'/g; s/mobileVersion:'1.0.30'/mobileVersion:'1.0.33'/g; s/mobileVersion:'1.0.31'/mobileVersion:'1.0.33'/g; s/mobileVersion:'1.0.32'/mobileVersion:'1.0.33'/g" android_project/app/src/main/assets/www/mobile-device-approval.js android_project/app/src/main/assets/www/mobile-license-gate.js || true
+          sed -i "s/'mobile-app-shell.js'\];/'mobile-app-shell.js','mobile-remote.js'];/" android_project/app/src/main/assets/www/mobile-license-gate.js
 
           cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
           cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
@@ -83,6 +85,7 @@ jobs:
           cat build-v26/mobile-license-gate.css >> android_project/app/src/main/assets/www/mobile-overrides.css
           cat build-v28/mobile-device-approval.css >> android_project/app/src/main/assets/www/mobile-overrides.css
           cat build-v30/mobile-import-v30.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v33/mobile-remote-v33.css >> android_project/app/src/main/assets/www/mobile-overrides.css
 
           python3 - <<'PY'
           from pathlib import Path
@@ -113,9 +116,13 @@ jobs:
           node --check android_project/app/src/main/assets/www/mobile-import-fix-v30.js
           node --check android_project/app/src/main/assets/www/mobile-license-gate.js
           node --check android_project/app/src/main/assets/www/mobile-device-approval.js
+          node --check android_project/app/src/main/assets/www/mobile-remote.js
           grep -q 'indexeddb-v29' android_project/app/src/main/assets/www/mobile-chrome-shim.js
           grep -q 'tfMobileRecoverRenderV31' android_project/app/src/main/assets/www/mobile-data-bridge.js
           grep -q '__TF_MOBILE_DASHBOARD_DOM_READY_V32' android_project/app/src/main/assets/www/mobile-license-gate.js
+          grep -q 'mobile-remote.js' android_project/app/src/main/assets/www/mobile-license-gate.js
+          grep -q 'tf-mobile-remote-open' android_project/app/src/main/assets/www/mobile-remote.js
+          grep -q 'PREMIUM FEATURE' android_project/app/src/main/assets/www/mobile-remote.js
           grep -q 'tf_mobile_import_loading_v8' android_project/app/src/main/assets/www/index.html
           grep -q 'application/octet-stream' android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
           grep -q 'V25 - FROZEN/STICKY COLUMNS' android_project/app/src/main/assets/www/mobile-overrides.css
@@ -123,11 +130,11 @@ jobs:
           grep -q 'ACTION_CREATE_DOCUMENT' android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
           test -s android_project/app/src/main/assets/www/icon32.png
 
-      - name: Build signed V32 release APK
+      - name: Build signed V33 release APK
         working-directory: android_project
         run: gradle assembleRelease --no-daemon --stacktrace
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TF_Analyzer_V32_IMPORT_TABLE_FIXED
+          name: TF_Analyzer_V33_REMOTE_PREMIUM
           path: android_project/app/build/outputs/apk/release/app-release.apk
