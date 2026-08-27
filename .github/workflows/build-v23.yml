@@ -1,0 +1,75 @@
+name: Build TF Analyzer V23
+on:
+  push:
+    branches: [chatgpt-build-v23]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Reconstruct V23 patch bundle
+        run: |
+          cat build-v23/chunk_*.txt | base64 -d > v23small.tar.xz
+          mkdir -p v23small
+          tar -xJf v23small.tar.xz
+
+      - name: Download REV224 base source
+        run: |
+          curl -L --fail -o rev224.zip https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.15.95/tf_multi_analyst_extension_rev224.zip
+          mkdir -p rev224
+          unzip -q rev224.zip -d rev224
+
+      - name: Assemble Android project
+        run: |
+          mkdir -p android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3
+          mkdir -p android_project/app/src/main/assets/www/assets
+          mkdir -p android_project/app/src/main/res/values
+          mkdir -p android_project/app/src/main/res/drawable
+
+          cp v23small/native/root-build.gradle android_project/build.gradle
+          cp v23small/native/settings.gradle android_project/settings.gradle
+          cp v23small/native/gradle.properties android_project/gradle.properties
+          cp v23small/native/app-build.gradle android_project/app/build.gradle
+          cp v23small/native/AndroidManifest.xml android_project/app/src/main/AndroidManifest.xml
+          cp v23small/native/styles.xml android_project/app/src/main/res/values/styles.xml
+          cp v23small/native/MainActivity.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          cp v23small/native/tfv23.jks android_project/app/tfv23.jks
+
+          cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
+          cp v23small/mobile/mobile-overrides.css android_project/app/src/main/assets/www/mobile-overrides.css
+          cp v23small/mobile/mobile-chrome-shim.js android_project/app/src/main/assets/www/mobile-chrome-shim.js
+          cp v23small/mobile/mobile-data-bridge.js android_project/app/src/main/assets/www/mobile-data-bridge.js
+          cp v23small/mobile/mobile-app-shell.js android_project/app/src/main/assets/www/mobile-app-shell.js
+
+          cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
+          cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
+          cp rev224/icon128.png android_project/app/src/main/res/drawable/tf_icon.png
+
+          xz -dc v23small/dashboard.patch.xz > dashboard.patch
+          patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < dashboard.patch
+          patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < build-v23/excel-native.patch
+
+          grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/mobile-app-shell.js
+          grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/assets/dashboard-mobile.js
+          grep -q "ACTION_CREATE_DOCUMENT" android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+
+      - name: Build signed release APK
+        working-directory: android_project
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TF_Analyzer_V23_NATIVE_SAVE
+          path: android_project/app/build/outputs/apk/release/app-release.apk
