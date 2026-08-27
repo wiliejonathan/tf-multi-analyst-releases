@@ -1,0 +1,149 @@
+name: Build TF Analyzer V38
+on:
+  push:
+    branches: [chatgpt-build-v23]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Repair and reconstruct V23 patch bundle
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, lzma
+          expected='d6ab29cdecf80dc817dd3875e92bac34b5cfd71619b8755e148da6c6a28762dd'
+          p='build-v23/chunk_03.txt'
+          c=open(p,'rb').read().decode('ascii')
+          if hashlib.sha256(c.encode()).hexdigest()!=expected:
+              fixed=None
+              for i in range(len(c)):
+                  s=c[:i]+c[i+1:]
+                  if hashlib.sha256(s.encode()).hexdigest()==expected:
+                      fixed=s; break
+              if fixed is None: raise SystemExit('Unable to repair chunk_03')
+              c=fixed
+          parts=[c if i==3 else open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read() for i in range(7)]
+          data=base64.b64decode(''.join(parts),validate=True)
+          lzma.decompress(data)
+          open('v23small.tar.xz','wb').write(data)
+          PY
+          tar -xJf v23small.tar.xz
+
+      - name: Reconstruct and validate REV238 Mobile source
+        run: |
+          base64 -d build-v38/mobile-remote-v38.b64.00 | xz -d > build-v38/mobile-remote-v38.js
+          base64 -d build-v38/mobile-data-bridge-v38.xz.b64 | xz -d > build-v38/mobile-data-bridge-v38.js
+          node --check build-v38/mobile-remote-v38.js
+          node --check build-v38/mobile-data-bridge-v38.js
+          grep -q "remoteRevision:'REV238'" build-v38/mobile-remote-v38.js
+          grep -q 'Export JSON ke ponsel' build-v38/mobile-remote-v38.js
+          grep -q 'REMOTE EVENT LOG' build-v38/mobile-remote-v38.js
+          grep -q 'AndroidRemoteProgress' build-v38/mobile-remote-v38.js
+          ! grep -q 'Pair Scan Channel' build-v38/mobile-remote-v38.js
+          ! grep -q 'ALL ANALIS PAIR' build-v38/mobile-remote-v38.js
+
+      - name: Download REV224 base source
+        run: |
+          curl -L --fail -o rev224.zip https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.15.95/tf_multi_analyst_extension_rev224.zip
+          mkdir -p rev224
+          unzip -q rev224.zip -d rev224
+
+      - name: Assemble V38 Android project
+        run: |
+          mkdir -p android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3 android_project/app/src/main/assets/www/assets android_project/app/src/main/res/values android_project/app/src/main/res/drawable
+          cp v23small/native/root-build.gradle android_project/build.gradle
+          cp v23small/native/settings.gradle android_project/settings.gradle
+          cp v23small/native/gradle.properties android_project/gradle.properties
+          cp build-v38/app-build.gradle android_project/app/build.gradle
+          cp build-v38/AndroidManifest.xml android_project/app/src/main/AndroidManifest.xml
+          cp build-v38/styles.xml android_project/app/src/main/res/values/styles.xml
+          cp build-v38/MainActivity.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          cp build-v38/RemoteProgressService.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/RemoteProgressService.java
+          cp v23small/native/tfv23.jks android_project/app/tfv23.jks
+          keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
+
+          cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
+          cp v23small/mobile/mobile-overrides.css android_project/app/src/main/assets/www/mobile-overrides.css
+          cp build-v29/mobile-chrome-shim-v29.js android_project/app/src/main/assets/www/mobile-chrome-shim.js
+          cp build-v38/mobile-data-bridge-v38.js android_project/app/src/main/assets/www/mobile-data-bridge.js
+          cp build-v30/mobile-import-fix-v30.js android_project/app/src/main/assets/www/mobile-import-fix-v30.js
+          cp v23small/mobile/mobile-app-shell.js android_project/app/src/main/assets/www/mobile-app-shell.js
+          cp build-v38/mobile-remote-v38.js android_project/app/src/main/assets/www/mobile-remote.js
+          cp build-v32/mobile-license-gate-v32.js android_project/app/src/main/assets/www/mobile-license-gate.js
+          cat build-v28/mobile-device-approval.b64.* | base64 -d > android_project/app/src/main/assets/www/mobile-device-approval.js
+          sed -i -E "s/mobileVersion:'1\.0\.[0-9]+'/mobileVersion:'1.0.38'/g" android_project/app/src/main/assets/www/mobile-device-approval.js android_project/app/src/main/assets/www/mobile-license-gate.js || true
+          sed -i "s/'mobile-app-shell.js'\];/'mobile-app-shell.js','mobile-remote.js'];/" android_project/app/src/main/assets/www/mobile-license-gate.js
+
+          cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
+          cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
+          cp rev224/icon128.png android_project/app/src/main/res/drawable/tf_icon.png
+          cp rev224/icon128.png android_project/app/src/main/assets/www/icon32.png
+          xz -dc v23small/dashboard.patch.xz > dashboard.patch
+          patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < dashboard.patch
+          patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < build-v23/excel-native.patch
+          cat build-v26/v25-frozen.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v26/mobile-license-gate.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v28/mobile-device-approval.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v30/mobile-import-v30.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v38/mobile-remote-v38.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android_project/app/src/main/assets/www/index.html')
+          s=p.read_text().replace('<html lang="id" data-tf-server-authorized="1" data-tf-license="valid">','<html lang="id">')
+          old='<script src="mobile-chrome-shim.js"></script>\n<script src="assets/dashboard-mobile.js"></script>\n<script src="mobile-data-bridge.js"></script>\n<script src="mobile-app-shell.js"></script>'
+          if old not in s: raise SystemExit('Expected mobile script block not found')
+          new='<script src="mobile-license-gate.js"></script>\n<script src="mobile-device-approval.js"></script>\n<script src="mobile-import-fix-v30.js"></script>'
+          s=s.replace(old,new)
+          for oldk,newk in [('tf_mobile_import_loading_v6','tf_mobile_import_loading_v8'),('tf_mobile_import_loading_detail_v6','tf_mobile_import_loading_detail_v8'),('tf_mobile_import_loading_v7','tf_mobile_import_loading_v8'),('tf_mobile_import_loading_detail_v7','tf_mobile_import_loading_detail_v8')]: s=s.replace(oldk,newk)
+          p.write_text(s)
+          PY
+
+          node --check android_project/app/src/main/assets/www/mobile-chrome-shim.js
+          node --check android_project/app/src/main/assets/www/mobile-data-bridge.js
+          node --check android_project/app/src/main/assets/www/mobile-import-fix-v30.js
+          node --check android_project/app/src/main/assets/www/mobile-license-gate.js
+          node --check android_project/app/src/main/assets/www/mobile-device-approval.js
+          node --check android_project/app/src/main/assets/www/mobile-remote.js
+          grep -q 'indexeddb-v29' android_project/app/src/main/assets/www/mobile-chrome-shim.js
+          grep -q 'tfMobileImportPayloadV38' android_project/app/src/main/assets/www/mobile-data-bridge.js
+          grep -q '__TF_MOBILE_DASHBOARD_DOM_READY_V32' android_project/app/src/main/assets/www/mobile-license-gate.js
+          grep -q 'mobile-remote.js' android_project/app/src/main/assets/www/mobile-license-gate.js
+          grep -q "remoteRevision:'REV238'" android_project/app/src/main/assets/www/mobile-remote.js
+          grep -q "mobileVersion:'1.0.38'" android_project/app/src/main/assets/www/mobile-remote.js
+          grep -q 'AndroidRemoteProgress' android_project/app/src/main/assets/www/mobile-remote.js
+          grep -q 'FOREGROUND_SERVICE_DATA_SYNC' android_project/app/src/main/AndroidManifest.xml
+          grep -q 'RemoteProgressService' android_project/app/src/main/AndroidManifest.xml
+          grep -q 'WindowInsets.Type.navigationBars' android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          grep -q 'ACTION_CREATE_DOCUMENT' android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          grep -q 'tf-mobile-remote-opened .tf-mobile-bottom-nav' android_project/app/src/main/assets/www/mobile-overrides.css
+          test -s android_project/app/src/main/assets/www/icon32.png
+
+      - name: Build signed V38 release APK
+        working-directory: android_project
+        run: gradle assembleRelease --no-daemon --stacktrace
+
+      - name: Verify signed APK
+        run: |
+          APK=android_project/app/build/outputs/apk/release/app-release.apk
+          test -s "$APK"
+          jarsigner -verify -certs "$APK" >/dev/null
+          unzip -p "$APK" assets/www/mobile-remote.js | grep -q 'REV238'
+          unzip -p "$APK" assets/www/mobile-remote.js | grep -q 'Export JSON ke ponsel'
+          unzip -p "$APK" assets/www/mobile-data-bridge.js | grep -q 'tfMobileImportPayloadV38'
+          sha256sum "$APK"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: TF_Analyzer_V38_REMOTE_SYNC
+          path: android_project/app/build/outputs/apk/release/app-release.apk
