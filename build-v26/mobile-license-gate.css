@@ -1,0 +1,30 @@
+/* ============================================================
+   V26 - MOBILE LICENSE ACTIVATION GATE
+   ============================================================ */
+#tf-mobile-license-gate{position:fixed!important;inset:0!important;z-index:2147483646!important;display:flex!important;align-items:center!important;justify-content:center!important;padding:22px!important;background:#020617!important;overflow:auto!important;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif!important}
+#tf-mobile-license-gate.tf-license-leaving{opacity:.3!important;pointer-events:none!important;transition:opacity .18s ease!important}
+#tf-mobile-license-gate *{box-sizing:border-box!important}
+#tf-mobile-license-gate .tf-license-card{width:min(100%,460px)!important;padding:24px!important;border-radius:22px!important;background:linear-gradient(180deg,#0f172a,#081224)!important;border:1px solid rgba(56,189,248,.24)!important;box-shadow:0 22px 70px rgba(0,0,0,.48)!important;color:#e5edf8!important}
+#tf-mobile-license-gate .tf-license-brand{display:flex!important;align-items:center!important;gap:13px!important;margin-bottom:14px!important}
+#tf-mobile-license-gate .tf-license-brand img{width:50px!important;height:50px!important;border-radius:14px!important;border:1px solid rgba(56,189,248,.34)!important;background:#0b2031!important;object-fit:cover!important}
+#tf-mobile-license-gate .tf-license-kicker{font-size:11px!important;line-height:14px!important;letter-spacing:.1em!important;text-transform:uppercase!important;color:#7dd3fc!important;font-weight:800!important}
+#tf-mobile-license-gate h1{margin:2px 0 0!important;font-size:24px!important;line-height:29px!important;color:#fff!important}
+#tf-mobile-license-gate .tf-license-copy{margin:0 0 16px!important;color:#94a3b8!important;font-size:13px!important;line-height:19px!important}
+#tf-mobile-license-gate .tf-license-status{margin:0 0 16px!important;padding:11px 12px!important;border-radius:11px!important;background:rgba(56,189,248,.08)!important;border:1px solid rgba(56,189,248,.18)!important;color:#bae6fd!important;font-size:12px!important;line-height:17px!important}
+#tf-mobile-license-gate .tf-license-status.error{background:rgba(239,68,68,.09)!important;border-color:rgba(239,68,68,.28)!important;color:#fca5a5!important}
+#tf-mobile-license-gate .tf-license-status.success{background:rgba(34,197,94,.09)!important;border-color:rgba(34,197,94,.28)!important;color:#86efac!important}
+#tf-mobile-license-gate .tf-license-form{display:grid!important;gap:8px!important}
+#tf-mobile-license-gate .tf-license-form.hidden,#tf-mobile-license-gate .tf-license-valid-box.hidden{display:none!important}
+#tf-mobile-license-gate label{font-size:11px!important;color:#a8b4c6!important;font-weight:700!important;margin-top:4px!important}
+#tf-mobile-license-gate input{width:100%!important;height:48px!important;padding:0 13px!important;border-radius:12px!important;border:1px solid #334155!important;background:#020b1d!important;color:#fff!important;font-size:14px!important;outline:none!important}
+#tf-mobile-license-gate input:focus{border-color:#38bdf8!important;box-shadow:0 0 0 3px rgba(56,189,248,.12)!important}
+#tf-mobile-license-gate .tf-license-token-wrap{display:grid!important;grid-template-columns:1fr 76px!important;gap:8px!important}
+#tf-mobile-license-gate button{font-family:inherit!important;cursor:pointer!important}
+#tf-mobile-license-gate .tf-license-primary{width:100%!important;min-height:48px!important;margin-top:8px!important;border:0!important;border-radius:12px!important;background:linear-gradient(90deg,#38bdf8,#0ea5e9)!important;color:#04111d!important;font-size:13px!important;font-weight:900!important}
+#tf-mobile-license-gate .tf-license-primary:disabled{opacity:.56!important}
+#tf-mobile-license-gate .tf-license-secondary{width:100%!important;min-height:44px!important;margin-top:8px!important;border-radius:12px!important;border:1px solid #334155!important;background:#0b1325!important;color:#cbd5e1!important;font-size:12px!important;font-weight:800!important}
+#tf-mobile-license-gate .tf-license-mini{height:48px!important;border-radius:12px!important;border:1px solid #334155!important;background:#0b1325!important;color:#bae6fd!important;font-size:11px!important;font-weight:800!important}
+#tf-mobile-license-gate .tf-license-valid-box{padding:14px!important;border-radius:13px!important;background:rgba(34,197,94,.06)!important;border:1px solid rgba(34,197,94,.18)!important}
+#tf-mobile-license-gate .tf-license-valid-title{font-size:15px!important;font-weight:900!important;color:#86efac!important;margin-bottom:6px!important}
+#tf-mobile-license-gate .tf-license-valid-detail{font-size:12px!important;line-height:18px!important;color:#b7c5d7!important}
+#tf-mobile-license-gate .tf-license-note{margin-top:15px!important;color:#64748b!important;font-size:10px!important;line-height:15px!important;text-align:center!important}
