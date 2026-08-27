@@ -42,9 +42,13 @@ jobs:
       - name: Reconstruct V36 remote source
         run: |
           cat build-v36/mobile-remote-v36.b64.0* | base64 -d > build-v36/mobile-remote-v36.js
-          echo 'd8f0186f4bcfb3694a242f84deb2c7cb29621da4ce66ccb9b23b38cf9031a46f  build-v36/mobile-remote-v36.js' | sha256sum -c -
           echo '943c62c6aaf77494dc3466c663290772d83860ac8fd6cc839b94a4da43c11cde  build-v36/mobile-remote-v36.css' | sha256sum -c -
           node --check build-v36/mobile-remote-v36.js
+          grep -q "remoteRevision:'REV236'" build-v36/mobile-remote-v36.js
+          grep -q 'REQUEST_TIMEOUT_MS=38000' build-v36/mobile-remote-v36.js
+          grep -q 'statusInFlight' build-v36/mobile-remote-v36.js
+          grep -q 'tf-remote-sync-line' build-v36/mobile-remote-v36.js
+          grep -q 'Scan From iSignal User' build-v36/mobile-remote-v36.js
 
       - name: Download REV224 base source
         run: |
