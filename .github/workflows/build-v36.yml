@@ -42,6 +42,7 @@ jobs:
       - name: Reconstruct V36 remote source
         run: |
           cat build-v36/mobile-remote-v36.b64.0* | base64 -d > build-v36/mobile-remote-v36.js
+          sed -i 's/lastStatus+&lastStatus\.desktopOnline/lastStatus\&\&lastStatus.desktopOnline/g' build-v36/mobile-remote-v36.js
           echo '943c62c6aaf77494dc3466c663290772d83860ac8fd6cc839b94a4da43c11cde  build-v36/mobile-remote-v36.css' | sha256sum -c -
           node --check build-v36/mobile-remote-v36.js
           grep -q "remoteRevision:'REV236'" build-v36/mobile-remote-v36.js
