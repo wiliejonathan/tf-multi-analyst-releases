@@ -1,0 +1,41 @@
+name: Export V23 Native Source
+on:
+  push:
+    branches: [chatgpt-build-v23]
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct native bundle
+        run: |
+          python3 - <<'PY'
+          import base64, hashlib, lzma
+          expected='d6ab29cdecf80dc817dd3875e92bac34b5cfd71619b8755e148da6c6a28762dd'
+          p='build-v23/chunk_03.txt'
+          c=open(p,'rb').read().decode('ascii')
+          if hashlib.sha256(c.encode()).hexdigest()!=expected:
+              fixed=None
+              for i in range(len(c)):
+                  s=c[:i]+c[i+1:]
+                  if hashlib.sha256(s.encode()).hexdigest()==expected:
+                      fixed=s; break
+              if fixed is None: raise SystemExit('Unable to repair chunk_03')
+              c=fixed
+          parts=[c if i==3 else open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read() for i in range(7)]
+          data=base64.b64decode(''.join(parts),validate=True)
+          lzma.decompress(data)
+          open('v23small.tar.xz','wb').write(data)
+          PY
+          tar -xJf v23small.tar.xz
+          mkdir -p out
+          cp v23small/native/MainActivity.java out/
+          cp v23small/native/AndroidManifest.xml out/
+          cp v23small/native/app-build.gradle out/
+          cp v23small/native/styles.xml out/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V23_NATIVE_SOURCE
+          path: out/
