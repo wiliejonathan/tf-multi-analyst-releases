@@ -19,19 +19,38 @@ jobs:
         with:
           gradle-version: '8.10.2'
 
-      - name: Reconstruct V23 patch bundle
+      - name: Repair and reconstruct V23 patch bundle
         run: |
           python3 - <<'PY'
-          import base64, re
-          names=[f'build-v23/chunk_{i:02d}.txt' for i in range(7)]
-          raw=b''.join(open(n,'rb').read() for n in names)
-          clean=re.sub(rb'[^A-Za-z0-9+/=]', b'', raw)
-          print('payload raw=',len(raw),'clean=',len(clean),'mod4=',len(clean)%4)
-          data=base64.b64decode(clean, validate=False)
+          import base64, hashlib, lzma
+          expected='d6ab29cdecf80dc817dd3875e92bac34b5cfd71619b8755e148da6c6a28762dd'
+          p='build-v23/chunk_03.txt'
+          c=open(p,'rb').read().decode('ascii')
+          print('chunk03 size before=',len(c))
+          if hashlib.sha256(c.encode()).hexdigest()!=expected:
+              fixed=None
+              for i in range(len(c)):
+                  s=c[:i]+c[i+1:]
+                  if hashlib.sha256(s.encode()).hexdigest()==expected:
+                      fixed=s
+                      print('removed extra char at index',i,'char=',repr(c[i]))
+                      break
+              if fixed is None:
+                  raise SystemExit('Unable to repair chunk_03 by expected SHA-256')
+              c=fixed
+          print('chunk03 size after=',len(c),'sha=',hashlib.sha256(c.encode()).hexdigest())
+          parts=[]
+          for i in range(7):
+              if i==3: parts.append(c)
+              else: parts.append(open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read())
+          payload=''.join(parts)
+          print('payload len=',len(payload),'mod4=',len(payload)%4)
+          data=base64.b64decode(payload, validate=True)
+          lzma.decompress(data)
           open('v23small.tar.xz','wb').write(data)
-          print('decoded=',len(data))
+          print('decoded=',len(data),'xz validation=PASS')
           PY
-          xz -t v23small.tar.xz
+          mkdir -p v23small
           tar -xJf v23small.tar.xz
 
       - name: Download REV224 base source
