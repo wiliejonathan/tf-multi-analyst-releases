@@ -26,7 +26,6 @@ jobs:
           expected='d6ab29cdecf80dc817dd3875e92bac34b5cfd71619b8755e148da6c6a28762dd'
           p='build-v23/chunk_03.txt'
           c=open(p,'rb').read().decode('ascii')
-          print('chunk03 size before=',len(c))
           if hashlib.sha256(c.encode()).hexdigest()!=expected:
               fixed=None
               for i in range(len(c)):
@@ -38,19 +37,15 @@ jobs:
               if fixed is None:
                   raise SystemExit('Unable to repair chunk_03 by expected SHA-256')
               c=fixed
-          print('chunk03 size after=',len(c),'sha=',hashlib.sha256(c.encode()).hexdigest())
           parts=[]
           for i in range(7):
-              if i==3: parts.append(c)
-              else: parts.append(open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read())
+              parts.append(c if i==3 else open(f'build-v23/chunk_{i:02d}.txt','r',encoding='ascii').read())
           payload=''.join(parts)
-          print('payload len=',len(payload),'mod4=',len(payload)%4)
           data=base64.b64decode(payload, validate=True)
           lzma.decompress(data)
           open('v23small.tar.xz','wb').write(data)
-          print('decoded=',len(data),'xz validation=PASS')
+          print('payload/xz validation=PASS')
           PY
-          mkdir -p v23small
           tar -xJf v23small.tar.xz
 
       - name: Download REV224 base source
@@ -73,7 +68,10 @@ jobs:
           cp v23small/native/AndroidManifest.xml android_project/app/src/main/AndroidManifest.xml
           cp v23small/native/styles.xml android_project/app/src/main/res/values/styles.xml
           cp v23small/native/MainActivity.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
-          cp v23small/native/tfv23.jks android_project/app/tfv23.jks
+
+          rm -f android_project/app/tfv23.jks
+          keytool -genkeypair -v -storetype JKS -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -keypass 'TFv23-Key-2026!' -alias tfv23 -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=TF Analyzer, OU=Mobile, O=SkillFusion, L=Jakarta, ST=Jakarta, C=ID'
+          keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
 
           cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
           cp v23small/mobile/mobile-overrides.css android_project/app/src/main/assets/www/mobile-overrides.css
