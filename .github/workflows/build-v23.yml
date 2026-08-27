@@ -1,4 +1,4 @@
-name: Build TF Analyzer V25
+name: Build TF Analyzer V26
 on:
   push:
     branches: [chatgpt-build-v23]
@@ -32,10 +32,9 @@ jobs:
                   s=c[:i]+c[i+1:]
                   if hashlib.sha256(s.encode()).hexdigest()==expected:
                       fixed=s
-                      print('removed extra char at index',i,'char=',repr(c[i]))
                       break
               if fixed is None:
-                  raise SystemExit('Unable to repair chunk_03 by expected SHA-256')
+                  raise SystemExit('Unable to repair chunk_03')
               c=fixed
           parts=[]
           for i in range(7):
@@ -44,7 +43,6 @@ jobs:
           data=base64.b64decode(payload, validate=True)
           lzma.decompress(data)
           open('v23small.tar.xz','wb').write(data)
-          print('payload/xz validation=PASS')
           PY
           tar -xJf v23small.tar.xz
 
@@ -54,7 +52,7 @@ jobs:
           mkdir -p rev224
           unzip -q rev224.zip -d rev224
 
-      - name: Assemble Android project
+      - name: Assemble V26 Android project
         run: |
           mkdir -p android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3
           mkdir -p android_project/app/src/main/assets/www/assets
@@ -72,8 +70,8 @@ jobs:
 
           sed -i 's/applicationId "com.skillfusion.tfmultianalystmobil3"/applicationId "com.skillfusion.tfmultianalystmobil4"/' android_project/app/build.gradle
           sed -i "s/keyPassword 'TFv23-Key-2026!'/keyPassword 'TFv23-Store-2026!'/" android_project/app/build.gradle
-          sed -i 's/versionCode 23/versionCode 25/' android_project/app/build.gradle
-          sed -i 's/versionName "1.0.23"/versionName "1.0.25"/' android_project/app/build.gradle
+          sed -i 's/versionCode 23/versionCode 26/' android_project/app/build.gradle
+          sed -i 's/versionName "1.0.23"/versionName "1.0.26"/' android_project/app/build.gradle
           keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
 
           cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
@@ -81,6 +79,7 @@ jobs:
           cp v23small/mobile/mobile-chrome-shim.js android_project/app/src/main/assets/www/mobile-chrome-shim.js
           cp v23small/mobile/mobile-data-bridge.js android_project/app/src/main/assets/www/mobile-data-bridge.js
           cp v23small/mobile/mobile-app-shell.js android_project/app/src/main/assets/www/mobile-app-shell.js
+          cp build-v26/mobile-license-gate.js android_project/app/src/main/assets/www/mobile-license-gate.js
 
           cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
           cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
@@ -91,19 +90,35 @@ jobs:
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < dashboard.patch
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < build-v23/excel-native.patch
 
-          echo 'LyogPT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09CiAgIFYyNSAtIEZST1pFTi9TVElDS1kgQ09MVU1OUwogICBUYWJsZSAxOiBOYW1hIEFuYWxpcyBzdGF5cyB2aXNpYmxlIG9uIGhvcml6b250YWwgc2Nyb2xsLgogICBUYWJsZSAzOiBjaGVja2JveC90aWNrZXIgKyBOYW1hIEFuYWxpcyBzdGF5IHZpc2libGUuCiAgID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PSAqLwoKLyogVGFibGUgMSDigJQgZnJlZXplIGZpcnN0IGNvbHVtbiAoTmFtYSBBbmFsaXMpLiAqLwojc2VjdGlvbi1zdW1tYXJ5ICNzdW1tYXJ5LXRhYmxlIHRoZWFkIHRoOmZpcnN0LWNoaWxkLAojc2VjdGlvbi1zdW1tYXJ5ICNzdW1tYXJ5LXRhYmxlIHRib2R5IHRkOmZpcnN0LWNoaWxkewogIHBvc2l0aW9uOnN0aWNreSFpbXBvcnRhbnQ7CiAgbGVmdDowIWltcG9ydGFudDsKICBiYWNrZ3JvdW5kOiMwZjE3MmEhaW1wb3J0YW50OwogIGJhY2tncm91bmQtY2xpcDpwYWRkaW5nLWJveCFpbXBvcnRhbnQ7CiAgYm94LXNoYWRvdzoycHggMCAwIHJnYmEoNTYsMTg5LDI0OCwuMTYpLCA3cHggMCAxMnB4IHJnYmEoMiw2LDIzLC4zOCkhaW1wb3J0YW50Owp9CiNzZWN0aW9uLXN1bW1hcnkgI3N1bW1hcnktdGFibGUgdGhlYWQgdGg6Zmlyc3QtY2hpbGR7CiAgei1pbmRleDo3MiFpbXBvcnRhbnQ7Cn0KI3NlY3Rpb24tc3VtbWFyeSAjc3VtbWFyeS10YWJsZSB0Ym9keSB0ZDpmaXJzdC1jaGlsZHsKICB6LWluZGV4OjM0IWltcG9ydGFudDsKfQojc2VjdGlvbi1zdW1tYXJ5ICNzdW1tYXJ5LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZChvZGQpIHRkOmZpcnN0LWNoaWxkewogIGJhY2tncm91bmQ6IzBmMTcyYSFpbXBvcnRhbnQ7Cn0KI3NlY3Rpb24tc3VtbWFyeSAjc3VtbWFyeS10YWJsZSB0Ym9keSB0cjpudGgtY2hpbGQoZXZlbikgdGQ6Zmlyc3QtY2hpbGR7CiAgYmFja2dyb3VuZDojMTExYjMxIWltcG9ydGFudDsKfQoKLyogVGFibGUgMyDigJQgZnJlZXplIGNoZWNrYm94L3RpY2tlciBhcyBmaXJzdCBzdGlja3kgY29sdW1uLiAqLwojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRoLnRmLWhpc3RvcnktY2ItaGVhZCwKI3NlY3Rpb24taGlzdG9yeSAjaGlzdG9yeS10YWJsZSB0ZC50Zi1oaXN0b3J5LWNiLWNlbGx7CiAgcG9zaXRpb246c3RpY2t5IWltcG9ydGFudDsKICBsZWZ0OjAhaW1wb3J0YW50OwogIHdpZHRoOjMycHghaW1wb3J0YW50OwogIG1pbi13aWR0aDozMnB4IWltcG9ydGFudDsKICBtYXgtd2lkdGg6MzJweCFpbXBvcnRhbnQ7CiAgYmFja2dyb3VuZDojMGYxNzJhIWltcG9ydGFudDsKICBiYWNrZ3JvdW5kLWNsaXA6cGFkZGluZy1ib3ghaW1wb3J0YW50Owp9CiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGgudGYtaGlzdG9yeS1jYi1oZWFkewogIHRvcDowIWltcG9ydGFudDsKICB6LWluZGV4Ojk0IWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRkLnRmLWhpc3RvcnktY2ItY2VsbHsKICB6LWluZGV4OjY0IWltcG9ydGFudDsKfQoKLyogVGFibGUgMyDigJQgTmFtYSBBbmFsaXMgYmVjb21lcyB0aGUgc2Vjb25kIGZyb3plbiBjb2x1bW4uICovCiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGhbZGF0YS1oaXN0b3J5LWNvbD0iYW5hbHlzdCJdLAojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRkW2RhdGEtaGlzdG9yeS1jb2w9ImFuYWx5c3QiXXsKICBwb3NpdGlvbjpzdGlja3khaW1wb3J0YW50OwogIGxlZnQ6MzJweCFpbXBvcnRhbnQ7CiAgbWluLXdpZHRoOjE1MHB4IWltcG9ydGFudDsKICBiYWNrZ3JvdW5kOiMwZjE3MmEhaW1wb3J0YW50OwogIGJhY2tncm91bmQtY2xpcDpwYWRkaW5nLWJveCFpbXBvcnRhbnQ7CiAgYm94LXNoYWRvdzoycHggMCAwIHJnYmEoNTYsMTg5LDI0OCwuMTgpLCA4cHggMCAxNHB4IHJnYmEoMiw2LDIzLC40MikhaW1wb3J0YW50Owp9CiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGhbZGF0YS1oaXN0b3J5LWNvbD0iYW5hbHlzdCJdewogIHRvcDowIWltcG9ydGFudDsKICB6LWluZGV4OjkzIWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRkW2RhdGEtaGlzdG9yeS1jb2w9ImFuYWx5c3QiXXsKICB6LWluZGV4OjYzIWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZChvZGQpIHRkLnRmLWhpc3RvcnktY2ItY2VsbCwKI3NlY3Rpb24taGlzdG9yeSAjaGlzdG9yeS10YWJsZSB0Ym9keSB0cjpudGgtY2hpbGQob2RkKSB0ZFtkYXRhLWhpc3RvcnktY29sPSJhbmFseXN0Il17CiAgYmFja2dyb3VuZDojMGYxNzJhIWltcG9ydGFudDsKfQojc2VjdGlvbi1oaXN0b3J5ICNoaXN0b3J5LXRhYmxlIHRib2R5IHRyOm50aC1jaGlsZChldmVuKSB0ZC50Zi1oaXN0b3J5LWNiLWNlbGwsCiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGJvZHkgdHI6bnRoLWNoaWxkKGV2ZW4pIHRkW2RhdGEtaGlzdG9yeS1jb2w9ImFuYWx5c3QiXXsKICBiYWNrZ3JvdW5kOiMxMTFiMzEhaW1wb3J0YW50Owp9CiNzZWN0aW9uLWhpc3RvcnkgI2hpc3RvcnktdGFibGUgdGJvZHkgdHIudGYtd2l0aGRyYXctcm93IHRkLnRmLWhpc3RvcnktY2ItY2VsbCwKI3NlY3Rpb24taGlzdG9yeSAjaGlzdG9yeS10YWJsZSB0Ym9keSB0ci50Zi13aXRoZHJhdy1yb3cgdGRbZGF0YS1oaXN0b3J5LWNvbD0iYW5hbHlzdCJdewogIGJhY2tncm91bmQ6IzI1MTMyNiFpbXBvcnRhbnQ7Cn0K' | base64 -d >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v26/v25-frozen.css >> android_project/app/src/main/assets/www/mobile-overrides.css
+          cat build-v26/mobile-license-gate.css >> android_project/app/src/main/assets/www/mobile-overrides.css
 
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('android_project/app/src/main/assets/www/index.html')
+          s=p.read_text()
+          s=s.replace('<html lang="id" data-tf-server-authorized="1" data-tf-license="valid">','<html lang="id">')
+          old='<script src="mobile-chrome-shim.js"></script>\n<script src="assets/dashboard-mobile.js"></script>\n<script src="mobile-data-bridge.js"></script>\n<script src="mobile-app-shell.js"></script>'
+          if old not in s:
+              raise SystemExit('Expected mobile script block not found')
+          s=s.replace(old,'<script src="mobile-license-gate.js"></script>')
+          p.write_text(s)
+          PY
+
+          node --check android_project/app/src/main/assets/www/mobile-license-gate.js
+          grep -q "V25 - FROZEN/STICKY COLUMNS" android_project/app/src/main/assets/www/mobile-overrides.css
+          grep -q "V26 - MOBILE LICENSE ACTIVATION GATE" android_project/app/src/main/assets/www/mobile-overrides.css
+          grep -q "Aktivasi Lisensi" android_project/app/src/main/assets/www/mobile-license-gate.js
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/mobile-app-shell.js
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/assets/dashboard-mobile.js
           grep -q "ACTION_CREATE_DOCUMENT" android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
-          grep -q "V25 - FROZEN/STICKY COLUMNS" android_project/app/src/main/assets/www/mobile-overrides.css
           test -s android_project/app/src/main/assets/www/icon32.png
 
-      - name: Build signed release APK
+      - name: Build signed V26 release APK
         working-directory: android_project
         run: gradle assembleRelease --no-daemon --stacktrace
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TF_Analyzer_V25_FROZEN_COLUMNS
+          name: TF_Analyzer_V26_TOKEN_ACTIVATION
           path: android_project/app/build/outputs/apk/release/app-release.apk
