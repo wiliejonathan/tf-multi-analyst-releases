@@ -1,0 +1,76 @@
+/* ============================================================
+   V25 - FROZEN/STICKY COLUMNS
+   Table 1: Nama Analis stays visible on horizontal scroll.
+   Table 3: checkbox/ticker + Nama Analis stay visible.
+   ============================================================ */
+
+/* Table 1 — freeze first column (Nama Analis). */
+#section-summary #summary-table thead th:first-child,
+#section-summary #summary-table tbody td:first-child{
+  position:sticky!important;
+  left:0!important;
+  background:#0f172a!important;
+  background-clip:padding-box!important;
+  box-shadow:2px 0 0 rgba(56,189,248,.16), 7px 0 12px rgba(2,6,23,.38)!important;
+}
+#section-summary #summary-table thead th:first-child{
+  z-index:72!important;
+}
+#section-summary #summary-table tbody td:first-child{
+  z-index:34!important;
+}
+#section-summary #summary-table tbody tr:nth-child(odd) td:first-child{
+  background:#0f172a!important;
+}
+#section-summary #summary-table tbody tr:nth-child(even) td:first-child{
+  background:#111b31!important;
+}
+
+/* Table 3 — freeze checkbox/ticker as first sticky column. */
+#section-history #history-table th.tf-history-cb-head,
+#section-history #history-table td.tf-history-cb-cell{
+  position:sticky!important;
+  left:0!important;
+  width:32px!important;
+  min-width:32px!important;
+  max-width:32px!important;
+  background:#0f172a!important;
+  background-clip:padding-box!important;
+}
+#section-history #history-table th.tf-history-cb-head{
+  top:0!important;
+  z-index:94!important;
+}
+#section-history #history-table td.tf-history-cb-cell{
+  z-index:64!important;
+}
+
+/* Table 3 — Nama Analis becomes the second frozen column. */
+#section-history #history-table th[data-history-col="analyst"],
+#section-history #history-table td[data-history-col="analyst"]{
+  position:sticky!important;
+  left:32px!important;
+  min-width:150px!important;
+  background:#0f172a!important;
+  background-clip:padding-box!important;
+  box-shadow:2px 0 0 rgba(56,189,248,.18), 8px 0 14px rgba(2,6,23,.42)!important;
+}
+#section-history #history-table th[data-history-col="analyst"]{
+  top:0!important;
+  z-index:93!important;
+}
+#section-history #history-table td[data-history-col="analyst"]{
+  z-index:63!important;
+}
+#section-history #history-table tbody tr:nth-child(odd) td.tf-history-cb-cell,
+#section-history #history-table tbody tr:nth-child(odd) td[data-history-col="analyst"]{
+  background:#0f172a!important;
+}
+#section-history #history-table tbody tr:nth-child(even) td.tf-history-cb-cell,
+#section-history #history-table tbody tr:nth-child(even) td[data-history-col="analyst"]{
+  background:#111b31!important;
+}
+#section-history #history-table tbody tr.tf-withdraw-row td.tf-history-cb-cell,
+#section-history #history-table tbody tr.tf-withdraw-row td[data-history-col="analyst"]{
+  background:#251326!important;
+}
