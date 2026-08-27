@@ -21,8 +21,8 @@ jobs:
 
       - name: Reconstruct V23 patch bundle
         run: |
-          cat build-v23/chunk_*.txt | base64 -d > v23small.tar.xz
-          mkdir -p v23small
+          cat build-v23/chunk_00.txt build-v23/chunk_01.txt build-v23/chunk_02.txt build-v23/chunk_03.txt build-v23/chunk_04.txt build-v23/chunk_05.txt build-v23/chunk_06.txt | tr -d '\r\n' | base64 -d > v23small.tar.xz
+          xz -t v23small.tar.xz
           tar -xJf v23small.tar.xz
 
       - name: Download REV224 base source
