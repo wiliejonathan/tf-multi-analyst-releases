@@ -1,4 +1,4 @@
-name: Build TF Analyzer V24
+name: Build TF Analyzer V25
 on:
   push:
     branches: [chatgpt-build-v23]
@@ -70,11 +70,11 @@ jobs:
           cp v23small/native/MainActivity.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
           cp v23small/native/tfv23.jks android_project/app/tfv23.jks
 
-          # V24: stable package for future updates + PKCS12 key password compatibility.
+          # Same stable V24 package/signing so V25 installs as an update to V24.
           sed -i 's/applicationId "com.skillfusion.tfmultianalystmobil3"/applicationId "com.skillfusion.tfmultianalystmobil4"/' android_project/app/build.gradle
           sed -i "s/keyPassword 'TFv23-Key-2026!'/keyPassword 'TFv23-Store-2026!'/" android_project/app/build.gradle
-          sed -i 's/versionCode 23/versionCode 24/' android_project/app/build.gradle
-          sed -i 's/versionName "1.0.23"/versionName "1.0.24"/' android_project/app/build.gradle
+          sed -i 's/versionCode 23/versionCode 25/' android_project/app/build.gradle
+          sed -i 's/versionName "1.0.23"/versionName "1.0.25"/' android_project/app/build.gradle
           keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
 
           cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
@@ -86,16 +86,99 @@ jobs:
           cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
           cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
           cp rev224/icon128.png android_project/app/src/main/res/drawable/tf_icon.png
-          # FIX: header mobile explicitly references icon32.png.
           cp rev224/icon128.png android_project/app/src/main/assets/www/icon32.png
 
           xz -dc v23small/dashboard.patch.xz > dashboard.patch
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < dashboard.patch
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < build-v23/excel-native.patch
 
+          # V25: freeze requested columns during horizontal table scrolling.
+          cat >> android_project/app/src/main/assets/www/mobile-overrides.css <<'CSS'
+
+/* ============================================================
+   V25 - FROZEN/STICKY COLUMNS
+   Table 1: Nama Analis stays visible on horizontal scroll.
+   Table 3: checkbox/ticker + Nama Analis stay visible.
+   ============================================================ */
+
+/* Table 1 — freeze first column (Nama Analis). */
+#section-summary #summary-table thead th:first-child,
+#section-summary #summary-table tbody td:first-child{
+  position:sticky!important;
+  left:0!important;
+  background:#0f172a!important;
+  background-clip:padding-box!important;
+  box-shadow:2px 0 0 rgba(56,189,248,.16), 7px 0 12px rgba(2,6,23,.38)!important;
+}
+#section-summary #summary-table thead th:first-child{
+  z-index:72!important;
+}
+#section-summary #summary-table tbody td:first-child{
+  z-index:34!important;
+}
+#section-summary #summary-table tbody tr:nth-child(odd) td:first-child{
+  background:#0f172a!important;
+}
+#section-summary #summary-table tbody tr:nth-child(even) td:first-child{
+  background:#111b31!important;
+}
+
+/* Table 3 — freeze checkbox/ticker as first sticky column. */
+#section-history #history-table th.tf-history-cb-head,
+#section-history #history-table td.tf-history-cb-cell{
+  position:sticky!important;
+  left:0!important;
+  width:32px!important;
+  min-width:32px!important;
+  max-width:32px!important;
+  background:#0f172a!important;
+  background-clip:padding-box!important;
+}
+#section-history #history-table th.tf-history-cb-head{
+  top:0!important;
+  z-index:94!important;
+}
+#section-history #history-table td.tf-history-cb-cell{
+  z-index:64!important;
+}
+
+/* Table 3 — Nama Analis becomes the second frozen column. It naturally
+   remains in its original place at scrollLeft=0, then locks beside the
+   checkbox once the date columns scroll underneath it. */
+#section-history #history-table th[data-history-col="analyst"],
+#section-history #history-table td[data-history-col="analyst"]{
+  position:sticky!important;
+  left:32px!important;
+  min-width:150px!important;
+  background:#0f172a!important;
+  background-clip:padding-box!important;
+  box-shadow:2px 0 0 rgba(56,189,248,.18), 8px 0 14px rgba(2,6,23,.42)!important;
+}
+#section-history #history-table th[data-history-col="analyst"]{
+  top:0!important;
+  z-index:93!important;
+}
+#section-history #history-table td[data-history-col="analyst"]{
+  z-index:63!important;
+}
+#section-history #history-table tbody tr:nth-child(odd) td.tf-history-cb-cell,
+#section-history #history-table tbody tr:nth-child(odd) td[data-history-col="analyst"]{
+  background:#0f172a!important;
+}
+#section-history #history-table tbody tr:nth-child(even) td.tf-history-cb-cell,
+#section-history #history-table tbody tr:nth-child(even) td[data-history-col="analyst"]{
+  background:#111b31!important;
+}
+#section-history #history-table tbody tr.tf-withdraw-row td.tf-history-cb-cell,
+#section-history #history-table tbody tr.tf-withdraw-row td[data-history-col="analyst"]{
+  background:#251326!important;
+}
+CSS
+
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/mobile-app-shell.js
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/assets/dashboard-mobile.js
           grep -q "ACTION_CREATE_DOCUMENT" android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          grep -q "V25 - FROZEN/STICKY COLUMNS" android_project/app/src/main/assets/www/mobile-overrides.css
           test -s android_project/app/src/main/assets/www/icon32.png
 
       - name: Build signed release APK
@@ -104,5 +187,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TF_Analyzer_V24_LOGO_FIXED
+          name: TF_Analyzer_V25_FROZEN_COLUMNS
           path: android_project/app/build/outputs/apk/release/app-release.apk
