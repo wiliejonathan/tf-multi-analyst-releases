@@ -1,4 +1,4 @@
-name: Build TF Analyzer V23
+name: Build TF Analyzer V24
 on:
   push:
     branches: [chatgpt-build-v23]
@@ -68,9 +68,13 @@ jobs:
           cp v23small/native/AndroidManifest.xml android_project/app/src/main/AndroidManifest.xml
           cp v23small/native/styles.xml android_project/app/src/main/res/values/styles.xml
           cp v23small/native/MainActivity.java android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          cp v23small/native/tfv23.jks android_project/app/tfv23.jks
 
-          rm -f android_project/app/tfv23.jks
-          keytool -genkeypair -v -storetype JKS -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -keypass 'TFv23-Key-2026!' -alias tfv23 -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=TF Analyzer, OU=Mobile, O=SkillFusion, L=Jakarta, ST=Jakarta, C=ID'
+          # V24: stable package for future updates + PKCS12 key password compatibility.
+          sed -i 's/applicationId "com.skillfusion.tfmultianalystmobil3"/applicationId "com.skillfusion.tfmultianalystmobil4"/' android_project/app/build.gradle
+          sed -i "s/keyPassword 'TFv23-Key-2026!'/keyPassword 'TFv23-Store-2026!'/" android_project/app/build.gradle
+          sed -i 's/versionCode 23/versionCode 24/' android_project/app/build.gradle
+          sed -i 's/versionName "1.0.23"/versionName "1.0.24"/' android_project/app/build.gradle
           keytool -list -keystore android_project/app/tfv23.jks -storepass 'TFv23-Store-2026!' -alias tfv23 >/dev/null
 
           cp v23small/mobile/index.html android_project/app/src/main/assets/www/index.html
@@ -82,6 +86,8 @@ jobs:
           cp rev224/assets/7e95b596e5bf8dff.css android_project/app/src/main/assets/www/assets/dashboard-original.css
           cp rev224/assets/4b4d6b8dc315a95c.js android_project/app/src/main/assets/www/assets/dashboard-mobile.js
           cp rev224/icon128.png android_project/app/src/main/res/drawable/tf_icon.png
+          # FIX: header mobile explicitly references icon32.png.
+          cp rev224/icon128.png android_project/app/src/main/assets/www/icon32.png
 
           xz -dc v23small/dashboard.patch.xz > dashboard.patch
           patch android_project/app/src/main/assets/www/assets/dashboard-mobile.js < dashboard.patch
@@ -90,6 +96,7 @@ jobs:
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/mobile-app-shell.js
           grep -q "AndroidSave.saveBase64" android_project/app/src/main/assets/www/assets/dashboard-mobile.js
           grep -q "ACTION_CREATE_DOCUMENT" android_project/app/src/main/java/com/skillfusion/tfmultianalystmobil3/MainActivity.java
+          test -s android_project/app/src/main/assets/www/icon32.png
 
       - name: Build signed release APK
         working-directory: android_project
@@ -97,5 +104,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: TF_Analyzer_V23_NATIVE_SAVE
+          name: TF_Analyzer_V24_LOGO_FIXED
           path: android_project/app/build/outputs/apk/release/app-release.apk
