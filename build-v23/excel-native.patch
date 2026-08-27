@@ -1,0 +1,33 @@
+--- /mnt/data/v22/assets/www/assets/dashboard-mobile.js	1980-01-01 01:00:00.000000000 +0000
++++ /mnt/data/v9proj/TF_Multi_Analyst_Mobile_REV224_ANDROID_COMPACT_UI_V9_PROJECT/android_project/app/src/main/assets/www/assets/dashboard-mobile.js	2026-08-27 09:50:21.909756113 +0000
+@@ -9399,15 +9399,21 @@
+ };
+ const bytes = tf_createHistoryExcelWorkbookBytes(lastHistoryRowsForExport, options);
+ const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+-const url = URL.createObjectURL(blob);
+-const a = document.createElement('a');
+-a.href = url;
+-a.download = 'tf_table3_history_' + tf_formatDateTimeForFilename(now) + '.xlsx';
+-document.body.appendChild(a);
+-a.click();
+-document.body.removeChild(a);
+-// Keep the Blob URL alive long enough for large history files to finish downloading.
+-setTimeout(() => URL.revokeObjectURL(url), 60000);
++const filename = 'tf_table3_history_' + tf_formatDateTimeForFilename(now) + '.xlsx';
++if (window.AndroidSave && typeof window.AndroidSave.saveBase64 === 'function') {
++  const reader = new FileReader();
++  reader.onloadend = function(){
++    const data = String(reader.result || '');
++    const b64 = data.indexOf(',') >= 0 ? data.slice(data.indexOf(',') + 1) : data;
++    window.AndroidSave.saveBase64(filename, blob.type || 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', b64);
++  };
++  reader.readAsDataURL(blob);
++} else {
++  const url = URL.createObjectURL(blob);
++  const a = document.createElement('a'); a.href = url; a.download = filename;
++  document.body.appendChild(a); a.click(); document.body.removeChild(a);
++  setTimeout(() => URL.revokeObjectURL(url), 60000);
++}
+ }
+ catch (error) {
+ console.error('TF Excel export gagal', error);
