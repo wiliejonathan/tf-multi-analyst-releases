@@ -21,7 +21,16 @@ jobs:
 
       - name: Reconstruct V23 patch bundle
         run: |
-          cat build-v23/chunk_00.txt build-v23/chunk_01.txt build-v23/chunk_02.txt build-v23/chunk_03.txt build-v23/chunk_04.txt build-v23/chunk_05.txt build-v23/chunk_06.txt | tr -d '\r\n' | base64 -d > v23small.tar.xz
+          python3 - <<'PY'
+          import base64, re
+          names=[f'build-v23/chunk_{i:02d}.txt' for i in range(7)]
+          raw=b''.join(open(n,'rb').read() for n in names)
+          clean=re.sub(rb'[^A-Za-z0-9+/=]', b'', raw)
+          print('payload raw=',len(raw),'clean=',len(clean),'mod4=',len(clean)%4)
+          data=base64.b64decode(clean, validate=False)
+          open('v23small.tar.xz','wb').write(data)
+          print('decoded=',len(data))
+          PY
           xz -t v23small.tar.xz
           tar -xJf v23small.tar.xz
 
