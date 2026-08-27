@@ -1,0 +1,22 @@
+name: Export V37 Remote Source
+on:
+  push:
+    branches: [chatgpt-build-v23]
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Reconstruct V37 source
+        run: |
+          mkdir -p out
+          cat build-v37/mobile-remote-v37.b64.* | base64 -d > out/mobile-remote-v37.js
+          cat build-v37/mobile-data-bridge-v37.b64.* | base64 -d > out/mobile-data-bridge-v37.js
+          node --check out/mobile-remote-v37.js
+          node --check out/mobile-data-bridge-v37.js
+      - uses: actions/upload-artifact@v4
+        with:
+          name: V37_REMOTE_SOURCE
+          path: out/
