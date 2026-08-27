@@ -1,4 +1,5 @@
 /* REV233 / Mobile V33 — Premium Remote Sidebar */
+#tf-mobile-appbar:has(#tf-mobile-remote-open){grid-template-columns:42px minmax(0,1fr) 52px 52px!important;gap:4px!important}
 #tf-mobile-appbar .tf-mobile-remote-open{margin-left:auto}
 #tf-mobile-appbar .tf-mobile-remote-open + #tf-mobile-data-open{margin-left:4px}
 .tf-mobile-remote-page{position:fixed;inset:0;z-index:2147483000;background:#020617;color:#e5edf8;transform:translateX(-102%);transition:transform .22s ease;overflow:hidden;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
