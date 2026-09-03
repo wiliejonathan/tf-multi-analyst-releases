@@ -2,7 +2,7 @@
   "schema": 1,
   "available": false,
   "reason": "ASSET_NOT_ATTACHED",
-  "revision": 66,
-  "tag_name": "v1.16.66",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.66"
+  "revision": 67,
+  "tag_name": "v1.16.67",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.67"
 }
