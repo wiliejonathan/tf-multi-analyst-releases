@@ -1,0 +1,34 @@
+name: Publish staged release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/**'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publish staged release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          META=$(find release-staging -name release.env -type f | sort | tail -n 1)
+          test -n "$META"
+          source "$META"
+          DIR=$(dirname "$META")
+          test -f "$DIR/$ASSET"
+          test -f "$DIR/RELEASE_NOTES.md"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TITLE" --notes-file "$DIR/RELEASE_NOTES.md"
+            gh release upload "$TAG" "$DIR/$ASSET" --clobber
+          else
+            gh release create "$TAG" "$DIR/$ASSET" --target main --title "$TITLE" --notes-file "$DIR/RELEASE_NOTES.md"
+          fi
