@@ -1,0 +1,127 @@
+diff -ruN base/GITHUB_RELEASE_REV369.txt new/GITHUB_RELEASE_REV369.txt
+--- base/GITHUB_RELEASE_REV369.txt	1970-01-01 00:00:00.000000000 +0000
++++ new/GITHUB_RELEASE_REV369.txt	2026-09-07 09:33:13.135232443 +0000
+@@ -0,0 +1,24 @@
++# TF Analyzer Analyst V1.16.83
++
++## REV369 — Refresh Activation Persistence Fix
++
++Release ini memperbaiki masalah ketika tombol **Refresh / Reset** dapat membuat `dashboard.html` meminta **Email + Token Aktivasi** lagi walaupun build yang sama sebelumnya sudah berhasil diaktivasi.
++
++### Perbaikan utama
++- Refresh / Reset sekarang **tidak menghapus receipt aktivasi per-build** (`tfManualBuildActivationV1`).
++- Setelah aktivasi berhasil sekali pada build yang sama, reload `dashboard.html`, buka/tutup Dashboard, dan Refresh / Reset tidak meminta kode aktivasi lagi.
++- Sistem **manual activation once per new Load unpacked build** tetap dipertahankan. Jadi build baru tetap meminta Email + Token satu kali sesuai desain REV363.
++- Explicit Clear/Change License, license expired, blocked, revoked, atau invalid tetap dapat mengembalikan user ke halaman Aktivasi.
++
++### Mobile verification
++Android production REV352 dan iOS/Browser REV368 sudah menyimpan remembered activation key di luar proses cleanup normal. Tidak ditemukan bug local-refresh yang sama pada kedua platform tersebut, sehingga tidak perlu memaksakan APK baru dengan signing key berbeda. Remote Refresh dari Mobile tetap aman setelah Plugin PC menggunakan REV369.
++
++### Existing fixes retained
++- REV368 Strict Update Login Preflight.
++- REV367 Low-Usage Realtime Remote + Exact Expiry.
++- REV366 Table 2 Hover-Free Smoothness.
++- Seluruh Scanner, Dashboard, Remote, Device Lock, iSignal, Import/Export, Table 1-4, dan Equity Curve tetap dipertahankan.
++
++Build: **v1.16.83 • REV369**
++
++Asset: `TF_Extension_PC_MAC_REV369_REFRESH_ACTIVATION_PERSISTENCE_FIX.zip`
+diff -ruN base/README_REV369.txt new/README_REV369.txt
+--- base/README_REV369.txt	1970-01-01 00:00:00.000000000 +0000
++++ new/README_REV369.txt	2026-09-07 09:33:13.134954374 +0000
+@@ -0,0 +1,17 @@
++TF Analyzer Analyst — REV369 / v1.16.83
++
++REFRESH ACTIVATION PERSISTENCE FIX
++
++REV369 fixes a regression where pressing Refresh / Reset could remove the local per-build activation receipt. When dashboard.html was reloaded immediately afterwards, Device Lock interpreted the same build as a newly loaded build and asked for Email + Token again.
++
++New behavior:
++- A new Load unpacked build still requires manual Email + Token activation once.
++- After that activation succeeds, closing/opening the plugin or reloading dashboard.html does not ask again on the same build.
++- Refresh / Reset clears scanner/dashboard working data but preserves the per-build activation receipt.
++- Explicit license clear/change, true revoke/expired/blocked state, or a genuinely new build can still return to Activation as designed.
++- REV368 strict Update login preflight and REV367 low-usage realtime Remote are retained.
++
++Mobile review:
++- Android production REV352 already preserves its remembered activation key during local cleanup/boot.
++- iOS/Browser REV368 already preserves its remembered activation key during local cleanup/boot.
++- Their Remote Refresh command only asks the PC to reset; therefore the PC-side REV369 fix resolves the observed cross-device Refresh symptom without changing the production APK or PWA activation logic.
+diff -ruN base/REV369_TEST_REPORT.txt new/REV369_TEST_REPORT.txt
+--- base/REV369_TEST_REPORT.txt	1970-01-01 00:00:00.000000000 +0000
++++ new/REV369_TEST_REPORT.txt	2026-09-07 09:33:35.902084818 +0000
+@@ -0,0 +1,23 @@
++TF Analyzer Analyst — REV369 TEST REPORT
++
++Build identity
++- Version: 1.16.83
++- Revision: REV369
++
++Activation persistence checks
++- Refresh / Reset preserve list contains tfManualBuildActivationV1: PASS
++- tfLicenseCredentials preserved on Refresh / Reset: PASS
++- tfDeviceSessionTokenV1 preserved on Refresh / Reset: PASS
++- Explicit Device Lock clear/change paths still remove tfManualBuildActivationV1: PASS
++- New-build manual activation gate remains enabled in tf-device-lock.js: PASS
++
++Mobile review
++- Android production REV352 AUTH_KEY is explicitly excluded from local cleanup: PASS
++- iOS/Browser REV368 AUTH_KEY is explicitly excluded from local cleanup: PASS
++- No mobile activation-code regression matching the PC Refresh bug was found: PASS
++
++Package QA
++- JS syntax: PASS
++- manifest JSON: PASS
++- protected integrity map: PASS
++- ZIP archive test: PASS
+diff -ruN base/assets/7b6af0cb4001a684.js new/assets/7b6af0cb4001a684.js
+--- base/assets/7b6af0cb4001a684.js	2026-09-07 02:38:39.000000000 +0000
++++ new/assets/7b6af0cb4001a684.js	2026-09-07 09:34:05.311983186 +0000
+@@ -283,6 +283,12 @@
+ FILES["README_REV368.txt"] = "ac366e54baf634ff4014c0b9d0974983bf221c7b05256242f0e8a1e6cb2b834b";
+ FILES["REV368_TEST_REPORT.txt"] = "e275739e9c414bbcb70b1bb17293b91d65b52cec81e3d5719126d9cf13638a31";
+ FILES["GITHUB_RELEASE_REV368.txt"] = "d4f1ce1bfa96316fe36930388a7a93f24a7aa6550087cfd216beee00e079a881";
++// REV369 final integrity overrides - Refresh / Reset activation receipt persistence.
++FILES["manifest.json"] = "2f77a397af422eb66ec931c1058124673d6ea4d8300703b06fc71bd6f8dad896";
++FILES["assets/927ecbd63036f61b.js"] = "fd256783346c6a19dfb4d3be316a3db1e684ed50c63e72cd3f1ce3d714792bbd";
++FILES["README_REV369.txt"] = "e2c9e7ac29f071b084f18410e6d36b5a493af90a2b1a65ea3c99e63177e48cae";
++FILES["REV369_TEST_REPORT.txt"] = "1596482dffaf437a6bdfe0fc4b43a2ee2ebdbcb77c284a7d86c827ae9681e3b0";
++FILES["GITHUB_RELEASE_REV369.txt"] = "ee2adc67265217e727917633ed2818f34a1728e6adf1802db5f852a216bb254a";
+ window.tfIntegrityReady = (async () => {
+ try {
+ for (const [path, expected] of Object.entries(FILES)) {
+diff -ruN base/assets/927ecbd63036f61b.js new/assets/927ecbd63036f61b.js
+--- base/assets/927ecbd63036f61b.js	2026-09-07 02:31:29.000000000 +0000
++++ new/assets/927ecbd63036f61b.js	2026-09-07 09:33:13.134358684 +0000
+@@ -11118,6 +11118,10 @@
+   'tfDeviceActivationTraceV1',
+   'tfDeviceApprovedTransferV1',
+   'tfDeviceApprovalPopupShownV1',
++  // REV369: Refresh / Reset is a data reset, not a license reset.
++  // Preserve the per-build activation receipt so dashboard reloads do not
++  // incorrectly ask for Email + Token again on the same installed build.
++  'tfManualBuildActivationV1',
+   'tfRemoteAlwaysOnlineV276'
+   ];
+ chrome.storage.local.get(null, (allStored) => {
+diff -ruN base/manifest.json new/manifest.json
+--- base/manifest.json	2026-09-07 02:37:52.000000000 +0000
++++ new/manifest.json	2026-09-07 09:33:13.134831326 +0000
+@@ -1,8 +1,8 @@
+ {
+   "manifest_version": 3,
+   "name": "TF Multi-Analyst Scanner",
+-  "version": "1.16.82",
+-  "description": "REV368: adds strict fresh-session verification before every Update so stale TradersFamily tabs cannot falsely authorize a scan; blocks Update and returns to Login when the real server session is logged out, while retaining REV367 low-usage realtime Remote, exact expiry enforcement, and all prior dashboard/table fixes.",
++  "version": "1.16.83",
++  "description": "REV369: fixes Refresh / Reset activation persistence so dashboard reloads on the same installed build no longer request Email + Token again; manual activation is still required once for each newly loaded build, while REV368 strict Update login preflight and REV367 low-usage realtime Remote remain intact.",
+   "minimum_chrome_version": "116",
+   "permissions": [
+     "alarms",
+@@ -87,5 +87,5 @@
+     "default_path": "popup.html"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJ7+8rQMKQLh6MP9c2K4xUBszCpYNbKYYAjqVPLl0hHHz3X1uS9NarldrfPMsAK5qAAnC+RrostZwMBJ8m3DQQuyMl14BaAsZeX9xHf+pbtSErcjQKAVJOgCkB3X8KpMNpX8vq3AnfRL7PHy8RfCKiE4kRh+xdBTDoRrFXTVThjdt4lgIZs9dvjCBrSHsza2U3vZVAOZyKWWYCxeVBu2Q6uJLI97bqu1c2afc1O2V4A/FDBh5sd34ahSrBrD4DaXt2J6+gy2U4UuAr4WZkn/rm16gT0eXHUMUKJfH4VwFtTD4526UdyIjZuXHT0b3FORHKbGhvIQ1ke9MvaInK52WQIDAQAB",
+-  "version_name": "REV368"
++  "version_name": "REV369"
+ }
