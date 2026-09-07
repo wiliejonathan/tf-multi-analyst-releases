@@ -37,89 +37,89 @@ diff -ruN rev369_base_release/GITHUB_RELEASE_REV370.txt rev370_work/GITHUB_RELEA
 +**Build:** v1.16.84 • REV370
 +
 +**Asset:** `TF_Extension_PC_MAC_REV370_UPDATE_BUTTON_PREFLIGHT_HANDLER_FIX.zip`
-+diff -ruN rev369_base_release/README_REV370.txt rev370_work/README_REV370.txt
-+--- rev369_base_release/README_REV370.txt	1970-01-01 00:00:00.000000000 +0000
-++++ rev370_work/README_REV370.txt	2026-09-07 19:04:26.020919589 +0000
-+@@ -0,0 +1,28 @@
-++TF ANALYZER ANALYST — REV370
-++================================
-++Version      : 1.16.84
-++Version Name : REV370
-++
-++FIX UTAMA — TOMBOL UPDATE KEMBALI BERFUNGSI
-++--------------------------------------------
-++REV368 menambahkan pemeriksaan login TradersFamily yang fresh sebelum Update.
-++Namun routing pesan `tf_verify_login_before_update_strict` tidak berada di listener
-++`chrome.runtime.onMessage` yang benar. Akibatnya tombol Update dapat terlihat bisa
-++diklik tetapi preflight tidak pernah menerima respons dan Update tidak dimulai.
-++
-++REV370 memperbaiki routing tersebut sehingga alur menjadi:
-++Update -> Fresh Login Preflight -> Login valid -> Update scan dimulai.
-++
-++Tambahan stabilitas:
-++- Fresh authenticated fetch diberi timeout 12 detik agar tidak menggantung tanpa batas.
-++- UI preflight diberi timeout 50 detik sebagai fail-safe.
-++- Jika session benar-benar logout, Update tetap dibatalkan dan user diarahkan login.
-++- Jika network sementara bermasalah, Update tidak dijalankan secara salah dan tombol
-++  kembali aktif setelah preflight selesai/timeout.
-++
-++DIPERTAHANKAN
-++-------------
-++- REV369 Refresh/Reset tidak menghapus receipt aktivasi build.
-++- REV368 strict fresh-session check sebelum Update.
-++- REV367 Low-Usage realtime Remote + Exact Expiry.
-++- Scanner, iSignal, Device Lock, Import/Export, Dashboard, Table 1-4 dan Equity tetap.
-+diff -ruN rev369_base_release/REV370_TEST_REPORT.txt rev370_work/REV370_TEST_REPORT.txt
-+--- rev369_base_release/REV370_TEST_REPORT.txt	1970-01-01 00:00:00.000000000 +0000
-++++ rev370_work/REV370_TEST_REPORT.txt	2026-09-07 19:04:26.020965649 +0000
-+@@ -0,0 +1,25 @@
-++TF ANALYZER ANALYST — REV370 TEST REPORT
-++=========================================
-++Build: 1.16.84 / REV370
-++
-++Root cause verification
-++- Misplaced tf_verify_login_before_update_strict branch removed from history helper: PASS
-++- Runtime onMessage has explicit tf_verify_login_before_update_strict handler: PASS
-++- Handler has sender/sendResponse in lexical scope and returns true asynchronously: PASS
-++
-++Update flow safeguards
-++- Fresh login fetch timeout (12s): PASS
-++- UI runtime response timeout (50s): PASS
-++- Busy state released in finally after success/failure/timeout: PASS
-++- STOP path remains before login-preflight path: PASS
-++
-++Regression/static validation
-++- manifest.json JSON validation: PASS
-++- assets/901c62026afc22f4.js syntax: PASS
-++- assets/927ecbd63036f61b.js syntax: PASS
-++- assets/tf-device-background.js syntax: PASS
-++- Effective integrity map: PASS
-++- ZIP archive integrity: PASS
-++- manifest.json at ZIP root: PASS
-++
-++Physical TradersFamily account test: NOT PERFORMED in container (requires live user session).
-+diff -ruN rev369_base_release/assets/7b6af0cb4001a684.js rev370_work/assets/7b6af0cb4001a684.js
-+--- rev369_base_release/assets/7b6af0cb4001a684.js	2026-09-07 09:34:05.000000000 +0000
-++++ rev370_work/assets/7b6af0cb4001a684.js	2026-09-07 19:04:40.323633274 +0000
-+@@ -289,6 +289,13 @@
-+ FILES["README_REV369.txt"] = "e2c9e7ac29f071b084f18410e6d36b5a493af90a2b1a65ea3c99e63177e48cae";
-+ FILES["REV369_TEST_REPORT.txt"] = "1596482dffaf437a6bdfe0fc4b43a2ee2ebdbcb77c284a7d86c827ae9681e3b0";
-+ FILES["GITHUB_RELEASE_REV369.txt"] = "ee2adc67265217e727917633ed2818f34a1728e6adf1802db5f852a216bb254a";
-++// REV370 final integrity overrides - Update button preflight runtime routing fix.
-++FILES["manifest.json"] = "11175c32dba23c4aee94425aecf1a53b83383dd87f9c0edd68c2c26a87dfa894";
-++FILES["assets/901c62026afc22f4.js"] = "980756039ab454854ccc753677138cf5fd5e174e171519a44ebc7d961976a460";
-++FILES["assets/927ecbd63036f61b.js"] = "223edfd0f358d99e8a212a0b9febbe0edafc374ec31a7b023ca84a421f828ca3";
-++FILES["README_REV370.txt"] = "73360b79d8d2cfbe8a5f3ee9d724d7a38a1adef30cac79ac34e546191bcbdcce";
-++FILES["REV370_TEST_REPORT.txt"] = "e38acd52f56d7b420e4b6f4cec043dc792fd2ff942fb246cede95b6718afabc6";
-++FILES["GITHUB_RELEASE_REV370.txt"] = "eb7b8a722b2228ecf5d785ed9d310d6b564bd8f3c51ef694e981bddd60db0153";
-+ window.tfIntegrityReady = (async () => {
-+ try {
-+ for (const [path, expected] of Object.entries(FILES)) {
-+diff -ruN rev369_base_release/assets/901c62026afc22f4.js rev370_work/assets/901c62026afc22f4.js
-+--- rev369_base_release/assets/901c62026afc22f4.js	2026-09-07 02:30:27.000000000 +0000
-++++ rev370_work/assets/901c62026afc22f4.js	2026-09-07 19:04:26.015266452 +0000
-+@@ -1596,19 +1596,6 @@
-+ try {
-+ if (!msg)
-+ return;
-+-if (msg.type === 'tf_verify_login_before_update_strict') {
+diff -ruN rev369_base_release/README_REV370.txt rev370_work/README_REV370.txt
+--- rev369_base_release/README_REV370.txt	1970-01-01 00:00:00.000000000 +0000
++++ rev370_work/README_REV370.txt	2026-09-07 19:04:26.020919589 +0000
+@@ -0,0 +1,28 @@
++TF ANALYZER ANALYST — REV370
++================================
++Version      : 1.16.84
++Version Name : REV370
++
++FIX UTAMA — TOMBOL UPDATE KEMBALI BERFUNGSI
++--------------------------------------------
++REV368 menambahkan pemeriksaan login TradersFamily yang fresh sebelum Update.
++Namun routing pesan `tf_verify_login_before_update_strict` tidak berada di listener
++`chrome.runtime.onMessage` yang benar. Akibatnya tombol Update dapat terlihat bisa
++diklik tetapi preflight tidak pernah menerima respons dan Update tidak dimulai.
++
++REV370 memperbaiki routing tersebut sehingga alur menjadi:
++Update -> Fresh Login Preflight -> Login valid -> Update scan dimulai.
++
++Tambahan stabilitas:
++- Fresh authenticated fetch diberi timeout 12 detik agar tidak menggantung tanpa batas.
++- UI preflight diberi timeout 50 detik sebagai fail-safe.
++- Jika session benar-benar logout, Update tetap dibatalkan dan user diarahkan login.
++- Jika network sementara bermasalah, Update tidak dijalankan secara salah dan tombol
++  kembali aktif setelah preflight selesai/timeout.
++
++DIPERTAHANKAN
++-------------
++- REV369 Refresh/Reset tidak menghapus receipt aktivasi build.
++- REV368 strict fresh-session check sebelum Update.
++- REV367 Low-Usage realtime Remote + Exact Expiry.
++- Scanner, iSignal, Device Lock, Import/Export, Dashboard, Table 1-4 dan Equity tetap.
+diff -ruN rev369_base_release/REV370_TEST_REPORT.txt rev370_work/REV370_TEST_REPORT.txt
+--- rev369_base_release/REV370_TEST_REPORT.txt	1970-01-01 00:00:00.000000000 +0000
++++ rev370_work/REV370_TEST_REPORT.txt	2026-09-07 19:04:26.020965649 +0000
+@@ -0,0 +1,25 @@
++TF ANALYZER ANALYST — REV370 TEST REPORT
++=========================================
++Build: 1.16.84 / REV370
++
++Root cause verification
++- Misplaced tf_verify_login_before_update_strict branch removed from history helper: PASS
++- Runtime onMessage has explicit tf_verify_login_before_update_strict handler: PASS
++- Handler has sender/sendResponse in lexical scope and returns true asynchronously: PASS
++
++Update flow safeguards
++- Fresh login fetch timeout (12s): PASS
++- UI runtime response timeout (50s): PASS
++- Busy state released in finally after success/failure/timeout: PASS
++- STOP path remains before login-preflight path: PASS
++
++Regression/static validation
++- manifest.json JSON validation: PASS
++- assets/901c62026afc22f4.js syntax: PASS
++- assets/927ecbd63036f61b.js syntax: PASS
++- assets/tf-device-background.js syntax: PASS
++- Effective integrity map: PASS
++- ZIP archive integrity: PASS
++- manifest.json at ZIP root: PASS
++
++Physical TradersFamily account test: NOT PERFORMED in container (requires live user session).
+diff -ruN rev369_base_release/assets/7b6af0cb4001a684.js rev370_work/assets/7b6af0cb4001a684.js
+--- rev369_base_release/assets/7b6af0cb4001a684.js	2026-09-07 09:34:05.000000000 +0000
++++ rev370_work/assets/7b6af0cb4001a684.js	2026-09-07 19:04:40.323633274 +0000
+@@ -289,6 +289,13 @@
+ FILES["README_REV369.txt"] = "e2c9e7ac29f071b084f18410e6d36b5a493af90a2b1a65ea3c99e63177e48cae";
+ FILES["REV369_TEST_REPORT.txt"] = "1596482dffaf437a6bdfe0fc4b43a2ee2ebdbcb77c284a7d86c827ae9681e3b0";
+ FILES["GITHUB_RELEASE_REV369.txt"] = "ee2adc67265217e727917633ed2818f34a1728e6adf1802db5f852a216bb254a";
++// REV370 final integrity overrides - Update button preflight runtime routing fix.
++FILES["manifest.json"] = "11175c32dba23c4aee94425aecf1a53b83383dd87f9c0edd68c2c26a87dfa894";
++FILES["assets/901c62026afc22f4.js"] = "980756039ab454854ccc753677138cf5fd5e174e171519a44ebc7d961976a460";
++FILES["assets/927ecbd63036f61b.js"] = "223edfd0f358d99e8a212a0b9febbe0edafc374ec31a7b023ca84a421f828ca3";
++FILES["README_REV370.txt"] = "73360b79d8d2cfbe8a5f3ee9d724d7a38a1adef30cac79ac34e546191bcbdcce";
++FILES["REV370_TEST_REPORT.txt"] = "e38acd52f56d7b420e4b6f4cec043dc792fd2ff942fb246cede95b6718afabc6";
++FILES["GITHUB_RELEASE_REV370.txt"] = "eb7b8a722b2228ecf5d785ed9d310d6b564bd8f3c51ef694e981bddd60db0153";
+ window.tfIntegrityReady = (async () => {
+ try {
+ for (const [path, expected] of Object.entries(FILES)) {
+diff -ruN rev369_base_release/assets/901c62026afc22f4.js rev370_work/assets/901c62026afc22f4.js
+--- rev369_base_release/assets/901c62026afc22f4.js	2026-09-07 02:30:27.000000000 +0000
++++ rev370_work/assets/901c62026afc22f4.js	2026-09-07 19:04:26.015266452 +0000
+@@ -1596,19 +1596,6 @@
+ try {
+ if (!msg)
+ return;
+-if (msg.type === 'tf_verify_login_before_update_strict') {
