@@ -1,0 +1,72 @@
+name: Publish staged release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/**/READY'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build, validate, and publish staged release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          READY=$(find release-staging -name READY -type f -print0 | xargs -0 -r ls -t | head -n 1)
+          test -n "$READY"
+          DIR=$(dirname "$READY")
+          META="$DIR/release.env"
+          test -f "$META"
+          source "$META"
+          test -f "$DIR/RELEASE_NOTES.md"
+
+          rm -rf /tmp/tf-release-base /tmp/tf-release-build
+          mkdir -p /tmp/tf-release-base /tmp/tf-release-build
+          gh release download "$PATCH_BASE_TAG" --pattern "$BASE_ASSET" --dir /tmp/tf-release-base
+          unzip -q "/tmp/tf-release-base/$BASE_ASSET" -d /tmp/tf-release-build
+          cat "$DIR"/release.patch.part* > /tmp/release.patch
+          (cd /tmp/tf-release-build && patch -p1 < /tmp/release.patch)
+
+          python3 -m json.tool /tmp/tf-release-build/manifest.json >/dev/null
+          python3 - <<'PY'
+          import json
+          p='/tmp/tf-release-build/manifest.json'
+          m=json.load(open(p,encoding='utf-8'))
+          assert m.get('version') == '1.16.84', m
+          assert m.get('version_name') == 'REV370', m
+          PY
+          node --check /tmp/tf-release-build/assets/901c62026afc22f4.js
+          node --check /tmp/tf-release-build/assets/927ecbd63036f61b.js
+          node --check /tmp/tf-release-build/assets/tf-device-background.js
+          python3 - <<'PY'
+          from pathlib import Path
+          import re, hashlib
+          root=Path('/tmp/tf-release-build')
+          s=(root/'assets/7b6af0cb4001a684.js').read_text(encoding='utf-8')
+          mp={}
+          for p,h in re.findall(r'FILES\["([^"]+)"\]\s*=\s*"([0-9a-f]{64})";',s): mp[p]=h
+          for p,h in mp.items():
+              f=root/p
+              assert f.exists(), p
+              assert hashlib.sha256(f.read_bytes()).hexdigest()==h, p
+          print('effective integrity entries',len(mp))
+          PY
+
+          (cd /tmp/tf-release-build && zip -qr "/tmp/$ASSET" .)
+          unzip -t "/tmp/$ASSET" >/dev/null
+          test -n "$(unzip -Z1 "/tmp/$ASSET" | grep '^manifest.json$')"
+
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TITLE" --notes-file "$DIR/RELEASE_NOTES.md"
+            gh release upload "$TAG" "/tmp/$ASSET" --clobber
+          else
+            gh release create "$TAG" "/tmp/$ASSET" --target main --title "$TITLE" --notes-file "$DIR/RELEASE_NOTES.md"
+          fi
