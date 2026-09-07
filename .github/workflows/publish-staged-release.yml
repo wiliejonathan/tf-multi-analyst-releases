@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'release-staging/**'
+      - 'release-staging/**/READY'
 
 permissions:
   contents: write
@@ -20,12 +20,18 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          META=$(find release-staging -name release.env -type f | sort | tail -n 1)
-          test -n "$META"
+          META=$(find release-staging -name READY -type f -print0 | xargs -0 -r ls -t | head -n 1 | xargs dirname)/release.env
+          test -f "$META"
           source "$META"
           DIR=$(dirname "$META")
-          test -f "$DIR/$ASSET"
           test -f "$DIR/RELEASE_NOTES.md"
+          if [ ! -f "$DIR/$ASSET" ]; then
+            cat "$DIR/$ASSET".b64part* | base64 -d > "$DIR/$ASSET"
+          fi
+          test -s "$DIR/$ASSET"
+          if [ -n "${SHA256:-}" ]; then
+            echo "$SHA256  $DIR/$ASSET" | sha256sum -c -
+          fi
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release edit "$TAG" --title "$TITLE" --notes-file "$DIR/RELEASE_NOTES.md"
             gh release upload "$TAG" "$DIR/$ASSET" --clobber
