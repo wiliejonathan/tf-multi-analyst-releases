@@ -1,0 +1,153 @@
+   function startLive(){
+     clearLive();if(!remoteEnabled)return;
+     liveTimer=setInterval(()=>{
+@@ -22,10 +23,12 @@
+       const now=Date.now();
+       // Executor expiry is deliberately generous and owned here, so a sleeping
+       // MV3 service worker cannot briefly reset a healthy sidebar to Offline.
+-      if(executorReady&&executorUpdatedAt&&now-executorUpdatedAt>45000){executorReady=false;wsSend({type:'desktop_executor_presence',ready:false,remoteEnabled:true,sessionId:desktopSessionId,seq:liveSeq,at:now});}
+-      if(wsReady)wsSend(livePacket());
++      if(executorReady&&executorUpdatedAt&&now-executorUpdatedAt>90000){executorReady=false;lastExecutorAnnounced=false;wsSend({type:'desktop_executor_presence',ready:false,remoteEnabled:true,sessionId:desktopSessionId,seq:liveSeq,at:now});}
++      // REV367: static heartbeat is handled by Durable Object auto-response, so
++      // hibernating rooms stay connected without waking JavaScript every second.
++      if(wsReady)wsSendRaw('TF_PING');
+       coreStatus();
+-    },1000);
++    },30000);
+     // REV355: never recycle a healthy OPEN WebSocket merely because the server
+     // has not emitted an application-level message. Some Fast Lane sessions are
+     // intentionally quiet while Mobile is closed. The browser/WebSocket stack
+@@ -40,7 +43,7 @@
+     },5000);
+   }
+   function scheduleNeedTicket(force=false){if(!remoteEnabled||reconnectTimer)return;const base=backoff[Math.min(reconnectStep++,backoff.length-1)],delay=base+Math.floor(Math.random()*Math.min(350,base));reconnectTimer=setTimeout(()=>{reconnectTimer=null;if(remoteEnabled)sendRuntime({type:'TF_REMOTE_OFFSCREEN_NEED_TICKET',force:force||reconnectStep>2,at:Date.now()});},delay);}
+-  function closeWs(notifyOff=false){clearReconnect();clearLive();wsReady=false;lastServerAt=0;const old=ws;ws=null;try{old&&old.close(1000,'remote-off');}catch(_){}if(notifyOff)coreStatus();}
++  function closeWs(notifyOff=false){clearReconnect();clearLive();wsReady=false;lastServerAt=0;lastExecutorAnnounced=null;const old=ws;ws=null;try{old&&old.close(1000,'remote-off');}catch(_){}if(notifyOff)coreStatus();}
+ 
+   function connectWs(url,sessionId,forceReplace=false){
+     remoteEnabled=true;desktopSessionId=String(sessionId||desktopSessionId||('desk-'+Date.now().toString(36)));
+@@ -51,6 +54,7 @@
+       ws=null;
+       wsReady=false;
+       clearLive();
++      lastExecutorAnnounced=null;
+       try{old.onclose=null;old.onerror=null;old.close(4001,'fresh-ticket');}catch(_){}
+     }
+     if(ws&&[WebSocket.OPEN,WebSocket.CONNECTING].includes(ws.readyState)){startLive();coreStatus();return;}
+@@ -61,14 +65,14 @@
+       const guard=setTimeout(()=>{try{if(sock.readyState!==WebSocket.OPEN)sock.close();}catch(_){}},15000);
+       sock.onopen=()=>{
+         if(ws!==sock)return;opened=true;clearTimeout(guard);wsReady=true;lastServerAt=Date.now();reconnectStep=0;
++        lastExecutorAnnounced=executorReady;
+         wsSend(livePacket({open:true}));
+-        if(executorReady)wsSend({type:'desktop_executor_presence',ready:true,remoteEnabled:true,sessionId:desktopSessionId,seq:liveSeq,at:Date.now()});
+         startLive();coreStatus();
+       };
+-      sock.onmessage=(e)=>{lastServerAt=Date.now();let msg;try{msg=JSON.parse(String(e.data||''));}catch(_){return;}void inboundWs(msg);};
++      sock.onmessage=(e)=>{lastServerAt=Date.now();const raw=String(e.data||'');if(raw==='TF_PONG')return;let msg;try{msg=JSON.parse(raw);}catch(_){return;}void inboundWs(msg);};
+       sock.onerror=()=>{};
+       sock.onclose=()=>{
+-        clearTimeout(guard);if(ws!==sock)return;ws=null;wsReady=false;clearLive();coreStatus();
++        clearTimeout(guard);if(ws!==sock)return;ws=null;wsReady=false;lastExecutorAnnounced=null;clearLive();coreStatus();
+         if(remoteEnabled)scheduleNeedTicket(true);
+       };
+     }catch(_){ws=null;wsReady=false;coreStatus();scheduleNeedTicket(true);}
+@@ -110,7 +114,7 @@
+       setTimeout(()=>{closeWs(true);closePeer();coreStatus();sendResponse&&sendResponse({ok:true});},120);
+       return true;
+     }
+-    if(m.type==='TF_REMOTE_OFFSCREEN_EXECUTOR_STATE'){executorReady=m.ready===true;executorUpdatedAt=Date.now();if(remoteEnabled&&wsReady)wsSend({type:'desktop_executor_presence',ready:executorReady,remoteEnabled:true,sessionId:desktopSessionId,seq:liveSeq,at:Date.now()});coreStatus();sendResponse&&sendResponse({ok:true});return true;}
++    if(m.type==='TF_REMOTE_OFFSCREEN_EXECUTOR_STATE'){const next=m.ready===true,changed=next!==executorReady;executorReady=next;executorUpdatedAt=Date.now();if(remoteEnabled&&wsReady&&(changed||lastExecutorAnnounced===null)){wsSend({type:'desktop_executor_presence',ready:executorReady,remoteEnabled:true,sessionId:desktopSessionId,seq:liveSeq,at:Date.now()});lastExecutorAnnounced=executorReady;}coreStatus();sendResponse&&sendResponse({ok:true});return true;}
+     if(m.type==='TF_REMOTE_OFFSCREEN_SIGNAL'){void handleSignal(m.signal,m.iceServers);sendResponse&&sendResponse({ok:true});return true;}
+     if(m.type==='TF_REMOTE_OFFSCREEN_SEND'){sendResponse&&sendResponse({ok:sendData(m.message||{})});return true;}
+     if(m.type==='TF_REMOTE_OFFSCREEN_WS_SEND'){sendResponse&&sendResponse({ok:wsSend(m.message||{})});return true;}
+--- rev366_extract_cmp/assets/tf-remote-sidebar-agent.js	2026-09-05 10:59:05.000000000 +0000
++++ rev368_work/assets/tf-remote-sidebar-agent.js	2026-09-07 02:32:01.571266756 +0000
+@@ -5,8 +5,9 @@
+   const CREDS_KEY = 'tfLicenseCredentials';
+   const SESSION_KEY = 'tfDeviceSessionTokenV1';
+   const STATE_KEY = 'tfDeviceLockStateV1';
+-  const SYNC_ONLINE_MS = 900;
+-  const SYNC_IDLE_MS = 1600;
++  const SYNC_ONLINE_MS = 3000;
++  const SYNC_IDLE_MS = 3000;
++  const HTTP_RECOVERY_BACKOFF_MS = [3000, 5000, 10000, 30000];
+   const REQUEST_TIMEOUT_MS = 26000;
+   const LAST_EXEC_KEY = 'tfRemoteLastExecutedCommandV260';
+   const PAIRS = ['XAUUSD','EURUSD','GBPUSD','AUDUSD','NZDUSD','USDJPY','EURJPY','GBPJPY','AUDJPY','NZDJPY','CADJPY','CHFJPY','USDCAD','USDCHF'];
+@@ -22,6 +23,7 @@
+   let badgeTimer = null;
+   let lastBadgeState = null;
+   let failureCount = 0;
++  let httpRecoveryStep = 0;
+   let lastSuccessAt = 0;
+   let hasImportDataCache = false;
+   let dataFingerprintCache = '';
+@@ -498,7 +500,7 @@
+   function sendFastCommandResult(clientCommandId,result){return relaySend({type:'command_result',clientCommandId:String(clientCommandId||'').slice(0,100),result:result||{ok:false,message:'Fast Lane result kosong.'},finishedAt:Date.now()});}
+   function handleCoreInbound(route,msg){if(!msg||typeof msg!=='object'||!remoteAvailabilityEnabled)return;if(msg.type==='presence'){const live=Object.prototype.hasOwnProperty.call(msg,'mobileRemoteOnline')?!!msg.mobileRemoteOnline:!!msg.mobileOnline;renderRemoteMobileStatus(live);if(live)queueFastSnapshot(5);return;}if(msg.type==='command'){void executeRealtimeCommand(msg,route==='direct'?'direct':'fast');return;}if(msg.type==='snapshot_request'){route==='direct'?sendDirectSnapshot():queueFastSnapshot(3);return;}}
+   try{
+-    chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{if(!message||typeof message!=='object')return;if(message.type==='TF_REMOTE_CORE_STATUS'){remoteAvailabilityEnabled=message.remoteEnabled===true;remoteAvailabilityLoaded=true;browserCoreWsReady=remoteAvailabilityEnabled&&message.wsReady===true;browserCoreDirectReady=remoteAvailabilityEnabled&&message.directReady===true;browserCoreMode=String(message.directMode||(remoteAvailabilityEnabled?'connecting':'off'));browserCoreRtt=Number(message.directRtt||0);browserCoreConnectionState=String(message.connectionState||'');browserCoreLastError=String(message.lastError||'');renderRemoteMobileStatus(Object.prototype.hasOwnProperty.call(message,'mobileRemoteOnline')?!!message.mobileRemoteOnline:!!message.mobileOnline);return;}if(message.type==='TF_REMOTE_CORE_INBOUND'){handleCoreInbound(String(message.route||'ws'),message.message);return;}});
++    chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{if(!message||typeof message!=='object')return;if(message.type==='TF_REMOTE_CORE_STATUS'){remoteAvailabilityEnabled=message.remoteEnabled===true;remoteAvailabilityLoaded=true;browserCoreWsReady=remoteAvailabilityEnabled&&message.wsReady===true;browserCoreDirectReady=remoteAvailabilityEnabled&&message.directReady===true;if(browserCoreWsReady||browserCoreDirectReady)httpRecoveryStep=0;browserCoreMode=String(message.directMode||(remoteAvailabilityEnabled?'connecting':'off'));browserCoreRtt=Number(message.directRtt||0);browserCoreConnectionState=String(message.connectionState||'');browserCoreLastError=String(message.lastError||'');renderRemoteMobileStatus(Object.prototype.hasOwnProperty.call(message,'mobileRemoteOnline')?!!message.mobileRemoteOnline:!!message.mobileOnline);return;}if(message.type==='TF_REMOTE_CORE_INBOUND'){handleCoreInbound(String(message.route||'ws'),message.message);return;}});
+     chrome.runtime.sendMessage({type:'TF_REMOTE_CORE_STATUS_QUERY'},s=>{try{void chrome.runtime.lastError;}catch(_){}if(s&&s.ok){remoteAvailabilityEnabled=s.remoteEnabled===true;remoteAvailabilityLoaded=true;browserCoreWsReady=remoteAvailabilityEnabled&&s.wsReady===true;browserCoreDirectReady=remoteAvailabilityEnabled&&s.directReady===true;browserCoreMode=String(s.directMode||(remoteAvailabilityEnabled?'connecting':'off'));browserCoreRtt=Number(s.directRtt||0);browserCoreConnectionState=String(s.connectionState||'');browserCoreLastError=String(s.lastError||'');renderRemoteMobileStatus(Object.prototype.hasOwnProperty.call(s,'mobileRemoteOnline')?!!s.mobileRemoteOnline:!!s.mobileOnline);if(browserCoreWsReady)queueFastSnapshot(5);}});
+   }catch(_){ }
+ 
+@@ -1523,8 +1525,24 @@
+       while(Date.now()-started<30000){await sleep(120);const t=cleanText(btn.textContent,80);const d=await storageGet(['tfScanInProgress']);if(!d.tfScanInProgress&&!/stop|stopping/i.test(t)){queueImmediateSync(30);return {ok:true,action:'update',scanActive:false,stopped:true,message:'Batch scanning sudah dihentikan.'};}}
+       return {ok:false,code:'STOP_TIMEOUT',message:'Stop sudah dikirim, tetapi plugin belum memberi signal selesai.'};
+     }
+-    while(Date.now()-started<5000){await sleep(90);const t=cleanText(btn.textContent,80);const d=await storageGet(['tfScanInProgress']);if(d.tfScanInProgress||/stop|stopping/i.test(t)){queueImmediateSync(30);return {ok:true,action:'update',scanActive:true,started:true,message:'Batch scanning sudah dimulai.'};}}
+-    queueImmediateSync(30);return {ok:true,action:'update',scanActive:false,message:'Perintah Update sudah diterima plugin.'};
++    while(Date.now()-started<12000){
++      await sleep(120);
++      const t=cleanText(btn.textContent,80);
++      const d=await storageGet(['tfScanInProgress','tfAccountLoginState','tfRootLoginState','tfLoginError','tfForceLoginForm']);
++      const account=String(d.tfAccountLoginState||'').toLowerCase();
++      const root=String(d.tfRootLoginState||'').toLowerCase();
++      const loginError=String(d.tfLoginError||'').trim();
++      if(account==='logged_out'||root==='logged_out'||d.tfForceLoginForm===true||/session tradersfamily.*tidak aktif|silakan login kembali sebelum update|session.*berakhir/i.test(loginError)){
++        queueImmediateSync(10);
++        return {ok:false,code:'TRADERSFAMILY_LOGIN_REQUIRED',action:'update',scanActive:false,message:'Update dibatalkan: session TradersFamily sudah logout. Silakan login kembali di Plugin PC.'};
++      }
++      if(d.tfScanInProgress||/stop|stopping/i.test(t)){
++        queueImmediateSync(30);
++        return {ok:true,action:'update',scanActive:true,started:true,message:'Login TradersFamily valid. Batch scanning Update sudah dimulai.'};
++      }
++    }
++    queueImmediateSync(30);
++    return {ok:false,code:'UPDATE_PREFLIGHT_TIMEOUT',action:'update',scanActive:false,message:'Update belum dimulai karena status login TradersFamily belum dapat diverifikasi. Periksa koneksi/login lalu coba lagi.'};
+   }
+ 
+   function setRemoteInputValue(el,value){
+@@ -1595,7 +1613,7 @@
+     if(action==='import_bundle_begin') return await importBundleBegin(payload);
+     if(action==='import_bundle_chunk') return await importBundleChunk(payload);
+     if(action==='import_bundle_commit') return await importBundleCommit(payload);
+-    if(action==='update') return updateOrStopDispatch();
++    if(action==='update') return await updateOrStopAndWait();
+     if(action==='refresh') return refreshDispatch();
+     if(action==='batch_toggle') return batchOrStopDispatch();
+     if(action==='scan_channel') return clickVisible(['tf-btn-scanlink-main','scan-btn','tf-btn-scanlink-isignal','tf-btn-scanlink-masuk']);
+@@ -1660,7 +1678,7 @@
+     const enabled=remoteAvailabilityEnabled===true;
+     btn.setAttribute('aria-checked',enabled?'true':'false');
+     btn.dataset.enabled=enabled?'1':'0';
+-    btn.title=enabled?'Remote ON — koneksi live nonstop setiap detik':'Remote OFF — klik untuk mengaktifkan Remote';
++    btn.title=enabled?'Remote ON — koneksi realtime hemat usage':'Remote OFF — klik untuk mengaktifkan Remote';
+     btn.style.background=enabled?'#16a34a':'#dc2626';
+     btn.style.borderColor=enabled?'rgba(74,222,128,.85)':'rgba(248,113,113,.88)';
+     btn.style.boxShadow='none';
+@@ -1887,7 +1905,6 @@
+       if(r && r.retry){
+         // REV248: transient Apps Script cold-start is not an OFFLINE event.
+         // Keep the sidebar badge ONLINE and retry without hammering the relay.
+-        scheduleNext(900);
+         return;
+       }
+       failureCount=0;
+@@ -1909,7 +1926,7 @@
+       if(failureCount>=6 && (!lastSuccessAt || Date.now()-lastSuccessAt>45000)){browserCoreHttpReadyAt=0;renderRemoteMobileStatus(false);}
+     }finally{
+       busy=false;
+-      if(!timer) scheduleNext((directSocketOpen()||relaySocketOpen())?30000:(remoteMobileOnline?SYNC_ONLINE_MS:SYNC_IDLE_MS));
++      if(!timer){if(directSocketOpen()||relaySocketOpen()){httpRecoveryStep=0;scheduleNext(30000);}else{const delay=HTTP_RECOVERY_BACKOFF_MS[Math.min(
