@@ -1,0 +1,251 @@
+httpRecoveryStep,HTTP_RECOVERY_BACKOFF_MS.length-1)];httpRecoveryStep=Math.min(httpRecoveryStep+1,HTTP_RECOVERY_BACKOFF_MS.length-1);scheduleNext(delay);}}
+     }
+   }
+ 
+@@ -1970,7 +1987,7 @@
+     }).catch(()=>{});
+     installRealtimeUiBridge();
+     installRealtimeLoginViewWatcher();
+-    const tfExecutorLive=setInterval(()=>{try{chrome.runtime.sendMessage({type:'TF_REMOTE_EXECUTOR_LIVE',at:Date.now()},()=>{try{void chrome.runtime.lastError;}catch(_){}});}catch(_){}},1000);
++    const tfExecutorLive=setInterval(()=>{try{chrome.runtime.sendMessage({type:'TF_REMOTE_EXECUTOR_LIVE',at:Date.now()},()=>{try{void chrome.runtime.lastError;}catch(_){}});}catch(_){}},30000);
+     try{chrome.runtime.sendMessage({type:'TF_REMOTE_EXECUTOR_HEARTBEAT',at:Date.now()},()=>{try{void chrome.runtime.lastError;}catch(_){}});}catch(_){}
+     try{
+       if(typeof chrome!=='undefined'&&chrome.storage&&chrome.storage.onChanged){
+--- rev366_extract_cmp/manifest.json	2026-09-05 15:07:26.000000000 +0000
++++ rev368_work/manifest.json	2026-09-07 02:37:52.514815254 +0000
+@@ -1,8 +1,8 @@
+ {
+   "manifest_version": 3,
+   "name": "TF Multi-Analyst Scanner",
+-  "version": "1.16.80",
+-  "description": "REV366: centers the compact Table 2 refresh icon and removes all Table 2 hover visual effects for smoother scrolling, while retaining REV365 scroll optimizations, REV364 APK-style percentage-based Equity axis, REV363 manual activation per new Load Unpacked build, and prior table refinements.",
++  "version": "1.16.82",
++  "description": "REV368: adds strict fresh-session verification before every Update so stale TradersFamily tabs cannot falsely authorize a scan; blocks Update and returns to Login when the real server session is logged out, while retaining REV367 low-usage realtime Remote, exact expiry enforcement, and all prior dashboard/table fixes.",
+   "minimum_chrome_version": "116",
+   "permissions": [
+     "alarms",
+@@ -87,5 +87,5 @@
+     "default_path": "popup.html"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJ7+8rQMKQLh6MP9c2K4xUBszCpYNbKYYAjqVPLl0hHHz3X1uS9NarldrfPMsAK5qAAnC+RrostZwMBJ8m3DQQuyMl14BaAsZeX9xHf+pbtSErcjQKAVJOgCkB3X8KpMNpX8vq3AnfRL7PHy8RfCKiE4kRh+xdBTDoRrFXTVThjdt4lgIZs9dvjCBrSHsza2U3vZVAOZyKWWYCxeVBu2Q6uJLI97bqu1c2afc1O2V4A/FDBh5sd34ahSrBrD4DaXt2J6+gy2U4UuAr4WZkn/rm16gT0eXHUMUKJfH4VwFtTD4526UdyIjZuXHT0b3FORHKbGhvIQ1ke9MvaInK52WQIDAQAB",
+-  "version_name": "REV366"
++  "version_name": "REV368"
+ }
+--- /dev/null	2026-09-07 02:15:48.064900507 +0000
++++ rev368_work/README_REV367.txt	2026-09-07 01:18:50.000000000 +0000
+@@ -0,0 +1,34 @@
++TF Analyzer Analyst — REV367
++Version: v1.16.81
++Revision: REV367
++
++LOW-USAGE REALTIME REMOTE + EXACT EXPIRY
++
++Tujuan:
++- Remote tetap realtime selama toggle Remote ON.
++- Mengurangi traffic Cloudflare background secara drastis.
++- Expiry lisensi tetap dikunci tepat waktu tanpa polling 5 detik.
++
++Perubahan Plugin PC:
++1. WebSocket heartbeat Desktop: 1 detik -> 30 detik.
++2. Heartbeat memakai string TF_PING yang dapat dijawab otomatis oleh Durable Object REV367 tanpa membangunkan JavaScript DO ketika hibernasi.
++3. Executor heartbeat Sidebar: 1 detik -> 30 detik, dengan grace 90 detik agar tidak false OFFLINE.
++4. Executor presence ke server hanya dikirim saat state benar-benar berubah, bukan setiap heartbeat lokal.
++5. HTTP fallback memakai backoff 3s -> 5s -> 10s -> 30s ketika WebSocket tidak tersedia.
++6. Saat WebSocket sehat, HTTP recovery kembali jarang (30 detik).
++7. License safety check background: 60 detik.
++8. Expiry yang sudah diketahui dari expiresAt menggunakan Chrome local alarm sehingga tidak menunggu safety poll.
++9. Jika Worker mengirim license_event LICENSE_EXPIRED, Remote langsung dimatikan dan session Remote dikunci.
++10. Dashboard/Side Panel yang terbuka menggunakan countdown server-aligned untuk mengunci expiry tanpa request tambahan.
++
++PENTING:
++- Worker Cloudflare REV367 perlu dideploy agar TF_PING memakai auto-response hibernation dan exact server-side expiry alarm aktif.
++- Google Apps Script tidak perlu diubah untuk revisi ini.
++- Patch mobile disertakan pada paket COMPLETE sebagai source asset. APK harus dibuild ulang dengan production signing key yang sama; jangan sign dengan key baru.
++
++Retained:
++- REV366 Table 2 Hover-Free Smoothness.
++- REV365 Smooth Dashboard Scroll.
++- REV364 APK-style Equity Axis + performance optimizations.
++- REV363 manual Activation page per new Load Unpacked build.
++- Device Lock, scanner, calculations, Import/Export, iSignal, WebRTC/Remote features tetap dipertahankan.
+--- /dev/null	2026-09-07 02:15:48.064900507 +0000
++++ rev368_work/REV367_TEST_REPORT.txt	2026-09-07 01:18:50.000000000 +0000
+@@ -0,0 +1,32 @@
++TF Analyzer Analyst REV367 — Static Validation Report
++
++Build
++- Manifest version: 1.16.81
++- Version name: REV367
++
++Plugin PC checks
++[PASS] Desktop WebSocket heartbeat changed to 30 seconds.
++[PASS] Desktop heartbeat uses TF_PING raw frame for Worker auto-response.
++[PASS] Executor local heartbeat changed to 30 seconds.
++[PASS] Executor stale grace changed to 90 seconds.
++[PASS] Executor presence is deduplicated before WebSocket send.
++[PASS] HTTP fallback backoff = 3s -> 5s -> 10s -> 30s.
++[PASS] Dashboard and Side Panel safety license poll = 60 seconds.
++[PASS] Local expiresAt countdown triggers expiry lock without waiting for server poll.
++[PASS] Background Remote license safety alarm = 60 seconds.
++[PASS] Background local exact expiry alarm added.
++[PASS] Worker license_event is handled by Desktop background.
++
++Backend checks
++[PASS] Source based on Cloudflare Device API REV332 so later Token Gate / Remote features are retained.
++[PASS] Existing Hibernation API acceptWebSocket retained.
++[PASS] setWebSocketAutoResponse(TF_PING -> TF_PONG) added.
++[PASS] Fast ticket carries signed licenseExpiresAt.
++[PASS] Durable Object schedules one alarm at nearest license expiry.
++[PASS] Expired socket receives LICENSE_EXPIRED event then closes.
++[PASS] No new Durable Object class or migration required.
++
++Runtime limitations
++- Physical browser/mobile end-to-end test was not performed here.
++- Manual admin Block/Delete is caught by the 60-second safety validation unless a separate Admin push event is implemented.
++- Android APK binary is not rebuilt in this package because the production signing private key is not present. Source patch is included for rebuild using the existing signing chain.
+--- /dev/null	2026-09-07 02:15:48.064900507 +0000
++++ rev368_work/GITHUB_RELEASE_REV367.txt	2026-09-07 01:18:50.000000000 +0000
+@@ -0,0 +1,51 @@
++TAG:
++v1.16.81
++
++TITLE:
++TF Analyzer Analyst V1.16.81 - Low-Usage Realtime Remote & Exact Expiry Enforcement
++
++ASSET:
++TF_Extension_PC_MAC_REV367_LOW_USAGE_REALTIME_EXACT_EXPIRY.zip
++
++DESCRIPTION:
++# TF Analyzer Analyst V1.16.81
++
++REV367 adalah update kumulatif setelah release v1.16.75, mencakup penyempurnaan Table 2/activation/dashboard dari REV362-REV366 serta optimasi besar penggunaan Cloudflare pada REV367.
++
++## REV362-REV366 retained
++- Table 2 divider + compact Pair + latest-month default view.
++- Manual Activation page pada setiap build baru yang di-Load Unpacked.
++- Dashboard rendering dan Equity Curve dioptimalkan.
++- Equity Y-axis mengikuti percentage-based range seperti APK.
++- Smooth vertical scrolling dan Table 2 hover-free.
++- Ikon Refresh Table 2 centered dan compact.
++
++## REV367 — Low-Usage Realtime Remote
++- Remote tetap WebSocket-first dan realtime.
++- Desktop heartbeat dari 1 detik menjadi 30 detik.
++- Heartbeat TF_PING dapat dijawab oleh Cloudflare Durable Object auto-response tanpa membangunkan JavaScript DO saat hibernasi.
++- Executor heartbeat Sidebar dari 1 detik menjadi 30 detik dengan 90 detik grace.
++- Presence executor hanya dikirim ke server jika state berubah.
++- HTTP fallback memakai progressive backoff 3s -> 5s -> 10s -> 30s.
++- License server safety validation menjadi 60 detik, bukan 5 detik.
++
++## Exact Expiry Enforcement
++- expiresAt tetap menjadi sumber waktu expiry.
++- Plugin memasang local exact-expiry alarm berdasarkan waktu server.
++- Dashboard/Side Panel mengunci lisensi saat countdown expiry mencapai nol tanpa menunggu request berikutnya.
++- Cloudflare Fast Lane ticket membawa signed licenseExpiresAt.
++- Durable Object menjadwalkan alarm di waktu expiry dan mengirim LICENSE_EXPIRED ke socket sebelum menutup koneksi.
++- Gangguan internet sementara tidak dianggap sebagai revoke.
++
++## Existing Features Retained
++- Device Lock
++- Persistent Remote/WebRTC
++- Scanner
++- Money Management
++- Table 1-4
++- Equity Curve / Drawdown
++- Import / Export
++- iSignal Users
++- GitHub update detection
++
++Build: v1.16.81 • REV367
+--- /dev/null	2026-09-07 02:15:48.064900507 +0000
++++ rev368_work/README_REV368.txt	2026-09-07 02:37:52.649393122 +0000
+@@ -0,0 +1,19 @@
++TF Analyzer Analyst — REV368
++Version: v1.16.82
++
++FOCUS
++- Strict TradersFamily login preflight before Update.
++- Update no longer trusts already-open/cached TradersFamily tabs as proof of login.
++- A fresh no-cache request to the protected account area is authoritative.
++- If the real server session is logged out, Update is blocked, cached login/profile state is cleared, the sidebar returns to Login, and open TradersFamily tabs are reloaded with bypassCache.
++- If login cannot be verified because the network is unavailable/unknown, Update is blocked instead of starting a scan that will fail.
++- STOP remains immediately available while an Update is already running.
++- Remote Mobile Update now waits for the same preflight and returns TRADERSFAMILY_LOGIN_REQUIRED when the PC session is logged out.
++
++RETAINED
++- REV367 low-usage realtime Remote: 30s WebSocket heartbeat, 60s license safety check, exact expiry enforcement, exponential HTTP recovery.
++- REV366 hover-free Table 2 and centered Refresh icon.
++- REV365 dashboard scroll optimization.
++- REV364 APK-style percentage Equity axis.
++- REV363 manual activation once per newly loaded plugin build.
++- Device Lock, scanner, calculations, Import/Export, iSignal, Remote and table behavior retained.
+--- /dev/null	2026-09-07 02:15:48.064900507 +0000
++++ rev368_work/REV368_TEST_REPORT.txt	2026-09-07 02:37:52.650234919 +0000
+@@ -0,0 +1,27 @@
++TF ANALYZER ANALYST — REV368 TEST REPORT
++========================================
++
++BUILD
++- Manifest version: 1.16.82
++- Revision: REV368
++
++STATIC / PACKAGE CHECKS
++- manifest.json parse: PASS
++- Background JS syntax (901c62026afc22f4.js): PASS
++- Sidebar JS syntax (927ecbd63036f61b.js): PASS
++- Remote sidebar agent syntax: PASS
++- Integrity hashes: rebuilt for all REV368 modified/new protected files
++- ZIP archive test: PASS (performed after packaging)
++
++LOGIN PREFLIGHT LOGIC
++- Normal Update performs tf_verify_login_before_update_strict before analyst reload/scan: PASS (source inspection)
++- Strict preflight uses a fresh authenticated no-cache /channels/ request before any positive decision: PASS
++- Already-open TradersFamily tab is not used as authoritative positive evidence for Update: PASS
++- Fresh server logout marks plugin logged_out, clears stale profile state, forces Login view, and reloads open TF tabs bypassing cache: PASS
++- Unknown/network failure blocks Update instead of launching scan: PASS
++- STOP path bypasses login preflight so a running Update can still be stopped: PASS
++- Remote Update waits for scan start or explicit login-required state: PASS
++
++PHYSICAL END-TO-END TEST
++- TradersFamily live production session expiry / server-side logout: NOT PERFORMED in container.
++- Chrome Load Unpacked UI interaction: NOT PERFORMED in container.
+--- /dev/null	2026-09-07 02:15:48.064900507 +0000
++++ rev368_work/GITHUB_RELEASE_REV368.txt	2026-09-07 02:37:52.650909173 +0000
+@@ -0,0 +1,37 @@
++Tag: v1.16.82
++Title: TF Analyzer Analyst V1.16.82 - Strict Update Login Preflight & Unified Mobile Package
++
++# TF Analyzer Analyst V1.16.82
++
++REV368 memperbaiki alur tombol Update agar scanner tidak lagi terkecoh oleh tab TradersFamily lama yang masih menampilkan tampilan logged-in dari cache/DOM lama, padahal session server sebenarnya sudah logout.
++
++## Strict Login Check Before Update
++- Setiap klik Update sekarang melakukan pemeriksaan session TradersFamily yang fresh sebelum scan dimulai.
++- Pemeriksaan utama menggunakan request authenticated `no-store` ke area account yang dilindungi.
++- Tab TradersFamily yang sudah terbuka tidak lagi dianggap sebagai bukti login yang authoritative untuk Update.
++- Jika server menyatakan session sudah logout/expired, Update langsung dibatalkan.
++- Plugin membersihkan state login/profile yang stale dan kembali ke halaman Login.
++- Tab TradersFamily yang sudah terbuka direload dengan bypass cache agar tampilannya ikut mencerminkan session server terbaru.
++- Jika status login tidak dapat diverifikasi karena network/error, Update tetap diblok untuk mencegah scan gagal di tengah proses.
++- Tombol STOP tetap dapat digunakan bila Update sudah berjalan dan session kemudian berakhir.
++
++## Remote / Mobile Update
++- Perintah Update dari Mobile memakai preflight yang sama di Plugin PC.
++- Mobile menerima error `TRADERSFAMILY_LOGIN_REQUIRED` bila session PC sudah logout, bukan status sukses palsu.
++
++## Low-Usage Realtime Retained
++- 30-second WebSocket heartbeat.
++- 60-second license safety validation.
++- Exact license expiry enforcement.
++- Exponential HTTP fallback recovery.
++- Hibernation-friendly Cloudflare realtime flow dari REV367 tetap dipertahankan.
++
++## UI / Dashboard Retained
++- Hover-free Table 2 + centered Refresh.
++- Smooth dashboard scrolling.
++- Percentage-based Equity axis parity with APK.
++- Table 2 sticky dividers and compact Pair column.
++- Table 3 compact width.
++- Table 1 Risk stepper.
++
++Build: v1.16.82 • REV368
