@@ -20,18 +20,34 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          META=$(find release-staging -name READY -type f -print0 | xargs -0 -r ls -t | head -n 1 | xargs dirname)/release.env
+          READY=$(find release-staging -name READY -type f -print0 | xargs -0 -r ls -t | head -n 1)
+          test -n "$READY"
+          DIR=$(dirname "$READY")
+          META="$DIR/release.env"
           test -f "$META"
           source "$META"
-          DIR=$(dirname "$META")
           test -f "$DIR/RELEASE_NOTES.md"
-          if [ ! -f "$DIR/$ASSET" ]; then
+
+          if [ -n "${PATCH_BASE_TAG:-}" ]; then
+            rm -rf /tmp/tf-release-base /tmp/tf-release-build
+            mkdir -p /tmp/tf-release-base /tmp/tf-release-build
+            gh release download "$PATCH_BASE_TAG" --pattern "$BASE_ASSET" --dir /tmp/tf-release-base
+            unzip -q "/tmp/tf-release-base/$BASE_ASSET" -d /tmp/tf-release-build
+            cat "$DIR"/rev368.patch.part* > /tmp/rev368.patch
+            (cd /tmp/tf-release-build && patch -p1 < /tmp/rev368.patch)
+            (cd /tmp/tf-release-build && zip -qr "/tmp/$ASSET" .)
+            cp "/tmp/$ASSET" "$DIR/$ASSET"
+          elif [ ! -f "$DIR/$ASSET" ]; then
             cat "$DIR/$ASSET".b64part* | base64 -d > "$DIR/$ASSET"
           fi
+
           test -s "$DIR/$ASSET"
-          if [ -n "${SHA256:-}" ]; then
+          unzip -t "$DIR/$ASSET" >/dev/null
+          test "$(unzip -Z1 "$DIR/$ASSET" | head -n 1 | cut -d/ -f1)" = "manifest.json" || test -n "$(unzip -Z1 "$DIR/$ASSET" | grep '^manifest.json$')"
+          if [ -n "${SHA256:-}" ] && [ -z "${PATCH_BASE_TAG:-}" ]; then
             echo "$SHA256  $DIR/$ASSET" | sha256sum -c -
           fi
+
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release edit "$TAG" --title "$TITLE" --notes-file "$DIR/RELEASE_NOTES.md"
             gh release upload "$TAG" "$DIR/$ASSET" --clobber
