@@ -1,0 +1,137 @@
+-(async () => {
+-try {
+-const ownerTabId = sender && sender.tab && sender.tab.id != null ? sender.tab.id : null;
+-const result = await bg_verifyLoginBeforeUpdateStrict(ownerTabId);
+-sendResponse(result || { ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_EMPTY' });
+-}
+-catch (e) {
+-sendResponse({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_ERROR', error: String(e && e.message ? e.message : e) });
+-}
+-})();
+-return true;
+-}
+ const batchIndex = (typeof msg.batchIndex === 'number') ? msg.batchIndex : null;
+ if (batchIndex !== 0)
+ return;
+@@ -2479,15 +2466,21 @@
+ // authenticated account session is still valid. Verify the protected account area
+ // before treating a root logout marker as meaningful. This helper NEVER changes UI state.
+ async function bg_verifyAccountSessionByFetch() {
++let controller = null;
++let timeout = null;
+ try {
+ const url = 'https://account.tradersfamily.id/channels/?tfext_periodic_verify=1&ts=' + Date.now();
++controller = new AbortController();
++timeout = setTimeout(() => { try { controller.abort(); } catch (e) { } }, 12000);
+ const resp = await fetch(url, {
+ method: 'GET',
+ credentials: 'include',
+ cache: 'no-store',
+ redirect: 'follow',
+-headers: { 'Cache-Control': 'no-cache' }
++headers: { 'Cache-Control': 'no-cache' },
++signal: controller.signal
+ });
++if (timeout) { clearTimeout(timeout); timeout = null; }
+ const finalUrl = String(resp && resp.url || '');
+ let body = '';
+ try { body = String(await resp.text()).slice(0, 260000); } catch (e) { }
+@@ -2501,6 +2494,7 @@
+ return { state: 'unknown', finalUrl, httpStatus: Number(resp && resp.status || 0) };
+ }
+ catch (e) {
++try { if (timeout) clearTimeout(timeout); } catch (err) { }
+ return { state: 'unknown', error: String(e && e.message ? e.message : e) };
+ }
+ }
+@@ -3042,6 +3036,22 @@
+ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+ if (!msg)
+ return;
++// REV370 — route the strict Update login preflight through the real runtime
++// message listener. REV368 accidentally placed this branch inside the
++// history-progress helper, where sender/sendResponse were not in scope.
++if (msg.type === 'tf_verify_login_before_update_strict') {
++(async () => {
++try {
++const ownerTabId = sender && sender.tab && sender.tab.id != null ? sender.tab.id : null;
++const result = await bg_verifyLoginBeforeUpdateStrict(ownerTabId);
++sendResponse(result || { ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_EMPTY' });
++}
++catch (e) {
++sendResponse({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_ERROR', error: String(e && e.message ? e.message : e) });
++}
++})();
++return true;
++}
+ if (msg.type === 'tf_close_transient_login_tabs') {
+ (async () => {
+ try {
+diff -ruN rev369_base_release/assets/927ecbd63036f61b.js rev370_work/assets/927ecbd63036f61b.js
+--- rev369_base_release/assets/927ecbd63036f61b.js	2026-09-07 09:33:13.000000000 +0000
++++ rev370_work/assets/927ecbd63036f61b.js	2026-09-07 19:04:26.020489139 +0000
+@@ -10304,27 +10304,38 @@
+ catch (e) { }
+ };
+ const tf_verifyFreshLoginBeforeUpdate = () => new Promise((resolve) => {
++let settled = false;
++let timeout = null;
++const done = (value) => {
++if (settled) return;
++settled = true;
++try { if (timeout) clearTimeout(timeout); } catch (e) { }
++resolve(value);
++};
++timeout = setTimeout(() => {
++done({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_TIMEOUT', error: 'Pemeriksaan login tidak memberi respons dalam batas waktu.' });
++}, 50000);
+ try {
+ if (!hasChromeStorage() || !chrome.runtime || !chrome.runtime.sendMessage) {
+-resolve({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_UNAVAILABLE' });
++done({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_UNAVAILABLE' });
+ return;
+ }
+ chrome.runtime.sendMessage({ type: 'tf_verify_login_before_update_strict', at: Date.now() }, (response) => {
+ try {
+ const err = chrome.runtime.lastError;
+ if (err) {
+-resolve({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_RUNTIME_ERROR', error: String(err.message || err) });
++done({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_RUNTIME_ERROR', error: String(err.message || err) });
+ return;
+ }
+-resolve(response || { ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_EMPTY' });
++done(response || { ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_EMPTY' });
+ }
+ catch (e) {
+-resolve({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_CALLBACK_ERROR', error: String(e && e.message ? e.message : e) });
++done({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_CALLBACK_ERROR', error: String(e && e.message ? e.message : e) });
+ }
+ });
+ }
+ catch (e) {
+-resolve({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_ERROR', error: String(e && e.message ? e.message : e) });
++done({ ok: false, loggedIn: false, state: 'unknown', code: 'LOGIN_PREFLIGHT_ERROR', error: String(e && e.message ? e.message : e) });
+ }
+ });
+ const onUpdateClick = async (btn) => {
+diff -ruN rev369_base_release/manifest.json rev370_work/manifest.json
+--- rev369_base_release/manifest.json	2026-09-07 09:33:13.000000000 +0000
++++ rev370_work/manifest.json	2026-09-07 19:04:26.020826160 +0000
+@@ -1,8 +1,8 @@
+ {
+   "manifest_version": 3,
+   "name": "TF Multi-Analyst Scanner",
+-  "version": "1.16.83",
+-  "description": "REV369: fixes Refresh / Reset activation persistence so dashboard reloads on the same installed build no longer request Email + Token again; manual activation is still required once for each newly loaded build, while REV368 strict Update login preflight and REV367 low-usage realtime Remote remain intact.",
++  "version": "1.16.84",
++  "description": "REV370: restores the Update button by routing strict TradersFamily login preflight through the correct service-worker message listener, adds bounded network/runtime timeouts, and retains REV369 activation persistence, REV368 fresh-session protection, and REV367 low-usage realtime Remote.",
+   "minimum_chrome_version": "116",
+   "permissions": [
+     "alarms",
+@@ -87,5 +87,5 @@
+     "default_path": "popup.html"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJ7+8rQMKQLh6MP9c2K4xUBszCpYNbKYYAjqVPLl0hHHz3X1uS9NarldrfPMsAK5qAAnC+RrostZwMBJ8m3DQQuyMl14BaAsZeX9xHf+pbtSErcjQKAVJOgCkB3X8KpMNpX8vq3AnfRL7PHy8RfCKiE4kRh+xdBTDoRrFXTVThjdt4lgIZs9dvjCBrSHsza2U3vZVAOZyKWWYCxeVBu2Q6uJLI97bqu1c2afc1O2V4A/FDBh5sd34ahSrBrD4DaXt2J6+gy2U4UuAr4WZkn/rm16gT0eXHUMUKJfH4VwFtTD4526UdyIjZuXHT0b3FORHKbGhvIQ1ke9MvaInK52WQIDAQAB",
+-  "version_name": "REV369"
++  "version_name": "REV370"
+ }
