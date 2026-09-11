@@ -1,0 +1,58 @@
+     currentCredentials = { ...credentials, email, token };
+ 
+     if (!email || !token) {
++      setContent('');
++      setStatus(
++        'loading',
++        'Memulihkan aktivasi PC setelah restart',
++        'Build ini sudah pernah diaktivasi. Mencari credential recovery pada Device Vault tanpa meminta kode aktivasi ulang.'
++      );
++      const restored = await restoreActivatedBuildCredentials(credentials);
++      if (restored) {
++        credentials = restored;
++        email = cleanEmail(restored.email || restored.emailCanonical);
++        token = normalizeToken(restored.token);
++        currentCredentials = { ...restored, email, token };
++      }
++    }
++
++    if (!email || !token) {
+       showActivationForm(
+         previousCode === 'LICENSE_NOT_FOUND'
+-          ? 'Credential lokal tidak tersedia. Masukkan kembali email dan token lisensi yang aktif.'
+-          : 'Belum ada lisensi tersimpan. Masukkan email dan token, lalu klik Aktifkan perangkat ini.',
++          ? 'Credential recovery tidak tersedia dan lisensi sebelumnya tidak ditemukan. Masukkan kembali email dan token lisensi yang aktif.'
++          : 'Credential aktivasi build ini tidak dapat dipulihkan dari storage maupun Device Vault. Masukkan email dan token satu kali untuk memulihkan perangkat.',
+         false
+       );
+       return;
+@@ -1689,7 +1824,7 @@
+         'Memulihkan aktivasi PC sebelumnya',
+         'Token tersimpan ditemukan. Extension akan membuat session baru untuk Device Vault yang sama tanpa meminta Reset PC.'
+       );
+-      await activateOrRenew(currentCredentials, true);
++      await activateOrRenew(currentCredentials, true, { sameBuildRecovery: true, recoveryAttempt: 0 });
+       return;
+     }
+ 
+diff -ruN rev370_base/manifest.json rev371_work/manifest.json
+--- rev370_base/manifest.json	2026-09-07 19:04:26.000000000 +0000
++++ rev371_work/manifest.json	2026-09-11 02:11:35.067269877 +0000
+@@ -1,8 +1,8 @@
+ {
+   "manifest_version": 3,
+   "name": "TF Multi-Analyst Scanner",
+-  "version": "1.16.84",
+-  "description": "REV370: restores the Update button by routing strict TradersFamily login preflight through the correct service-worker message listener, adds bounded network/runtime timeouts, and retains REV369 activation persistence, REV368 fresh-session protection, and REV367 low-usage realtime Remote.",
++  "version": "1.16.85",
++  "description": "REV371: makes same-build PC restart activation recover automatically from the existing Device Vault identity, retries cold-start session renewal without asking for Email/Token again, and retains REV370 Update-button routing, REV369 activation persistence, REV368 fresh-login protection, and REV367 low-usage Remote.",
+   "minimum_chrome_version": "116",
+   "permissions": [
+     "alarms",
+@@ -87,5 +87,5 @@
+     "default_path": "popup.html"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJ7+8rQMKQLh6MP9c2K4xUBszCpYNbKYYAjqVPLl0hHHz3X1uS9NarldrfPMsAK5qAAnC+RrostZwMBJ8m3DQQuyMl14BaAsZeX9xHf+pbtSErcjQKAVJOgCkB3X8KpMNpX8vq3AnfRL7PHy8RfCKiE4kRh+xdBTDoRrFXTVThjdt4lgIZs9dvjCBrSHsza2U3vZVAOZyKWWYCxeVBu2Q6uJLI97bqu1c2afc1O2V4A/FDBh5sd34ahSrBrD4DaXt2J6+gy2U4UuAr4WZkn/rm16gT0eXHUMUKJfH4VwFtTD4526UdyIjZuXHT0b3FORHKbGhvIQ1ke9MvaInK52WQIDAQAB",
+-  "version_name": "REV370"
++  "version_name": "REV371"
+ }
