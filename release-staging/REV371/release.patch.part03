@@ -1,0 +1,120 @@
++      void activateOrRenew(credentials, reloadAfterSuccess, { sameBuildRecovery: true, recoveryAttempt: nextAttempt });
++    }, delayMs);
++    return true;
++  }
++
+   async function saveSession(credentials, bindResult) {
+     const now = Date.now();
+     const existing = (await storageGet([CREDENTIALS_KEY]))[CREDENTIALS_KEY] || {};
+@@ -1369,9 +1447,10 @@
+     });
+   }
+ 
+-  async function activateOrRenew(credentials, reloadAfterSuccess) {
++  async function activateOrRenew(credentials, reloadAfterSuccess, options = {}) {
+     if (busy) return;
+     busy = true;
++    const sameBuildRecovery = options && options.sameBuildRecovery === true;
+     credentials = {
+       ...(credentials || {}),
+       email: cleanEmail(credentials && credentials.email),
+@@ -1417,7 +1496,11 @@
+       } else if (sourceLookup && sourceLookupDefinitive(sourceLookup)) {
+         const sourceCode = String(sourceLookup.code || sourceLookup.error || 'LICENSE_NOT_FOUND');
+         const sourceMessage = String(sourceLookup.message || 'Email atau token tidak ditemukan pada sumber data lisensi.');
+-        showActivationForm(`[${sourceCode}] ${sourceMessage}`);
++        if (sameBuildRecovery) {
++          showError({ code: sourceCode, message: sourceMessage }, sourceMessage);
++        } else {
++          showActivationForm(`[${sourceCode}] ${sourceMessage}`);
++        }
+         return;
+       }
+ 
+@@ -1450,13 +1533,26 @@
+         const code = String(challengeResult && (challengeResult.code || challengeResult.error) || 'DEVICE_CHALLENGE_FAILED');
+         const message = String(challengeResult && (challengeResult.message || challengeResult.code || challengeResult.error) || 'Lisensi tidak valid.');
+         if (String(code).toUpperCase() === 'LICENSE_NOT_FOUND' && sourceLookup && sourceLookup.valid === true) {
+-          showActivationForm('[DEVICE_API_OUT_OF_SYNC] Lisensi ditemukan di Google Sheet, tetapi Cloudflare Device API belum membaca data yang sama. Deploy ulang Cloudflare Worker dan pastikan APPS_SCRIPT_URL serta SERVER_SHARED_SECRET sama dengan Apps Script aktif.');
++          const outOfSync = 'Lisensi ditemukan di Google Sheet, tetapi Cloudflare Device API belum membaca data yang sama.';
++          if (sameBuildRecovery) {
++            showError({ code: 'DEVICE_API_OUT_OF_SYNC', message: outOfSync }, outOfSync);
++          } else {
++            showActivationForm('[DEVICE_API_OUT_OF_SYNC] ' + outOfSync + ' Deploy ulang Cloudflare Worker dan pastikan APPS_SCRIPT_URL serta SERVER_SHARED_SECRET sama dengan Apps Script aktif.');
++          }
+           return;
+         }
+         const suffix = /TOKEN|CREDENTIAL|PERIKSA.*TOKEN/i.test(code + ' ' + message)
+           ? '\nExtension sudah mencoba variasi aman email dan token tanpa menyimpan format yang gagal.'
+           : '';
+-        showActivationForm(`[${code}] ${message}${suffix}`);
++        if (sameBuildRecovery && isTransientRecoveryResult(challengeResult) &&
++            scheduleSameBuildRecovery(credentials, reloadAfterSuccess, options, message)) {
++          return;
++        }
++        if (sameBuildRecovery) {
++          showError({ code, message: message + suffix }, message + suffix);
++        } else {
++          showActivationForm(`[${code}] ${message}${suffix}`);
++        }
+         return;
+       }
+ 
+@@ -1512,13 +1608,36 @@
+         return;
+       }
+ 
+-      showActivationForm(String(bindResult && (bindResult.message || bindResult.code) || 'Pengikatan perangkat gagal.'));
++      const bindMessage = String(bindResult && (bindResult.message || bindResult.code) || 'Pengikatan perangkat gagal.');
++      if (sameBuildRecovery && isTransientRecoveryResult(bindResult) &&
++          scheduleSameBuildRecovery(credentials, reloadAfterSuccess, options, bindMessage)) {
++        return;
++      }
++      if (sameBuildRecovery) {
++        showError({
++          code: String(bindResult && (bindResult.code || bindResult.error) || 'DEVICE_RECOVERY_FAILED'),
++          message: bindMessage
++        }, bindMessage);
++      } else {
++        showActivationForm(bindMessage);
++      }
+     } catch (error) {
+       await saveActivationTrace('ACTIVATION_EXCEPTION', {
+         code: error && error.name || 'ERROR',
+         message: error && error.message || String(error)
+       });
+-      showActivationForm(friendlyErrorMessage(error));
++      const friendly = friendlyErrorMessage(error);
++      if (sameBuildRecovery) {
++        if (scheduleSameBuildRecovery(credentials, reloadAfterSuccess, options, friendly)) {
++          return;
++        }
++        if (await unlockFromRecentDeviceValidation(friendly)) {
++          return;
++        }
++        showError({ code: 'DEVICE_RESTART_RECOVERY_FAILED', message: friendly }, friendly);
++      } else {
++        showActivationForm(friendly);
++      }
+     } finally {
+       busy = false;
+     }
+@@ -1550,7 +1669,7 @@
+         const code = String(challengeResult && challengeResult.code || '');
+         if (['DEVICE_SESSION_INVALID', 'DEVICE_SESSION_NOT_FOUND', 'DEVICE_NOT_BOUND'].includes(code)) {
+           busy = false;
+-          await activateOrRenew(credentials, true);
++          await activateOrRenew(credentials, true, { sameBuildRecovery: true, recoveryAttempt: 0 });
+           return;
+         }
+         showError(challengeResult, 'Session perangkat tidak valid.');
+@@ -1598,7 +1717,7 @@
+       const invalidCode = String(validateResult && validateResult.code || '');
+       if (['DEVICE_SESSION_INVALID', 'DEVICE_SESSION_CHANGED', 'DEVICE_SESSION_NOT_AVAILABLE'].includes(invalidCode)) {
+         busy = false;
+-        await activateOrRenew(credentials, true);
++        await activateOrRenew(credentials, true, { sameBuildRecovery: true, recoveryAttempt: 0 });
+         return;
+       }
+ 
+@@ -1657,10 +1776,26 @@
