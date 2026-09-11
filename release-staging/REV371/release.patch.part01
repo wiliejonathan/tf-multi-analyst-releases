@@ -1,0 +1,86 @@
+diff -ruN rev370_base/GITHUB_RELEASE_REV371.txt rev371_work/GITHUB_RELEASE_REV371.txt
+--- rev370_base/GITHUB_RELEASE_REV371.txt	1970-01-01 00:00:00.000000000 +0000
++++ rev371_work/GITHUB_RELEASE_REV371.txt	2026-09-11 02:11:35.067490611 +0000
+@@ -0,0 +1,29 @@
++# TF Analyzer Analyst V1.16.85
++
++## REV371 — PC Restart Activation Auto-Recovery
++
++Release ini memperbaiki kondisi ketika setelah restart Windows/PC/Chrome, Plugin PC pada build yang sama terasa sulit diaktivasi kembali atau kembali meminta proses Device Lock walaupun akun terlihat ONLINE di Google Sheet.
++
++### Root cause
++`ONLINE_STATUS PC` di Google Sheet adalah indikator presence/lookup dari UI Desktop. Status hijau tersebut tidak sama dengan bukti bahwa Device Lock session dan signature Device Vault sudah selesai diverifikasi. Setelah cold restart, UI dapat lebih dulu mengirim presence sementara session token, Device Vault page, atau network masih dalam proses recovery.
++
++### Perbaikan REV371
++- Build yang sudah berhasil diaktivasi tidak meminta Email + Token ulang hanya karena restart PC/Chrome.
++- Jika credential local belum siap, build yang sama mencoba recovery dari stable TF Device Vault.
++- Session Desktop yang hilang/expired melakukan same-device renewal otomatis memakai Device Vault identity yang sama.
++- Cold-start Device Vault/server melakukan retry otomatis 1.2s → 3s → 6.5s.
++- Error sementara tidak menghapus receipt aktivasi, credential, atau recovery identity.
++- Setelah retry habis, validasi perangkat terakhir yang masih berada dalam offline grace dapat dipakai sementara sesuai kebijakan Device Lock yang sudah ada.
++- Lisensi expired, blocked, inactive, revoked, atau benar-benar tidak valid tetap ditolak.
++- Build/version baru tetap meminta aktivasi manual satu kali sesuai REV363.
++
++### Existing fixes retained
++- REV370 Update Button Preflight Handler Fix.
++- REV369 Refresh Activation Persistence Fix.
++- REV368 Strict Update Login Preflight.
++- REV367 Low-Usage Realtime Remote & Exact Expiry.
++- Scanner, Dashboard, Remote, Device Lock, iSignal, Import/Export, Table 1-4, Equity Curve tetap dipertahankan.
++
++**Build:** v1.16.85 • REV371
++
++**Asset:** `TF_Extension_PC_MAC_REV371_PC_RESTART_ACTIVATION_AUTO_RECOVERY.zip`
+diff -ruN rev370_base/README_REV371.txt rev371_work/README_REV371.txt
+--- rev370_base/README_REV371.txt	1970-01-01 00:00:00.000000000 +0000
++++ rev371_work/README_REV371.txt	2026-09-11 02:11:35.067419016 +0000
+@@ -0,0 +1,27 @@
++TF ANALYZER ANALYST — REV371
++================================
++Version      : 1.16.85
++Version Name : REV371
++
++Fokus:
++Memperbaiki aktivasi Desktop setelah restart Windows/PC/Chrome pada build yang sama.
++
++Perubahan:
++1. Build yang sudah pernah diaktivasi tidak lagi langsung meminta Email + Token hanya karena local credential/session belum siap sesaat setelah restart.
++2. Jika credential local belum terbaca tetapi receipt aktivasi build masih valid, extension mencoba recovery credential dari stable TF Device Vault.
++3. Session yang hilang/expired pada build yang sama melakukan same-device renewal otomatis menggunakan Device Vault identity yang sama.
++4. Cold-start server / Device Vault diberi retry otomatis 1.2s -> 3s -> 6.5s sebelum user diminta tindakan.
++5. Kegagalan sementara tidak menghapus receipt aktivasi atau credential recovery.
++6. Setelah retry habis, validasi perangkat terakhir yang masih berada di offline grace dapat dipakai sementara, sama seperti kebijakan Device Lock sebelumnya.
++7. Lisensi expired/blocked/inactive/revoked tetap tidak dilewati.
++8. New build / version tetap meminta aktivasi manual sekali sesuai REV363.
++
++Catatan tentang Google Sheet ONLINE_STATUS:
++Status ONLINE PC adalah indikator presence/lookup dari UI Desktop, bukan bukti bahwa Device Lock session sudah selesai divalidasi. Karena itu status dapat hijau sementara proses session Device Vault masih recovery. REV371 memperbaiki UX recovery tersebut agar tidak meminta input aktivasi berulang.
++
++Retained:
++- REV370 Update Button Preflight Handler Fix
++- REV369 Refresh Activation Persistence Fix
++- REV368 Strict Update Login Preflight
++- REV367 Low-Usage Realtime Remote & Exact Expiry
++- Scanner, Dashboard, Device Lock, Remote, iSignal, Import/Export, Table 1-4, Equity Curve
+diff -ruN rev370_base/REV371_TEST_REPORT.txt rev371_work/REV371_TEST_REPORT.txt
+--- rev370_base/REV371_TEST_REPORT.txt	1970-01-01 00:00:00.000000000 +0000
++++ rev371_work/REV371_TEST_REPORT.txt	2026-09-11 02:11:35.067460147 +0000
+@@ -0,0 +1,16 @@
++TF Analyzer Analyst REV371 — Static Validation Report
++
++[PASS] Manifest version = 1.16.85 / REV371.
++[PASS] assets/tf-device-lock.js syntax OK.
++[PASS] Same-build startup attempts Device Vault credential recovery only after per-build activation receipt matches current version.
++[PASS] New build activation gate from REV363 is preserved and cannot be bypassed by Vault recovery.
++[PASS] Missing/invalid Desktop session performs automatic same-device renewal.
++[PASS] Same-build recovery retries cold-start failures automatically at 1.2s / 3s / 6.5s.
++[PASS] Transient restart recovery failures no longer force the Email + Token activation form.
++[PASS] Recent valid Device Lock state can use the existing 72-hour offline grace after recovery retries are exhausted.
++[PASS] Explicit Change Email/Token and Clear License still clear local + Vault recovery and per-build activation receipt.
++[PASS] REV370 Update button handler remains present.
++[PASS] Manifest JSON validation PASS.
++[PASS] Full effective integrity map PASS.
++[PASS] ZIP manifest.json at archive root.
++[PASS] unzip -t PASS.
+diff -ruN rev370_base/assets/7b6af0cb4001a684.js rev371_work/assets/7b6af0cb4001a684.js
+--- rev370_base/assets/7b6af0cb4001a684.js	2026-09-07 19:04:40.000000000 +0000
