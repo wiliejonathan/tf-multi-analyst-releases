@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 376,
-  "tag_name": "v1.16.89",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.89",
-  "published_at": "2026-09-16T08:30:32Z",
+  "revision": 377,
+  "tag_name": "v1.16.90",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.90",
+  "published_at": "2026-09-16T18:51:02Z",
   "asset": {
-    "id": 567533814,
-    "name": "TF_Extension_PC_MAC_REV376_LOGIN_REQUIRED_AUTO_RESUME.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.89/TF_Extension_PC_MAC_REV376_LOGIN_REQUIRED_AUTO_RESUME.zip",
-    "size": 809188,
-    "digest": "sha256:dad69055e400af60141d9eff16af312bae100d9af6a3439c8a8b240726b65520",
-    "updated_at": "2026-09-16T08:30:31Z"
+    "id": 568576545,
+    "name": "TF_Extension_PC_MAC_REV377_SESSION_EXPIRED_LOGIN_FIX.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.90/TF_Extension_PC_MAC_REV377_SESSION_EXPIRED_LOGIN_FIX.zip",
+    "size": 810247,
+    "digest": "sha256:b6bb370930190ef7e2ce47e250b98cae3e6af4f00ca2d9dfd90a5284848a51d2",
+    "updated_at": "2026-09-16T18:51:01Z"
   }
 }
