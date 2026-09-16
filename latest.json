@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 373,
-  "tag_name": "v1.16.86",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.86",
-  "published_at": "2026-09-16T01:11:09Z",
+  "revision": 374,
+  "tag_name": "v1.16.87",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.87",
+  "published_at": "2026-09-16T01:44:17Z",
   "asset": {
-    "id": 566878368,
-    "name": "TF_Extension_PC_MAC_REV373_ACTIVATION_FIX.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.86/TF_Extension_PC_MAC_REV373_ACTIVATION_FIX.zip",
-    "size": 806110,
-    "digest": "sha256:ae301dd4daf332df25bd3871d5ac0cfa7cc4ec7a187a24d3e568f03277017b78",
-    "updated_at": "2026-09-16T01:11:08Z"
+    "id": 566924750,
+    "name": "TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.87/TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip",
+    "size": 806243,
+    "digest": "sha256:4aaa2bf7a4d32584197be4e0935a08087fed463ab958cf39e8535edafaa983b7",
+    "updated_at": "2026-09-16T01:44:16Z"
   }
 }
