@@ -1,0 +1,89 @@
+name: Publish PC REV375 activation timeout recovery
+on:
+  push:
+    paths:
+      - 'release-staging/REV375/READY'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev375
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch and verify REV374 release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download v1.16.87 --pattern 'TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip' --output base.zip
+          echo '4aaa2bf7a4d32584197be4e0935a08087fed463ab958cf39e8535edafaa983b7  base.zip' | sha256sum -c -
+          python3 build_release_rev375.py base.zip
+      - name: Validate packaged extension
+        run: |
+          rm -rf extension
+          unzip -q deliverables/TF_Extension_PC_MAC_REV375_ACTIVATION_TIMEOUT_RECOVERY.zip -d extension
+          python3 - <<'PY'
+          import hashlib, json, re
+          from pathlib import Path
+          root=Path('extension')
+          loaders=[]
+          for p in (root/'assets').glob('*.js'):
+              s=p.read_text(errors='ignore')
+              if 'const FILES =' in s and 'window.tfIntegrityReady' in s:
+                  loaders.append(p)
+          assert len(loaders)==1, loaders
+          s=loaders[0].read_text()
+          files=json.loads(re.search(r'const FILES = (\{.*?\});',s,re.S).group(1))
+          for path,digest in re.findall(r'FILES\[["\']([^"\']+)["\']\]\s*=\s*["\']([0-9a-f]{64})["\']\s*;',s):
+              files[path]=digest
+          mismatch=[]
+          for path,expected in files.items():
+              f=root/path
+              actual=hashlib.sha256(f.read_bytes()).hexdigest() if f.exists() else 'MISSING'
+              if actual!=expected: mismatch.append((path,expected,actual))
+          assert not mismatch, mismatch
+          manifest=json.loads((root/'manifest.json').read_text())
+          assert manifest['version']=='1.16.88'
+          assert manifest['version_name']=='REV375'
+          lock=(root/'assets/tf-device-lock.js').read_text()
+          assert 'ACTIVATION_RETRY_DELAYS_MS = [1200, 3000, 6500, 12000]' in lock
+          assert 'duplicate /license-check call' in lock
+          print('Protected integrity PASS:',len(files),'entries')
+          PY
+          for file in extension/assets/*.js; do node --check "$file"; done
+      - name: Publish verified release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v1.16.88 >/dev/null 2>&1; then
+            echo 'Release v1.16.88 already exists; refusing to overwrite.'
+            exit 1
+          fi
+          gh release create v1.16.88 deliverables/TF_Extension_PC_MAC_REV375_ACTIVATION_TIMEOUT_RECOVERY.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.88 — REV375 Activation Timeout Recovery' --notes-file deliverables/RELEASE_NOTES_REV375.md --latest
+      - name: Publish update metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/$GITHUB_REPOSITORY/releases/tags/v1.16.88 > release.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('release.json').read_text())
+          a=next(a for a in r['assets'] if a['name']=='TF_Extension_PC_MAC_REV375_ACTIVATION_TIMEOUT_RECOVERY.zip')
+          assert a['state']=='uploaded' and a['size']>0
+          data={'schema':1,'available':True,'revision':375,'tag_name':r['tag_name'],'release_url':r['html_url'],'published_at':r['published_at'],'asset':{'id':a['id'],'name':a['name'],'url':a['browser_download_url'],'size':a['size'],'digest':a.get('digest',''),'updated_at':a['updated_at']}}
+          Path('/tmp/latest-rev375.json').write_text(json.dumps(data,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/latest-rev375.json latest.json
+          git add latest.json
+          git diff --cached --quiet || git commit -m 'Publish verified REV375 update metadata'
+          git push origin HEAD:main
