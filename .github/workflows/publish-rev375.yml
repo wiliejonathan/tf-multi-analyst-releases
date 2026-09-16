@@ -23,6 +23,7 @@ jobs:
         run: |
           gh release download v1.16.87 --pattern 'TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip' --output base.zip
           echo '4aaa2bf7a4d32584197be4e0935a08087fed463ab958cf39e8535edafaa983b7  base.zip' | sha256sum -c -
+          sed -i 's/\\"/"/g' build_release_rev375.py
           python3 build_release_rev375.py base.zip
       - name: Validate packaged extension
         run: |
