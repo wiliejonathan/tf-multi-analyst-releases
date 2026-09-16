@@ -66,18 +66,11 @@ jobs:
 
           if release:
               tag = str(release.get("tag_name") or "").strip()
-              numbers = re.findall(r"\d+", tag)
-              revision = int(numbers[-1]) if numbers else 0
-              expected_name = f"tf_multi_analyst_extension_rev{revision}.zip" if revision else ""
-              asset = next(
-                  (
-                      item
-                      for item in release.get("assets", [])
-                      if str(item.get("name") or "") == expected_name
-                      and str(item.get("state") or "uploaded") == "uploaded"
-                  ),
-                  None,
-              )
+              assets = [item for item in release.get("assets", [])
+                        if re.search(r"(?:extension|multi.analyst).*rev[_ -]?\d+.*\.zip$", str(item.get("name") or ""), re.I)
+                        and str(item.get("state") or "uploaded") == "uploaded"]
+              asset = max(assets, key=lambda item: int(re.search(r"rev[_ -]?(\d+)", item["name"], re.I).group(1)), default=None)
+              revision = int(re.search(r"rev[_ -]?(\d+)", asset["name"], re.I).group(1)) if asset else 0
 
               if revision and asset:
                   output = {
@@ -125,3 +118,4 @@ jobs:
           git commit -m "chore: update latest release manifest"
           git pull --rebase origin main
           git push origin HEAD:main
+

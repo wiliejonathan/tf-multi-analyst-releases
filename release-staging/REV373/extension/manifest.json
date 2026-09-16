@@ -1,0 +1,91 @@
+{
+  "manifest_version": 3,
+  "name": "TF Multi-Analyst Scanner",
+  "version": "1.16.86",
+  "description": "REV373: coordinated desktop activation, accurate approval timeout, pending recovery and reliable post-bind session validation.",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "alarms",
+    "storage",
+    "unlimitedStorage",
+    "scripting",
+    "activeTab",
+    "tabs",
+    "sidePanel",
+    "clipboardRead",
+    "clipboardWrite",
+    "notifications",
+    "power",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://account.tradersfamily.id/*",
+    "https://tradersfamily.id/*",
+    "https://www.myfxbook.com/*",
+    "https://id.investing.com/*",
+    "https://script.google.com/*",
+    "https://script.googleusercontent.com/*",
+    "https://wiliejonathan.github.io/*",
+    "https://tf-license-device-api.wiliejonathan1999.workers.dev/*",
+    "https://github.com/*",
+    "https://objects.githubusercontent.com/*",
+    "https://release-assets.githubusercontent.com/*",
+    "https://api.github.com/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "background": {
+    "service_worker": "assets/tf-device-background.js"
+  },
+  "action": {
+    "default_title": "TF Scanner"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://account.tradersfamily.id/channels/*"
+      ],
+      "js": [
+        "assets/dec74fd654ec6d54.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://account.tradersfamily.id/*"
+      ],
+      "js": [
+        "assets/tf-login-helper-rev205.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://tradersfamily.id/*"
+      ],
+      "js": [
+        "assets/da378285998b1195.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://wiliejonathan.github.io/tf-device-vault/*"
+      ],
+      "js": [
+        "assets/tf-device-vault-bridge.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJ7+8rQMKQLh6MP9c2K4xUBszCpYNbKYYAjqVPLl0hHHz3X1uS9NarldrfPMsAK5qAAnC+RrostZwMBJ8m3DQQuyMl14BaAsZeX9xHf+pbtSErcjQKAVJOgCkB3X8KpMNpX8vq3AnfRL7PHy8RfCKiE4kRh+xdBTDoRrFXTVThjdt4lgIZs9dvjCBrSHsza2U3vZVAOZyKWWYCxeVBu2Q6uJLI97bqu1c2afc1O2V4A/FDBh5sd34ahSrBrD4DaXt2J6+gy2U4UuAr4WZkn/rm16gT0eXHUMUKJfH4VwFtTD4526UdyIjZuXHT0b3FORHKbGhvIQ1ke9MvaInK52WQIDAQAB",
+  "version_name": "REV373"
+}

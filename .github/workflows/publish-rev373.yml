@@ -1,0 +1,62 @@
+name: Publish PC REV373 activation fix
+on:
+  push:
+    paths:
+      - 'release-staging/REV373/READY'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev373
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch and verify previous release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download v1.16.85 --pattern 'TF_Extension_PC_MAC_REV371_PC_RESTART_ACTIVATION_AUTO_RECOVERY.zip' --output base.zip
+          echo 'fec1e213309ba897e6f5a4dce4f996cfe78e81af473fcd189a6afc6ba49105ac  base.zip' | sha256sum -c -
+          python3 build_release.py base.zip
+      - name: Validate packaged extension and worker
+        run: |
+          unzip -q deliverables/TF_Extension_PC_MAC_REV373_ACTIVATION_FIX.zip -d extension
+          node --test tests/*.cjs
+          for file in extension/assets/*.js; do node --check "$file"; done
+          node --check deliverables/Cloudflare_Device_API_REV373_ACTIVATION_FIX.js
+      - name: Publish verified ZIP and release notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v1.16.86 >/dev/null 2>&1; then
+            echo 'Release already exists; refusing to overwrite.'
+            exit 1
+          fi
+          gh release create v1.16.86 deliverables/TF_Extension_PC_MAC_REV373_ACTIVATION_FIX.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.86 — REV373 Activation Fix' --notes-file deliverables/RELEASE_NOTES_REV373.md --latest
+      - name: Publish update metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/$GITHUB_REPOSITORY/releases/tags/v1.16.86 > release.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('release.json').read_text())
+          a=next(a for a in r['assets'] if a['name']=='TF_Extension_PC_MAC_REV373_ACTIVATION_FIX.zip')
+          assert a['state']=='uploaded' and a['size']>0
+          data={'schema':1,'available':True,'revision':373,'tag_name':r['tag_name'],'release_url':r['html_url'],'published_at':r['published_at'],'asset':{'id':a['id'],'name':a['name'],'url':a['browser_download_url'],'size':a['size'],'digest':a.get('digest',''),'updated_at':a['updated_at']}}
+          Path('/tmp/latest-rev373.json').write_text(json.dumps(data,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/latest-rev373.json latest.json
+          git add latest.json
+          git diff --cached --quiet || git commit -m 'Publish verified REV373 update metadata'
+          git push origin HEAD:main
