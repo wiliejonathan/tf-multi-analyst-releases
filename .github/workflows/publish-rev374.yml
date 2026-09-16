@@ -1,0 +1,89 @@
+name: Publish PC REV374 integrity hash fix
+on:
+  push:
+    paths:
+      - 'release-staging/REV374/READY'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev374
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch and verify REV373 release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release download v1.16.86 --pattern 'TF_Extension_PC_MAC_REV373_ACTIVATION_FIX.zip' --output base.zip
+          echo 'ae301dd4daf332df25bd3871d5ac0cfa7cc4ec7a187a24d3e568f03277017b78  base.zip' | sha256sum -c -
+          python3 build_release_rev374.py base.zip
+      - name: Validate packaged extension
+        run: |
+          rm -rf extension
+          unzip -q deliverables/TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip -d extension
+          python3 - <<'PY'
+          import hashlib, json, re
+          from pathlib import Path
+          root=Path('extension')
+          loaders=[]
+          for p in (root/'assets').glob('*.js'):
+              s=p.read_text(errors='ignore')
+              if 'const FILES =' in s and 'window.tfIntegrityReady' in s:
+                  loaders.append(p)
+          assert len(loaders)==1, loaders
+          s=loaders[0].read_text()
+          m=re.search(r'const FILES = (\{.*?\});',s,re.S)
+          files=json.loads(m.group(1))
+          for path,digest in re.findall(r'FILES\[["\']([^"\']+)["\']\]\s*=\s*["\']([0-9a-f]{64})["\']\s*;',s):
+              files[path]=digest
+          missing=[]; mismatch=[]
+          for path,expected in files.items():
+              f=root/path
+              if not f.exists(): missing.append(path); continue
+              actual=hashlib.sha256(f.read_bytes()).hexdigest()
+              if actual!=expected: mismatch.append((path,expected,actual))
+          assert not missing, missing
+          assert not mismatch, mismatch
+          manifest=json.loads((root/'manifest.json').read_text())
+          assert manifest['version']=='1.16.87'
+          assert manifest['version_name']=='REV374'
+          print('Protected integrity PASS:',len(files),'entries')
+          PY
+          for file in extension/assets/*.js; do node --check "$file"; done
+      - name: Publish verified release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view v1.16.87 >/dev/null 2>&1; then
+            echo 'Release v1.16.87 already exists; refusing to overwrite.'
+            exit 1
+          fi
+          gh release create v1.16.87 deliverables/TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.87 — REV374 Integrity Hash Fix' --notes-file deliverables/RELEASE_NOTES_REV374.md --latest
+      - name: Publish update metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/$GITHUB_REPOSITORY/releases/tags/v1.16.87 > release.json
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('release.json').read_text())
+          a=next(a for a in r['assets'] if a['name']=='TF_Extension_PC_MAC_REV374_INTEGRITY_HASH_FIX.zip')
+          assert a['state']=='uploaded' and a['size']>0
+          data={'schema':1,'available':True,'revision':374,'tag_name':r['tag_name'],'release_url':r['html_url'],'published_at':r['published_at'],'asset':{'id':a['id'],'name':a['name'],'url':a['browser_download_url'],'size':a['size'],'digest':a.get('digest',''),'updated_at':a['updated_at']}}
+          Path('/tmp/latest-rev374.json').write_text(json.dumps(data,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/latest-rev374.json latest.json
+          git add latest.json
+          git diff --cached --quiet || git commit -m 'Publish verified REV374 update metadata'
+          git push origin HEAD:main
