@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 378,
-  "tag_name": "v1.16.91",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.91",
-  "published_at": "2026-09-16T19:35:04Z",
+  "revision": 379,
+  "tag_name": "v1.16.92",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.92",
+  "published_at": "2026-09-17T19:23:16Z",
   "asset": {
-    "id": 568651771,
-    "name": "TF_Extension_PC_MAC_REV378_PAIR_SELECTOR_LABEL_FIX.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.91/TF_Extension_PC_MAC_REV378_PAIR_SELECTOR_LABEL_FIX.zip",
-    "size": 810689,
-    "digest": "sha256:f2f5f536de08bbd7a2c1c58e34013cf62168314c22dcb267eb24bef71c00c6ca",
-    "updated_at": "2026-09-16T19:35:03Z"
+    "id": 570929663,
+    "name": "TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.92/TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip",
+    "size": 811704,
+    "digest": "sha256:531d5cbe418af77d4e32d987161b4bbf6166ed3390691954a9b8260d55686ac8",
+    "updated_at": "2026-09-17T19:23:15Z"
   }
 }
