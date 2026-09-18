@@ -1,0 +1,46 @@
+name: Audit REV379 price provider read only
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit-trigger/REV379-price-provider/READY'
+permissions:
+  contents: write
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Read released REV379 and extract provider
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/rev379
+          mkdir -p /tmp/rev379/ext
+          gh release download v1.16.92 --repo wiliejonathan/tf-multi-analyst-releases --pattern 'TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip' --output /tmp/rev379/base.zip
+          unzip -q /tmp/rev379/base.zip -d /tmp/rev379/ext
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          root=Path('/tmp/rev379/ext')
+          out=['# REV379 Price Provider - read-only audit','']
+          for p in root.rglob('*.js'):
+              s=p.read_text(encoding='utf-8',errors='ignore')
+              if 'ensure_myfxbook_prices' not in s and 'tfMyfxbookPrices' not in s:
+                  continue
+              out += ['## '+str(p.relative_to(root))]
+              for term in ['ensure_myfxbook_prices','tfMyfxbookPrices','tfMyfxbookPricesAt']:
+                  positions=[m.start() for m in re.finditer(re.escape(term),s)]
+                  for n,pos in enumerate(positions[:20],1):
+                      out += ['', '### '+term+' '+str(n), '~~~js', s[max(0,pos-9000):min(len(s),pos+26000)], '~~~']
+          Path('audit').mkdir(exist_ok=True)
+          Path('audit/REV379_PRICE_PROVIDER_READONLY.md').write_text('\n'.join(out),encoding='utf-8')
+          PY
+      - name: Commit audit report only
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audit/REV379_PRICE_PROVIDER_READONLY.md
+          git commit -m 'Add read-only REV379 price provider audit' || exit 0
+          git push origin HEAD:main
