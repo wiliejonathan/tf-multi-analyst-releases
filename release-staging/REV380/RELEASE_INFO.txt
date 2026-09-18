@@ -1,0 +1,2 @@
+REV380 mobile calculation parity
+PC formulas unchanged; price snapshot added to mobile bundle.
