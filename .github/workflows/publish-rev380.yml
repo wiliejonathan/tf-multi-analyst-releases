@@ -45,8 +45,8 @@ jobs:
           assert len(cores)==1, [str(x[0]) for x in cores]
           core=cores[0][1]
           block=core[core.index('const TF_EXPORT_STORAGE_KEYS'):core.index('const TF_TIME_RANGE_LABELS')]
-          assert 'TF_MYFXBOOK_PRICES_KEY' in block
-          assert 'TF_MYFXBOOK_PRICES_AT_KEY' in block
+          assert "'tfMyfxbookPrices'" in block
+          assert "'tfMyfxbookPricesAt'" in block
           loaders=[]
           for p in (root/'assets').glob('*.js'):
               s=p.read_text(errors='ignore')
