@@ -66,7 +66,7 @@ jobs:
           print('Protected integrity PASS:',len(files))
           PY
           for file in extension/assets/*.js; do node --check "$file"; done
-          sha256sum -c deliverables/TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip.sha256
+          (cd deliverables && sha256sum -c TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip.sha256)
       - name: Publish verified release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
