@@ -27,7 +27,7 @@ core_candidates = []
 for name, raw in data.items():
     if not (name.startswith('assets/') and name.endswith('.js')):
         continue
-    if b'const TF_EXPORT_STORAGE_KEYS' in raw and b'TF_MYFXBOOK_PRICES_KEY' in raw and b'tf_multi_analyst_export_v1' in raw:
+    if b'const TF_EXPORT_STORAGE_KEYS' in raw and b'tf_multi_analyst_export_v1' in raw:
         core_candidates.append(name)
 assert len(core_candidates) == 1, core_candidates
 core_name = core_candidates[0]
@@ -38,8 +38,8 @@ TF_ANALYST_SOURCES_KEY,"""
 new = """'tfAvgSlPips',
 // REV380: Mobile calculation parity. The PC price snapshot is part of the
 // exported/Remote bundle so Mobile uses the same $/pip inputs as Desktop.
-TF_MYFXBOOK_PRICES_KEY,
-TF_MYFXBOOK_PRICES_AT_KEY,
+'tfMyfxbookPrices',
+'tfMyfxbookPricesAt',
 TF_ANALYST_SOURCES_KEY,"""
 count = core.count(old)
 assert count == 1, f'export storage anchor count={count}'
