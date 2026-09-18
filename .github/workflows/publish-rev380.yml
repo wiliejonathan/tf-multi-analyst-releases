@@ -1,0 +1,102 @@
+name: Publish PC REV380 mobile calculation parity
+on:
+  push:
+    paths:
+      - 'release-staging/REV380/READY'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev380
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch REV379 and build REV380
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh release download v1.16.92 --pattern 'TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip' --output base.zip
+          echo '531d5cbe418af77d4e32d987161b4bbf6166ed3390691954a9b8260d55686ac8  base.zip' | sha256sum -c -
+          python3 build_release_rev380.py base.zip
+      - name: Validate packaged extension
+        run: |
+          set -euo pipefail
+          rm -rf extension
+          unzip -q deliverables/TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip -d extension
+          python3 - <<'PY'
+          import hashlib,json,re
+          from pathlib import Path
+          root=Path('extension')
+          manifest=json.loads((root/'manifest.json').read_text())
+          assert manifest['version']=='1.16.93'
+          assert manifest['version_name']=='REV380'
+          cores=[]
+          for p in (root/'assets').glob('*.js'):
+              s=p.read_text(errors='ignore')
+              if 'const TF_EXPORT_STORAGE_KEYS' in s and 'tf_multi_analyst_export_v1' in s:
+                  cores.append((p,s))
+          assert len(cores)==1, [str(x[0]) for x in cores]
+          core=cores[0][1]
+          block=core[core.index('const TF_EXPORT_STORAGE_KEYS'):core.index('const TF_TIME_RANGE_LABELS')]
+          assert 'TF_MYFXBOOK_PRICES_KEY' in block
+          assert 'TF_MYFXBOOK_PRICES_AT_KEY' in block
+          loaders=[]
+          for p in (root/'assets').glob('*.js'):
+              s=p.read_text(errors='ignore')
+              if 'const FILES =' in s and 'window.tfIntegrityReady' in s:
+                  loaders.append(p)
+          assert len(loaders)==1
+          s=loaders[0].read_text()
+          files=json.loads(re.search(r'const FILES = (\{.*?\});',s,re.S).group(1))
+          for path,digest in re.findall(r'FILES\[["\']([^"\']+)["\']\]\s*=\s*["\']([0-9a-f]{64})["\']\s*;',s):
+              files[path]=digest
+          bad=[]
+          for path,expected in files.items():
+              f=root/path
+              actual=hashlib.sha256(f.read_bytes()).hexdigest() if f.exists() else 'MISSING'
+              if actual!=expected: bad.append((path,expected,actual))
+          assert not bad,bad
+          print('Protected integrity PASS:',len(files))
+          PY
+          for file in extension/assets/*.js; do node --check "$file"; done
+          sha256sum -c deliverables/TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip.sha256
+      - name: Publish verified release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.16.93 >/dev/null 2>&1; then
+            echo 'Release v1.16.93 already exists; refusing to overwrite.'
+            exit 1
+          fi
+          gh release create v1.16.93             deliverables/TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip             deliverables/TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip.sha256             --target "$GITHUB_SHA"             --title 'TF Analyzer Analyst v1.16.93 — REV380 Mobile Calculation Parity'             --notes-file deliverables/RELEASE_NOTES_REV380.md --latest
+      - name: Publish update metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api repos/$GITHUB_REPOSITORY/releases/tags/v1.16.93 > release.json
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          r=json.loads(Path('release.json').read_text())
+          name='TF_Extension_PC_MAC_REV380_MOBILE_CALC_PARITY.zip'
+          a=next(a for a in r['assets'] if a['name']==name)
+          sha=Path('deliverables/'+name+'.sha256').read_text().split()[0]
+          data={'schema':1,'available':True,'revision':380,'tag_name':r['tag_name'],'release_url':r['html_url'],'published_at':r['published_at'],'asset':{'id':a['id'],'name':a['name'],'url':a['browser_download_url'],'size':a['size'],'digest':a.get('digest','') or ('sha256:'+sha),'updated_at':a['updated_at']}}
+          Path('/tmp/latest-rev380.json').write_text(json.dumps(data,indent=2)+'\n')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          cp /tmp/latest-rev380.json latest.json
+          git add latest.json
+          git diff --cached --quiet || git commit -m 'Publish verified REV380 update metadata'
+          git push origin HEAD:main
