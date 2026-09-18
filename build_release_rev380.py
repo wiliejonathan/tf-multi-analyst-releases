@@ -33,17 +33,21 @@ assert len(core_candidates) == 1, core_candidates
 core_name = core_candidates[0]
 core = data[core_name].decode('utf-8')
 
-old = """'tfAvgSlPips',
-TF_ANALYST_SOURCES_KEY,"""
-new = """'tfAvgSlPips',
-// REV380: Mobile calculation parity. The PC price snapshot is part of the
-// exported/Remote bundle so Mobile uses the same $/pip inputs as Desktop.
-'tfMyfxbookPrices',
-'tfMyfxbookPricesAt',
-TF_ANALYST_SOURCES_KEY,"""
-count = core.count(old)
-assert count == 1, f'export storage anchor count={count}'
-core = core.replace(old, new, 1)
+block_start = core.index('const TF_EXPORT_STORAGE_KEYS = [')
+block_end = core.index('];', block_start)
+export_block = core[block_start:block_end]
+assert "'tfMyfxbookPrices'" not in export_block
+anchor = "'tfAvgSlPips',"
+assert export_block.count(anchor) == 1, export_block
+export_block = export_block.replace(
+    anchor,
+    anchor + "\n// REV380: Mobile calculation parity. The PC price snapshot is part of the"
+             "\n// exported/Remote bundle so Mobile uses the same $/pip inputs as Desktop."
+             "\n\'tfMyfxbookPrices\',"
+             "\n\'tfMyfxbookPricesAt\',",
+    1,
+)
+core = core[:block_start] + export_block + core[block_end:]
 data[core_name] = core.encode('utf-8')
 
 manifest['version'] = NEW_VERSION
