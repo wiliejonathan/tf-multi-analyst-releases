@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 412,
-  "tag_name": "v1.17.25",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.25",
-  "published_at": "2026-09-30T19:59:01Z",
+  "revision": 413,
+  "tag_name": "v1.17.26",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.26",
+  "published_at": "2026-09-30T20:33:57Z",
   "asset": {
-    "id": 601695381,
-    "name": "TF_Extension_PC_MAC_REV412_EQUITY_ISIGNAL_OVERVIEW.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.25/TF_Extension_PC_MAC_REV412_EQUITY_ISIGNAL_OVERVIEW.zip",
-    "size": 861771,
-    "digest": "sha256:c25067ec15a5ffabd02ab44de0383480bd19364fb493c6d58ee49a86e4522c21",
-    "updated_at": "2026-09-30T19:59:00Z"
+    "id": 601750218,
+    "name": "TF_Extension_PC_MAC_REV413_EQUITY_CHART_RESTORE.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.26/TF_Extension_PC_MAC_REV413_EQUITY_CHART_RESTORE.zip",
+    "size": 861846,
+    "digest": "sha256:c7f1d8760d7182a3e873141a25cd8a95c17084fc24b7bf825112b19c980c2220",
+    "updated_at": "2026-09-30T20:33:57Z"
   }
 }
