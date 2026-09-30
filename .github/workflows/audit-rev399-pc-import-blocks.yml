@@ -1,0 +1,27 @@
+name: Inspect REV398 PC import blocks
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV399-pc-import-blocks/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect import blocks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev398-pc-import-blocks
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.11 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          f="$ROOT/src/assets/927ecbd63036f61b.js"
+          echo '=== PAYLOAD FUNCTION ==='
+          sed -n '5120,5280p' "$f"
+          echo '=== FILE READER ==='
+          sed -n '11470,11640p' "$f"
