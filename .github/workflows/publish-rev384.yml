@@ -68,9 +68,10 @@ jobs:
           block += "FILES['manifest.json'] = '" + sha(Path('manifest.json')) + "';\n"
           block += "FILES['assets/tf-mechanical-theme.css'] = '" + sha(Path('assets/tf-mechanical-theme.css')) + "';\n"
           block += "FILES['README_REV384.md'] = '" + sha(Path('README_REV384.md')) + "';\n"
-          assert '\nwindow.tfIntegrityReady =' in js
+          pos=js.find('window.tfIntegrityReady')
+          assert pos>0, 'tfIntegrityReady anchor not found'
           if '// REV384 final integrity overrides' not in js:
-              js=js.replace('\nwindow.tfIntegrityReady =',block+'\nwindow.tfIntegrityReady =',1)
+              js=js[:pos]+block+'\n'+js[pos:]
           integ.write_text(js)
           PY
           node --check /tmp/tf-rev384/src/assets/4b4d6b8dc315a95c.js
