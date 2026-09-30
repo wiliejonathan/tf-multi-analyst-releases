@@ -1,0 +1,102 @@
+name: Publish PC Mac REV386 Holding final accuracy
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV386/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev386
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV385 base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev386
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.16.98 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV385_HOLDING_ACCURACY_FIX.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+      - name: Patch exact final Table 3 Holding source
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev386/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'; s=app.read_text()
+          old='''function tf_renderHoldingPeriodTables(allTickerRows, filteredRows) {\nconst leftBody = document.getElementById('tf-holding-body-left');\nconst rightBody = document.getElementById('tf-holding-body-right');\nif (!leftBody || !rightBody)\nreturn;\nconst allRows = Array.isArray(allTickerRows) ? allTickerRows.filter((r) => r && !r.isWithdraw) : [];\nconst avgRows = Array.isArray(filteredRows) ? filteredRows.filter((r) => r && !r.isWithdraw) : [];\n'''
+          new='''function tf_renderHoldingPeriodTables(tableRows) {\nconst leftBody = document.getElementById('tf-holding-body-left');\nconst rightBody = document.getElementById('tf-holding-body-right');\nif (!leftBody || !rightBody)\nreturn;\n// REV386: exact source is the final trade rows currently rendered/exported by Table 3.\nconst rows = Array.isArray(tableRows) ? tableRows.filter((r) => r && !r.isWithdraw) : [];\n'''
+          assert old in s, 'render signature not found'; s=s.replace(old,new,1)
+          old2='''const names = Array.from(new Set(allRows.map(tf_holdingAnalystPairKey).filter(Boolean)))\n.sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));\nconst maxByAnalyst = new Map();\nconst avgAgg = new Map();\nfor (let i = 0; i < allRows.length; i++) {\nconst row = allRows[i];\nconst name = tf_holdingAnalystPairKey(row);\nif (!name)\ncontinue;\nconst ms = tf_getHoldingDurationMs(row);\nif (ms === null)\ncontinue;\nconst prev = maxByAnalyst.get(name);\nif (!Number.isFinite(prev) || ms > prev)\nmaxByAnalyst.set(name, ms);\n}\nfor (let i = 0; i < avgRows.length; i++) {\nconst row = avgRows[i];\nconst name = tf_holdingAnalystPairKey(row);\nif (!name)\ncontinue;\nconst ms = tf_getHoldingDurationMs(row);\nif (ms === null)\ncontinue;\nlet agg = avgAgg.get(name);\nif (!agg) {\nagg = { sum: 0, count: 0 };\navgAgg.set(name, agg);\n}\nagg.sum += ms;\nagg.count += 1;\n}\n'''
+          new2='''const names = Array.from(new Set(rows.map(tf_holdingAnalystPairKey).filter(Boolean)))\n.sort((a, b) => a.localeCompare(b, 'id', { sensitivity: 'base' }));\nconst maxByAnalyst = new Map();\nconst avgAgg = new Map();\nfor (let i = 0; i < rows.length; i++) {\nconst row = rows[i];\nconst name = tf_holdingAnalystPairKey(row);\nif (!name)\ncontinue;\nconst ms = tf_getHoldingDurationMs(row);\nif (ms === null)\ncontinue;\nconst prev = maxByAnalyst.get(name);\nif (!Number.isFinite(prev) || ms > prev)\nmaxByAnalyst.set(name, ms);\nlet agg = avgAgg.get(name);\nif (!agg) {\nagg = { sum: 0, count: 0 };\navgAgg.set(name, agg);\n}\nagg.sum += ms;\nagg.count += 1;\n}\n'''
+          assert old2 in s, 'aggregate block not found'; s=s.replace(old2,new2,1)
+          s=s.replace('''try {\nconst tf_holdingFilteredRows = tf_filterRowsByUnifiedDate(baseRows);\ntf_renderHoldingPeriodTables(tf_holdingAllTickerRows, tf_holdingFilteredRows);\n}\ncatch (e) { }\n''','',1)
+          anchor='const rowsForUi = tf_getHistoryRowsForUiAndExport(rowsForDisplay);\n'
+          assert anchor in s
+          if 'tf_renderHoldingPeriodTables(rowsForUi);' not in s:
+              s=s.replace(anchor,anchor+'try {\ntf_renderHoldingPeriodTables(rowsForUi);\n}\ncatch (e) { }\n',1)
+          app.write_text(s)
+          mf=root/'manifest.json'; m=json.loads(mf.read_text()); m['version']='1.16.99'; m['version_name']='REV386'; m['description']='REV386: Holding Period is calculated strictly from final Table 3 trade rows after active filters, using Closed At (displayDate) minus Created At (createdDate). Includes REV385 date parsing, REV384 alignment/performance, import persistence, Analyst-Pair analytics, and mini neon cursor.'; mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV386.md').write_text('# REV386 — Holding Period Final Table 3 Accuracy\n\n- Dataset = exact final Table 3 trade rows after active filters.\n- Holding = Closed At (displayDate) - Created At (createdDate).\n- sort keys are fallback-only.\n- Withdraw excluded.\n- Max and Avg use the same final Table 3 rows.\n- Version 1.16.99 / REV386.\n')
+          loader=root/'assets/7b6af0cb4001a684.js'; ls=loader.read_text(); mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S); assert mm
+          files=json.loads(mm.group(1)); files.pop('assets/7b6af0cb4001a684.js',None); files['README_REV386.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end()); marker=marker if marker>=0 else ls.find('async function',mm.end()); assert marker>=0
+          runtime=ls[marker:]; cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path; assert fp.is_file(),path; newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV386: single authoritative SHA-256 registry generated from exact packaged bytes.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('protected',len(newmap))
+          PY
+          node --check /tmp/tf-rev386/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev386/src/assets/7b6af0cb4001a684.js
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json,hashlib
+          root=Path('/tmp/tf-rev386/src'); app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          assert 'function tf_renderHoldingPeriodTables(tableRows)' in app
+          assert 'tf_renderHoldingPeriodTables(rowsForUi);' in app
+          assert 'tf_parseHistoryTableDateMs(row.createdDate)' in app and 'tf_parseHistoryTableDateMs(row.displayDate)' in app
+          s=(root/'assets/7b6af0cb4001a684.js').read_text(); m=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S); d=json.loads(m.group(1)); bad=[]
+          for p,h in d.items():
+              fp=root/p; a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h: bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV386 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV386_HOLDING_TABLE3_FINAL_ACCURACY.zip
+          cd /tmp/tf-rev386/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          SHA=$(sha256sum "$OUT" | awk '{print $1}')
+          printf '%s  %s\n' "$SHA" 'TF_Extension_PC_MAC_REV386_HOLDING_TABLE3_FINAL_ACCURACY.zip' > "$OUT.sha256"
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.16.99
+          OUT=/tmp/TF_Extension_PC_MAC_REV386_HOLDING_TABLE3_FINAL_ACCURACY.zip
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.99 — REV386' --notes-file deliverables/RELEASE_NOTES_REV386.md --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.99 — REV386' --notes-file deliverables/RELEASE_NOTES_REV386.md --latest
+          fi
