@@ -1,0 +1,47 @@
+name: Audit REV393 desktop anchors
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV393-desktop-anchors/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect desktop JS anchors
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev393-anchor
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.05 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV392_HOLDING_STRICT_TIME_RANGE.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('/tmp/tf-rev393-anchor/src/assets/4b4d6b8dc315a95c.js').read_text()
+          marks=[
+            'function renderSummaryTable() {',
+            'function tf_renderAnalystPerformanceTablesFromRows(rows) {',
+            'nameSpan.className = "tf-perf-name-text";',
+            'function buildMonthlyTableSkeleton() {',
+            "span.textContent = signals + ' Signals';",
+            'function tf_renderHoldingPeriodTables',
+            'function recomputeHistoryRows() {',
+            "analystCell.textContent",
+            'function computeAndRenderDrawdownStats(rows) {',
+            "nameCell.textContent = name;",
+            "body.innerHTML = analysts.map(({name, records, latest}) => {",
+            'function tf_isignalUsers_renderIsignalAnalystTables(entries) {',
+            "a.setAttribute('rel', 'noopener noreferrer');",
+            'function tf_isignalUsers_renderDetailTable',
+            'tf_isignalUsers_applyAnalystLink(analystLink, entry.baseName);',
+          ]
+          for m in marks:
+              p=s.find(m)
+              print('\n===',m,'@',p,'===')
+              if p>=0: print(s[max(0,p-1200):p+4200])
+          PY
