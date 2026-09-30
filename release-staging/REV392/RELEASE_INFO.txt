@@ -1,0 +1,2 @@
+REV392 / v1.17.05
+Holding strict Created At time-range boundary + checked Table 3 parity.
