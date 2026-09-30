@@ -1,0 +1,343 @@
+name: Publish PC Mac REV394 risk icon layout
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV394/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev394
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Download REV393 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev394
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.06 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV393_LATEST_RISK_WARNINGS.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch icon layout, row alignment and ticker color-only
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev394/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          old="""function tf_applyLatestRiskToElement(el, analyst, pair, showIcon) {
+          try {
+          if (!el) return null;
+          const st = tf_getLatestRiskState(analyst, pair);
+          el.classList.remove('tf-latest-risk-warning','tf-latest-risk-critical');
+          el.querySelectorAll && el.querySelectorAll('[data-tf-latest-risk-icon="1"]').forEach((x) => x.remove());
+          if (!st || !st.severity) {
+          if (el.dataset && el.dataset.tfRiskBaseTitle != null) el.title = el.dataset.tfRiskBaseTitle;
+          return null;
+          }
+          el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : 'tf-latest-risk-warning');
+          if (el.dataset) {
+          if (el.dataset.tfRiskBaseTitle == null) el.dataset.tfRiskBaseTitle = el.title || '';
+          const base = el.dataset.tfRiskBaseTitle || '';
+          el.title = (base ? base + ' · ' : '') + tf_latestRiskReason(st);
+          }
+          if (showIcon !== false) {
+          const icon = document.createElement('span');
+          icon.setAttribute('data-tf-latest-risk-icon','1');
+          icon.className = 'tf-latest-risk-icon ' + (st.severity >= 2 ? 'tf-latest-risk-icon-critical' : 'tf-latest-risk-icon-warning');
+          icon.textContent = st.severity >= 2 ? '×' : '!';
+          icon.setAttribute('aria-label', tf_latestRiskReason(st));
+          icon.title = tf_latestRiskReason(st);
+          el.appendChild(icon);
+          }
+          return st;
+          }
+          catch (e) { return null; }
+          }"""
+          new="""function tf_applyLatestRiskToElement(el, analyst, pair, showIcon, iconPosition) {
+          try {
+          if (!el) return null;
+          const st = tf_getLatestRiskState(analyst, pair);
+          el.classList.remove('tf-latest-risk-warning','tf-latest-risk-critical');
+          el.querySelectorAll && el.querySelectorAll('[data-tf-latest-risk-icon="1"]').forEach((x) => x.remove());
+          if (!st || !st.severity) {
+          if (el.dataset && el.dataset.tfRiskBaseTitle != null) el.title = el.dataset.tfRiskBaseTitle;
+          return null;
+          }
+          el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : 'tf-latest-risk-warning');
+          if (el.dataset) {
+          if (el.dataset.tfRiskBaseTitle == null) el.dataset.tfRiskBaseTitle = el.title || '';
+          const base = el.dataset.tfRiskBaseTitle || '';
+          el.title = (base ? base + ' · ' : '') + tf_latestRiskReason(st);
+          }
+          if (showIcon !== false) {
+          const icon = document.createElement('span');
+          icon.setAttribute('data-tf-latest-risk-icon','1');
+          const pos = String(iconPosition || 'right').toLowerCase() === 'left' ? 'left' : 'right';
+          icon.className = 'tf-latest-risk-icon tf-latest-risk-icon-' + pos + ' ' + (st.severity >= 2 ? 'tf-latest-risk-icon-critical' : 'tf-latest-risk-icon-warning');
+          icon.textContent = st.severity >= 2 ? '×' : '!';
+          icon.setAttribute('aria-label', tf_latestRiskReason(st));
+          icon.title = tf_latestRiskReason(st);
+          if (pos === 'left') el.insertBefore(icon, el.firstChild || null);
+          else el.appendChild(icon);
+          }
+          return st;
+          }
+          catch (e) { return null; }
+          }"""
+          assert old in s, 'risk helper anchor missing'
+          s=s.replace(old,new,1)
+
+          reps=[
+            ("tf_applyLatestRiskToElement(nameSpan, it.name, null, true);","tf_applyLatestRiskToElement(nameSpan, it.name, null, true, 'left');"),
+            ("tf_applyLatestRiskToElement(nameCell, baseName, null, true);","tf_applyLatestRiskToElement(nameCell, baseName, null, true, 'left');"),
+            ("tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true);","tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true, 'left');"),
+            ("tf_applyLatestRiskToElement(nameCell, name, null, true);","tf_applyLatestRiskToElement(nameCell, name, null, true, 'left');"),
+            ("tf_applyLatestRiskToElement(cell, entry.name, null, true);","tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left');"),
+            ("tf_applyLatestRiskToElement(a, name, null, true);","tf_applyLatestRiskToElement(a, name, null, true, 'left');"),
+            ("tf_applyLatestRiskToElement(tdName,name.slice(0,sep),name.slice(sep+3),true);","tf_applyLatestRiskToElement(tdName,name.slice(0,sep),name.slice(sep+3),true,'left');")
+          ]
+          for a,b in reps:
+              if a in s: s=s.replace(a,b)
+
+          old="tf_applyLatestRiskToElement(nameCell, a.baseName || a.name, a.pair || getPrimaryPairForAnalyst(a), true);"
+          assert old in s, 'Table2 analyst anchor missing'
+          s=s.replace(old,"tf_applyLatestRiskToElement(nameCell, a.baseName || a.name, a.pair || getPrimaryPairForAnalyst(a), false);",1)
+
+          old="tf_applyLatestRiskToElement(span, analystName, a.pair || getPrimaryPairForAnalyst(a), true);"
+          assert old in s, 'Table2 latest Signals anchor missing'
+          s=s.replace(old,"tf_applyLatestRiskToElement(span, analystName, a.pair || getPrimaryPairForAnalyst(a), true, 'left');",1)
+
+          # All analyst ticker/filter labels are COLOR ONLY.
+          old="""nameSpan.textContent = formatAnalystDisplayName(name);
+          nameSpan.title = String(name || '').trim();
+          if (analystNoValue)
+          nameSpan.classList.add('tf-analyst-no-value');
+          label.appendChild(nameSpan);"""
+          new="""nameSpan.textContent = formatAnalystDisplayName(name);
+          nameSpan.title = String(name || '').trim();
+          if (analystNoValue)
+          nameSpan.classList.add('tf-analyst-no-value');
+          // REV394: all analyst ticker names are color-only.
+          tf_applyLatestRiskToElement(nameSpan, name, null, false);
+          label.appendChild(nameSpan);"""
+          assert old in s, 'ticker name anchor missing'
+          s=s.replace(old,new,1)
+
+          # Left-align data rows only; headers are untouched.
+          old="""const nameCell = document.createElement('td');
+          nameCell.textContent = a.baseName || a.name;
+          nameCell.classList.add('monthly-sticky-col-2');"""
+          new="""const nameCell = document.createElement('td');
+          nameCell.textContent = a.baseName || a.name;
+          nameCell.classList.add('monthly-sticky-col-2','tf-risk-name-left');"""
+          assert old in s, 'Table1 name alignment anchor missing'
+          s=s.replace(old,new,1)
+
+          old="""const analystCell = tf_markHistoryCell(document.createElement('td'), 'analyst');
+          analystCell.textContent = isWithdrawRow ? 'Withdraw' : formatAnalystDisplayName(row.analyst || '');
+          analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();"""
+          new="""const analystCell = tf_markHistoryCell(document.createElement('td'), 'analyst');
+          analystCell.classList.add('tf-risk-name-left');
+          analystCell.textContent = isWithdrawRow ? 'Withdraw' : formatAnalystDisplayName(row.analyst || '');
+          analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();"""
+          assert old in s, 'Table3 alignment anchor missing'
+          s=s.replace(old,new,1)
+
+          old="""const nameCell = document.createElement('td');
+          nameCell.textContent = name;
+          if (name !== 'Withdraw')"""
+          new="""const nameCell = document.createElement('td');
+          nameCell.classList.add('tf-risk-name-left');
+          nameCell.textContent = name;
+          if (name !== 'Withdraw')"""
+          assert old in s, 'Drawdown alignment anchor missing'
+          s=s.replace(old,new,1)
+
+          old="""const cell = scoreRows[idx] ? scoreRows[idx].querySelector('.tf-score-analyst') : null;
+                if (cell) tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left');"""
+          new="""const cell = scoreRows[idx] ? scoreRows[idx].querySelector('.tf-score-analyst') : null;
+                if (cell) {
+                  cell.classList.add('tf-risk-name-left');
+                  tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left');
+                }"""
+          assert old in s, 'Score alignment anchor missing'
+          s=s.replace(old,new,1)
+
+          s=s.replace('// ===== END REV393 latest-month risk warning system =====',
+                      '// REV394 presentation: smaller icons, left placement, ticker color-only.\n// ===== END REV393 latest-month risk warning system =====',1)
+          app.write_text(s)
+
+          css=root/'assets/7e95b596e5bf8dff.css'
+          cs=css.read_text()
+          old=""" .tf-latest-risk-icon{
+            display:inline-grid;
+            place-items:center;
+            width:15px;
+            height:15px;
+            min-width:15px;
+            margin-left:5px;
+            border-radius:50%;
+            vertical-align:-2px;
+            font-family:Arial,sans-serif;
+            font-size:12px;
+            line-height:1;
+            font-weight:900;
+            box-sizing:border-box;
+            user-select:none;
+          }"""
+          # tolerate no leading space
+          old=old.lstrip()
+          new=""".tf-latest-risk-icon{
+            display:inline-grid;
+            place-items:center;
+            width:10px;
+            height:10px;
+            min-width:10px;
+            border-radius:50%;
+            vertical-align:0;
+            font-family:Arial,sans-serif;
+            font-size:7px;
+            line-height:1;
+            font-weight:900;
+            box-sizing:border-box;
+            user-select:none;
+            flex:0 0 10px;
+          }
+          .tf-latest-risk-icon-left{
+            margin-left:0;
+            margin-right:4px;
+          }
+          .tf-latest-risk-icon-right{
+            margin-left:4px;
+            margin-right:0;
+          }"""
+          assert old in cs, 'icon CSS anchor missing'
+          cs=cs.replace(old,new,1)
+          old=""".tf-latest-risk-icon-critical{
+            background:#ef4444;
+            border:1px solid #f87171;
+            color:#fff;
+            box-shadow:0 0 0 1px rgba(239,68,68,.18);
+          }"""
+          new=""".tf-latest-risk-icon-critical{
+            background:#ef4444;
+            border:1px solid #f87171;
+            color:#fff;
+            font-size:7px;
+            box-shadow:0 0 0 1px rgba(239,68,68,.18);
+          }"""
+          assert old in cs
+          cs=cs.replace(old,new,1)
+          if '.tf-risk-name-left' not in cs:
+              cs += """\n/* REV394 — data rows only; headers remain centered. */\n.tf-risk-name-left{ text-align:left !important; }\n"""
+          css.write_text(cs)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.7'
+          m['version_name']='REV394'
+          m['description']='REV394: smaller left-side risk icons; Table 2 analyst row and all analyst tickers are color-only; analyst data rows align left while headers remain centered.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV394.md').write_text(
+              '# REV394 — Risk Icon Layout\n\n'
+              '- Icons ~10px.\n- Requested icons moved left.\n'
+              '- Table 2 analyst row and all ticker analyst names: color only.\n'
+              '- Table 1 / Table 3 / Drawdown / Score analyst data rows: left aligned; headers unchanged.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S)
+          assert mm
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['README_REV394.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV394 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('REV394 patched',len(newmap),'protected files')
+          PY
+          node --check /tmp/tf-rev394/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev394/src/assets/7b6af0cb4001a684.js
+          node --check /tmp/tf-rev394/src/assets/tf-latest-risk-sidebar-rev393.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev394/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          side=(root/'assets/tf-latest-risk-sidebar-rev393.js').read_text()
+          assert "function tf_applyLatestRiskToElement(el, analyst, pair, showIcon, iconPosition)" in app
+          assert "tf_applyLatestRiskToElement(nameSpan, it.name, null, true, 'left');" in app
+          assert "tf_applyLatestRiskToElement(nameCell, a.baseName || a.name, a.pair || getPrimaryPairForAnalyst(a), false);" in app
+          assert "tf_applyLatestRiskToElement(span, analystName, a.pair || getPrimaryPairForAnalyst(a), true, 'left');" in app
+          assert "tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true, 'left');" in app
+          assert "tf_applyLatestRiskToElement(a, name, null, true, 'left');" in app
+          assert "tf_applyLatestRiskToElement(nameSpan, name, null, false);" in app
+          assert "width:10px;" in css and "height:10px;" in css
+          assert '.tf-latest-risk-icon-left' in css
+          assert '.tf-risk-name-left' in css
+          assert 'REV393 SIDEBAR' in side
+          assert 'data-tf-latest-risk-icon' not in side
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.7' and m['version_name']=='REV394'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for p,h in d.items():
+              fp=root/p
+              a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV394 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV394_RISK_ICON_LAYOUT.zip
+          cd /tmp/tf-rev394/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.07
+          OUT=/tmp/TF_Extension_PC_MAC_REV394_RISK_ICON_LAYOUT.zip
+          NOTES=deliverables/RELEASE_NOTES_REV394.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.07 — REV394 Risk Icon Layout' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.07 — REV394 Risk Icon Layout' --notes-file "$NOTES" --latest
+          fi
