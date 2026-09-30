@@ -19,7 +19,7 @@ jobs:
           node-version: '22'
       - name: Fetch REV379 baseline and build REV383
         env:
-          GH_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           gh release download v1.16.92 --pattern 'TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip' --output base.zip
@@ -71,7 +71,7 @@ jobs:
           sha256sum -c deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip.sha256
       - name: Publish release
         env:
-          GH_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           TAG=v1.16.96
@@ -85,7 +85,7 @@ jobs:
           fi
       - name: Publish updater metadata
         env:
-          GH_TOKEN: \${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           gh api repos/$GITHUB_REPOSITORY/releases/tags/v1.16.96 > release.json
