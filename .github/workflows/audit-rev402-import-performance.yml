@@ -1,0 +1,29 @@
+name: Audit REV401 import loading performance
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV402-import-performance/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect REV401 import render path
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev402-audit
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.14 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV401_JSON_LINK_RESTORE_FIX.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          F="$ROOT/src/assets/927ecbd63036f61b.js"
+          echo '=== IMPORT FUNCTION ==='
+          grep -n -A220 -B30 'function tf_importPayloadToStorage' "$F" || true
+          echo '=== FILE IMPORT HANDLERS ==='
+          grep -n -A120 -B20 -E 'FileReader|Import / Combine|tf_importPayloadToStorage|chrome\.storage\.local\.set|location\.reload|reload\(' "$F" | tail -n 1200 || true
+          echo '=== LOADING TEXT ==='
+          grep -RIn -E 'Memuat data|Memuat Data|Membangun dashboard|loading|Loading' "$ROOT/src" | head -n 300 || true
