@@ -47,4 +47,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v1.17.22 /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.22 — REV409 Device Identity Recovery' --notes-file release-staging/REV409/RELEASE_NOTES.md --latest
+          if gh release view v1.17.22 >/dev/null 2>&1; then
+            gh release edit v1.17.22 --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.22 — REV409 Device Identity Recovery' --notes-file release-staging/REV409/RELEASE_NOTES.md --latest
+            gh release upload v1.17.22 /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip --clobber
+          else
+            gh release create v1.17.22 /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.22 — REV409 Device Identity Recovery' --notes-file release-staging/REV409/RELEASE_NOTES.md --latest
+          fi

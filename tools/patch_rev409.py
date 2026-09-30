@@ -25,8 +25,17 @@ s=s[:idx]+'''  async function api(path, body) {
 s=s.replace("    if (/APPS_SCRIPT_TIMEOUT|Apps Script timeout/i.test(raw)) {", "    if (/Apps Script HTTP\\s+404/i.test(raw)) return 'Google Apps Script mengembalikan HTTP 404. Email, token, session, dan identitas perangkat tetap disimpan. Jika terus berulang, deployment Apps Script pada server perlu diperiksa.';\n    if (/APPS_SCRIPT_TIMEOUT|Apps Script timeout/i.test(raw)) {")
 s=s.replace('  let currentCredentials = null;', "  let currentCredentials = null;\n  let verifiedVaultIdentity = null;")
 s=s.replace('      const deviceInfo = proof.deviceInfo || {};', '''      const deviceInfo = proof.deviceInfo || {};
-      const pinned = (await storageGet(['tfDeviceVaultIdentityV1'])).tfDeviceVaultIdentityV1;
-      if (pinned && pinned.publicKeySpki && pinned.publicKeySpki !== deviceInfo.publicKeySpki) {
+      const identityState = await storageGet(['tfDeviceVaultIdentityV1',SESSION_KEY]);
+      const pinned = identityState.tfDeviceVaultIdentityV1;
+      let previousDeviceId = '';
+      try {
+        const parts=String(identityState[SESSION_KEY] || '').split('.');
+        if(parts[0]==='tfs1' && parts.length===3) {
+          const payload=JSON.parse(atob(parts[1].replace(/-/g,'+').replace(/_/g,'/')));
+          if(payload.kind==='session')previousDeviceId=String(payload.deviceId || '');
+        }
+      } catch (_) {}
+      if ((pinned && pinned.publicKeySpki && pinned.publicKeySpki !== deviceInfo.publicKeySpki) || (previousDeviceId && previousDeviceId !== deviceInfo.fullDeviceId)) {
         const error = new Error('Kunci Device Vault berbeda dari perangkat yang terakhir berhasil diaktivasi. Tidak membuat permintaan perangkat baru; pulihkan data browser lama sebelum melanjutkan.');
         error.code = 'DEVICE_VAULT_IDENTITY_CHANGED';
         throw error;
@@ -37,6 +46,7 @@ s=s.replace('      [SESSION_KEY]: String(bindResult.sessionToken', "      ...(ve
 a=s.index('  async function saveValidatedSessionState(');b=s.index('\n  async function',a+10)
 part=s[a:b];part=part.replace('    await storageSet({', "    await storageSet({\n      ...(verifiedVaultIdentity && verifiedVaultIdentity.publicKeySpki ? {tfDeviceVaultIdentityV1: verifiedVaultIdentity} : {}),",1);s=s[:a]+part+s[b:]
 a=s.index('  async function activateOrRenew(');b=s.index('  async function start()',a);part=s[a:b];part=part.replace('    } catch (error) {', "    } catch (error) {\n      if (error && error.code === 'DEVICE_VAULT_IDENTITY_CHANGED') { showError({code:error.code,message:error.message}); return; }",2);s=s[:a]+part+s[b:]
+s=s.replace('[CREDENTIALS_KEY, SESSION_KEY, STATE_KEY, PENDING_CLIENT_KEY, ACTIVATION_TRACE_KEY, MANUAL_BUILD_ACTIVATION_KEY]);', '[CREDENTIALS_KEY, SESSION_KEY, STATE_KEY, PENDING_CLIENT_KEY, ACTIVATION_TRACE_KEY, MANUAL_BUILD_ACTIVATION_KEY, \'tfDeviceVaultIdentityV1\']);')
 f.write_text(s)
 f=root/'assets/tf-device-background.js';s=f.read_text();s=s.replace('          return response.data || {};', '''          const proof = response.data || {};
           const info = proof.deviceInfo || {}, signed = proof.signatureInfo || {};
