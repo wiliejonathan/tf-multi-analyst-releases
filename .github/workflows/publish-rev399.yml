@@ -1,0 +1,224 @@
+name: Publish PC Mac REV399 JSON import fix
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV399/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev399
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV398 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev399
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.11 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch JSON import safety
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev399/src')
+          popup=root/'assets/927ecbd63036f61b.js'
+          s=popup.read_text()
+
+          old="""function tf_safeJsonParse(text) {
+          try {
+          return JSON.parse(text);
+          }
+          catch (e) {
+          return null;
+          }
+          }"""
+          new="""function tf_safeJsonParse(text) {
+          try {
+          let src=String(text==null?'':text).replace(/^\\uFEFF/,'').replace(/^\\s*\\uFEFF/,'').trim();
+          if(!src)return null;
+          let parsed;
+          try{parsed=JSON.parse(src);}catch(e){
+          const retry=src.replace(/^\\u0000+/,'').replace(/\\u0000+$/,'').trim();
+          if(retry===src)return null;
+          try{parsed=JSON.parse(retry);}catch(_){return null;}
+          }
+          if(typeof parsed==='string'){
+          const nested=parsed.replace(/^\\uFEFF/,'').trim();
+          if((nested.startsWith('{')&&nested.endsWith('}'))||(nested.startsWith('[')&&nested.endsWith(']'))){
+          try{parsed=JSON.parse(nested);}catch(_){}
+          }
+          }
+          return parsed&&typeof parsed==='object'?parsed:null;
+          } catch(e){return null;}
+          }
+          function tf_isRecognizedImportStorageV399(storage,payload) {
+          if(!storage||typeof storage!=='object'||Array.isArray(storage))return false;
+          if(payload&&payload.schema===TF_EXPORT_SCHEMA)return true;
+          return !!(
+          Array.isArray(storage.tfHistorySignals)||
+          (storage[TF_ANALYST_SOURCES_KEY]&&typeof storage[TF_ANALYST_SOURCES_KEY]==='object'&&!Array.isArray(storage[TF_ANALYST_SOURCES_KEY]))||
+          (storage.tfMonthlyStats&&typeof storage.tfMonthlyStats==='object'&&!Array.isArray(storage.tfMonthlyStats))||
+          Array.isArray(storage.tfScoreHistory)||
+          Array.isArray(storage[TF_REMEMBERED_LINKS_KEY])
+          );
+          }
+          function tf_hasImportContentV399(storage) {
+          if(!storage||typeof storage!=='object')return false;
+          return !!(
+          (Array.isArray(storage.tfHistorySignals)&&storage.tfHistorySignals.length)||
+          (storage[TF_ANALYST_SOURCES_KEY]&&typeof storage[TF_ANALYST_SOURCES_KEY]==='object'&&Object.keys(storage[TF_ANALYST_SOURCES_KEY]).length)||
+          (storage.tfMonthlyStats&&typeof storage.tfMonthlyStats==='object'&&Object.keys(storage.tfMonthlyStats).length)||
+          (Array.isArray(storage.tfScoreHistory)&&storage.tfScoreHistory.length)||
+          (Array.isArray(storage[TF_REMEMBERED_LINKS_KEY])&&storage[TF_REMEMBERED_LINKS_KEY].length)
+          );
+          }"""
+          assert old in s,'tf_safeJsonParse anchor missing'
+          s=s.replace(old,new,1)
+
+          # Reject unrelated/empty JSON BEFORE default empty objects are written.
+          anchor="""const storage = payload.storage && typeof payload.storage === 'object' ? payload.storage : payload;
+          if (!storage[TF_REMEMBERED_LINKS_KEY]"""
+          repl="""const storage = payload.storage && typeof payload.storage === 'object' && !Array.isArray(payload.storage) ? payload.storage : payload;
+          if (!tf_isRecognizedImportStorageV399(storage,payload)) {
+          alert('File JSON valid, tetapi bukan format data TF Analyzer yang dikenali.');
+          setStatus('Import / Combine gagal — format data tidak dikenali.');
+          return false;
+          }
+          if (!tf_hasImportContentV399(storage)) {
+          alert('File JSON terbaca, tetapi tidak berisi History/Analis/Monthly/Score yang dapat di-import. Data lama tidak dihapus.');
+          setStatus('Import / Combine gagal — file kosong. Data lama tetap aman.');
+          return false;
+          }
+          if (!storage[TF_REMEMBERED_LINKS_KEY]"""
+          assert anchor in s,'import storage anchor missing'
+          s=s.replace(anchor,repl,1)
+
+          # FileReader gets filename-specific failure after robust parser.
+          old="""const parsed = tf_safeJsonParse(txt);
+          if (!parsed) {
+          reject(new Error('JSON tidak valid: ' + String(file && file.name ? file.name : 'file')));
+          return;
+          }"""
+          new="""const parsed = tf_safeJsonParse(txt);
+          if (!parsed) {
+          reject(new Error('JSON tidak valid / rusak: ' + String(file && file.name ? file.name : 'file') + '. Periksa encoding atau export ulang file.'));
+          return;
+          }"""
+          assert old in s,'reader parse anchor missing'
+          s=s.replace(old,new,1)
+
+          # Combine refuses any unrelated/empty source instead of silently producing empty storage.
+          combine_anchor="""const list = (Array.isArray(payloads) ? payloads : []).filter((p) => p && typeof p === 'object');
+          if (!list.length)
+          return null;
+          const primary = list[0];"""
+          combine_repl="""const list = (Array.isArray(payloads) ? payloads : []).filter((p) => p && typeof p === 'object');
+          if (!list.length)
+          return null;
+          for (const p of list) {
+          const st=p&&p.storage&&typeof p.storage==='object'&&!Array.isArray(p.storage)?p.storage:p;
+          if(!tf_isRecognizedImportStorageV399(st,p)||!tf_hasImportContentV399(st))return null;
+          }
+          const primary = list[0];"""
+          assert combine_anchor in s,'combine preflight anchor missing'
+          s=s.replace(combine_anchor,combine_repl,1)
+
+          # Make function result explicit for Remote callers.
+          marker="function tf_importPayloadToStorage(payload, afterImport) {"
+          assert marker in s
+          # callback path remains untouched; only validation early-return safety changes.
+
+          popup.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.12'
+          m['version_name']='REV399'
+          m['description']='REV399: robust JSON Import/Combine parser; BOM/double-encoded support; rejects unrelated or empty JSON without overwriting saved data.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV399.md').write_text(
+              '# REV399 — JSON Import Fix\n\n'
+              '- Robust BOM/NUL/double-encoded JSON parser.\n'
+              '- Official envelope and raw canonical storage supported.\n'
+              '- Invalid/empty imports never overwrite existing data.\n'
+              '- Multi-file Combine preflights every file.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV399.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0:marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:];cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0:runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV399 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev399/src/assets/927ecbd63036f61b.js
+          node --check /tmp/tf-rev399/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev399/src')
+          p=(root/'assets/927ecbd63036f61b.js').read_text()
+          assert 'function tf_isRecognizedImportStorageV399' in p
+          assert 'function tf_hasImportContentV399' in p
+          assert "replace(/^\\uFEFF/,'')" in p
+          assert "typeof parsed==='string'" in p
+          assert 'Data lama tidak dihapus.' in p
+          assert 'format data TF Analyzer yang dikenali' in p
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.12' and m['version_name']=='REV399'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text();mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for path,h in d.items():
+              fp=root/path;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((path,a,h))
+          assert not bad,bad[:10]
+          print('REV399 PC JSON import QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV399_JSON_IMPORT_FIX.zip
+          cd /tmp/tf-rev399/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.12
+          OUT=/tmp/TF_Extension_PC_MAC_REV399_JSON_IMPORT_FIX.zip
+          NOTES=deliverables/RELEASE_NOTES_REV399.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.12 — REV399 JSON Import Fix' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.12 — REV399 JSON Import Fix' --notes-file "$NOTES" --latest
+          fi
