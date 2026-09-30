@@ -119,17 +119,11 @@ jobs:
           assert q>=0, 'pair helper state missing'
           s=s[:q]+s[q:].replace(old,"const st = tf_getLatestRiskState(analyst, pair) || tf_getLatestRiskState(analyst, null);",1)
 
-          # Holding duration fixed-width numeric units.
-          old="""function tf_formatHoldingDuration(ms) {
-          const raw=Number(ms);
-          if(!Number.isFinite(raw)||raw<0)return '—';
-          let totalMinutes=Math.round(raw/60000);
-          if(totalMinutes<=0)return '0m';
-          const days=Math.floor(totalMinutes/1440); totalMinutes-=days*1440;
-          const hours=Math.floor(totalMinutes/60); const minutes=totalMinutes-hours*60;
-          const parts=[]; if(days>0)parts.push(days+'d'); if(hours>0||days>0)parts.push(hours+'h'); parts.push(minutes+'m');
-          return parts.join(' ');
-          }"""
+          # Holding duration fixed-width numeric units. Replace by function bounds
+          # because desktop spacing differs slightly from mobile.
+          a=s.find('function tf_formatHoldingDuration(ms) {')
+          b=s.find('\nfunction tf_renderHoldingPeriodTables',a)
+          assert a>=0 and b>a, 'Holding formatter bounds missing'
           new="""function tf_formatHoldingDuration(ms) {
           const raw=Number(ms);
           if(!Number.isFinite(raw)||raw<0)return '—';
@@ -141,8 +135,7 @@ jobs:
           const parts=[]; if(days>0)parts.push(pad2(days)+'d'); if(hours>0||days>0)parts.push(pad2(hours)+'h'); parts.push(pad2(minutes)+'m');
           return parts.join(' ');
           }"""
-          assert old in s, 'Holding formatter missing'
-          s=s.replace(old,new,1)
+          s=s[:a]+new+s[b:]
 
           # Table 3 row text follows PNL%, analyst cell keeps analyst status.
           old="""tr.appendChild(balanceCell);
