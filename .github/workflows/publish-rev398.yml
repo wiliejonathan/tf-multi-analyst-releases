@@ -68,10 +68,12 @@ jobs:
 
           cfn=s.find('function tf_applyLatestRiskColorOnly')
           assert cfn>=0
-          q=s.find(classline,cfn)
+          compact="el.classList.add(st.severity>=2?'tf-latest-risk-critical':(st.severity===1?'tf-latest-risk-warning':'tf-latest-risk-healthy'));"
+          target=classline if s.find(classline,cfn)>=0 else compact
+          q=s.find(target,cfn)
           assert q>=0
-          if 'tf_forceLatestRiskTextColor(el, st);' not in s[q:q+len(classline)+100]:
-              s=s[:q]+s[q:].replace(classline,classline+"\ntf_forceLatestRiskTextColor(el, st);",1)
+          if 'tf_forceLatestRiskTextColor(el, st);' not in s[q:q+len(target)+100]:
+              s=s[:q]+s[q:].replace(target,target+"\ntf_forceLatestRiskTextColor(el, st);",1)
 
           sweep=s.find('function tf_colorEveryRenderedAnalystName')
           assert sweep>=0
