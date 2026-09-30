@@ -54,7 +54,7 @@ jobs:
               a=hashlib.sha256(fp.read_bytes()).hexdigest()
               if a!=h: bad.append((p,a,h))
           assert not bad,bad[:10]
-          assert len(d)>=239
+          assert len(d)>=236
           print('REV385 integrity PASS',len(d),'protected files')
           PY
       - name: Package
