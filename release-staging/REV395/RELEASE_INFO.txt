@@ -1,0 +1,1 @@
+REV395 / v1.17.08\nAll analyst names use aggregate severity; healthy green check on icon surfaces.\n
