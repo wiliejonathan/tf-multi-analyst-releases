@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 383,
-  "tag_name": "v1.16.96",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.96",
-  "published_at": "2026-09-30T06:34:16Z",
+  "revision": 384,
+  "tag_name": "v1.16.97",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.97",
+  "published_at": "2026-09-30T07:10:43Z",
   "asset": {
-    "id": 600214104,
-    "name": "TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.96/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip",
-    "size": 821058,
-    "digest": "sha256:32a319f2b5e581ffee053dc5fa3288f7de69d02d33875055dfb80dd4fd1cde9a",
-    "updated_at": "2026-09-30T06:34:15Z"
+    "id": 600274204,
+    "name": "TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.97/TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip",
+    "size": 837571,
+    "digest": "sha256:2c4e9fde6136b2bdadcb9e5cb8ff369c7f5532311b5e536facc7fc35e5ee515a",
+    "updated_at": "2026-09-30T07:10:41Z"
   }
 }
