@@ -1,0 +1,47 @@
+name: Publish PC Mac REV404 activation recovery
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV404/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev404/src
+          gh release download v1.17.16 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV403_TABLE_COLUMN_SIZING.zip' --output /tmp/tf-rev404/base.zip
+          unzip -q /tmp/tf-rev404/base.zip -d /tmp/tf-rev404/src
+          python3 tools/patch_rev404.py /tmp/tf-rev404/src
+          TF_PC_GATE=/tmp/tf-rev404/src/assets/tf-device-lock.js node --test tests/activation404.cjs
+          find /tmp/tf-rev404/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev404/src')
+          registry=json.loads(re.search(r'const FILES\s*=\s*(\{.*?\});',(root/'assets/7b6af0cb4001a684.js').read_text(),re.S).group(1))
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in registry.items())
+          assert json.loads((root/'manifest.json').read_text())['version']=='1.17.17'
+          print('Hashes PASS',len(registry))
+          CHECK
+          (cd /tmp/tf-rev404/src && zip -qr /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip
+          sha256sum /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip > /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip.sha256
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.17.17 /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip.sha256 --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.17 — REV404 Activation Recovery' --notes-file deliverables/RELEASE_NOTES_REV404.md --latest
+      - name: Diagnose backend availability (no customer credentials)
+        continue-on-error: true
+        run: |
+          curl -sS --connect-timeout 10 --max-time 45 -w '\nHTTP %{http_code} seconds %{time_total}\n' -H 'Content-Type: application/json' --data '{"email":"diagnostic@example.invalid","token":"INVALID-DIAGNOSTIC","deviceType":"DESKTOP"}' https://tf-license-device-api.wiliejonathan1999.workers.dev/device-challenge
