@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 402,
-  "tag_name": "v1.17.15",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.15",
-  "published_at": "2026-09-30T13:39:22Z",
+  "revision": 404,
+  "tag_name": "v1.17.17",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.17",
+  "published_at": "2026-09-30T15:02:35Z",
   "asset": {
-    "id": 601013420,
-    "name": "TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.15/TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip",
-    "size": 842093,
-    "digest": "sha256:472b6d3611e68fd9e9385d566aed57f949ece6c841162bcc0a7cf3be43a544c3",
-    "updated_at": "2026-09-30T13:39:21Z"
+    "id": 601183292,
+    "name": "TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.17/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip",
+    "size": 843043,
+    "digest": "sha256:3e422e17a62bb85861951525eff75cda92da41b54deb984e10a51470f369cfb3",
+    "updated_at": "2026-09-30T15:02:34Z"
   }
 }
