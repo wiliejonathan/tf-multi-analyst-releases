@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 409,
-  "tag_name": "v1.17.22",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.22",
-  "published_at": "2026-09-30T17:44:58Z",
+  "revision": 410,
+  "tag_name": "v1.17.23",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.23",
+  "published_at": "2026-09-30T18:06:05Z",
   "asset": {
-    "id": 601480716,
-    "name": "TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.22/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip",
-    "size": 850016,
-    "digest": "sha256:f6a64ff1b8cce4c189b377942410d1f9167dea769102339537182dc405108475",
-    "updated_at": "2026-09-30T17:47:58Z"
+    "id": 601510576,
+    "name": "TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.23/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip",
+    "size": 850361,
+    "digest": "sha256:56313865b8aedf1924329ace45f6a0847c8edaf8228bae35be5f06ecc19af16b",
+    "updated_at": "2026-09-30T18:06:05Z"
   }
 }
