@@ -1,4 +1,4 @@
-name: Publish PC Mac REV385 Holding Table3 source fix
+name: Publish PC Mac REV385 Holding accuracy
 on:
   push:
     branches: [main]
@@ -27,57 +27,100 @@ jobs:
           gh release download v1.16.97 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip' --output "$ROOT/base.zip"
           unzip -tq "$ROOT/base.zip"
           unzip -q "$ROOT/base.zip" -d "$ROOT/src"
-      - name: Patch REV385
+      - name: Patch Holding Period to Table 3 display dates
         run: |
           set -euo pipefail
-          python3 tools/build_rev385.py /tmp/tf-rev385/src
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev385/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+          old='''function tf_getHoldingDurationMs(row) {\ntry {\nif (!row || row.isWithdraw)\nreturn null;\nconst created = Number(row.createdSortKey);\nconst closed = Number(row.sortKey);\nif (!Number.isFinite(created) || !Number.isFinite(closed) || created <= 0 || closed <= 0)\nreturn null;\nconst diff = closed - created;\nreturn Number.isFinite(diff) && diff >= 0 ? diff : null;\n}\ncatch (e) {\nreturn null;\n}\n}\n'''
+          new='''function tf_parseHistoryTableDateMs(value) {\ntry {\nif (value === null || value === undefined)\nreturn null;\nif (typeof value === 'number' && Number.isFinite(value) && value > 0)\nreturn value;\nconst raw = String(value || '').trim();\nif (!raw)\nreturn null;\nconst wib = raw.replace(/\\s*WIB\\s*$/i, '').trim();\nconst m = wib.match(/^(\\d{1,2})[-\\/](\\d{1,2})[-\\/](\\d{4})\\s+(\\d{1,2}):(\\d{2})(?::(\\d{2}))?$/);\nif (m) {\nconst day = Number(m[1]);\nconst month = Number(m[2]);\nconst year = Number(m[3]);\nconst hour = Number(m[4]);\nconst minute = Number(m[5]);\nconst second = Number(m[6] || 0);\nif (month >= 1 && month <= 12 && day >= 1 && day <= 31 && hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59) {\nconst utcMs = Date.UTC(year, month - 1, day, hour - 7, minute, second, 0);\nif (Number.isFinite(utcMs))\nreturn utcMs;\n}\n}\nconst parsed = Date.parse(raw);\nreturn Number.isFinite(parsed) ? parsed : null;\n}\ncatch (e) {\nreturn null;\n}\n}\nfunction tf_getHoldingDurationMs(row) {\ntry {\nif (!row || row.isWithdraw)\nreturn null;\n// REV385: Holding Period MUST follow the exact dates displayed in Table 3.\n// Primary source: Created At = createdDate, Closed At = displayDate.\n// Sort keys are fallback-only for legacy rows that do not carry display strings.\nlet created = tf_parseHistoryTableDateMs(row.createdDate);\nlet closed = tf_parseHistoryTableDateMs(row.displayDate);\nif (!Number.isFinite(created) || created <= 0)\ncreated = Number(row.createdSortKey);\nif (!Number.isFinite(closed) || closed <= 0)\nclosed = Number(row.sortKey);\nif (!Number.isFinite(created) || !Number.isFinite(closed) || created <= 0 || closed <= 0)\nreturn null;\nconst diff = closed - created;\nreturn Number.isFinite(diff) && diff >= 0 ? diff : null;\n}\ncatch (e) {\nreturn null;\n}\n}\n'''
+          assert old in s, 'REV384 Holding duration function not found'
+          app.write_text(s.replace(old,new,1))
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.16.98'
+          m['version_name']='REV385'
+          m['description']='REV385: Holding Period accuracy fix uses exact Table 3 Created At and Closed At display dates as primary source; sort keys are fallback-only. Includes REV384 alignment, no inner scrollbars, Table 3 performance fix, persistent imports, Analyst-Pair analytics, and mini neon cursor.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV385.md').write_text('# REV385 — Holding Period Accuracy Fix\n\n- Created At = createdDate.\n- Closed At = displayDate.\n- sort keys are fallback-only.\n- Max = all history for active Analyst-Pair.\n- Avg = active Time Range / Month / date filters.\n- Version 1.16.98 / REV385.\n')
+          # regenerate one authoritative protected hash map
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S)
+          assert mm, 'FILES registry missing'
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['README_REV385.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(), 'Missing protected '+path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          out="(() => {\n'use strict';\n// REV385: single authoritative SHA-256 registry generated from exact packaged bytes.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime
+          loader.write_text(out)
+          print('REV385 protected files',len(newmap))
+          PY
           node --check /tmp/tf-rev385/src/assets/4b4d6b8dc315a95c.js
           node --check /tmp/tf-rev385/src/assets/7b6af0cb4001a684.js
-      - name: Validate exact Table3 source and integrity
+      - name: Validate hashes and Holding source
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
           import re,json,hashlib
           root=Path('/tmp/tf-rev385/src')
-          main=(root/'assets/4b4d6b8dc315a95c.js').read_text()
-          assert 'tf_parseHistoryTableDateMs' in main
-          assert 'tf_renderHoldingPeriodTables(rowsForUi)' in main
-          assert 'tf_holdingAllTickerRows' not in main
-          assert 'row.createdDate' in main and 'row.displayDate' in main
-          loader=(root/'assets/7b6af0cb4001a684.js').read_text()
-          m=re.search(r'const FILES = (\{.*?\});\n// The integrity loader',loader,re.S); assert m
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          assert 'REV385: Holding Period MUST follow the exact dates displayed in Table 3.' in app
+          assert 'tf_parseHistoryTableDateMs(row.createdDate)' in app
+          assert 'tf_parseHistoryTableDateMs(row.displayDate)' in app
+          assert 'const tf_holdingAllTickerRows = baseRows.slice();' in app
+          assert 'tf_renderHoldingPeriodTables(tf_holdingAllTickerRows, tf_holdingFilteredRows);' in app
+          s=(root/'assets/7b6af0cb4001a684.js').read_text()
+          m=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S); assert m
           d=json.loads(m.group(1)); bad=[]
+          assert 'assets/7b6af0cb4001a684.js' not in d
           for p,h in d.items():
               fp=root/p
               if not fp.is_file(): bad.append((p,'missing')); continue
               a=hashlib.sha256(fp.read_bytes()).hexdigest()
               if a!=h: bad.append((p,a,h))
-          assert not bad,bad[:10]
-          assert len(d)>=236
-          print('REV385 integrity PASS',len(d),'protected files')
+          assert not bad, bad[:10]
+          assert len(d)>=238
+          print('REV385 PC integrity PASS',len(d),'protected, 0 mismatch')
           PY
-      - name: Package
+      - name: Build ZIP
         run: |
           set -euo pipefail
-          OUT=/tmp/TF_Extension_PC_MAC_REV385_HOLDING_TABLE3_SOURCE_FIX.zip
+          OUT=/tmp/TF_Extension_PC_MAC_REV385_HOLDING_ACCURACY_FIX.zip
           cd /tmp/tf-rev385/src
           zip -qr "$OUT" .
           unzip -tq "$OUT"
           SHA=$(sha256sum "$OUT" | awk '{print $1}')
-          printf '%s  %s\n' "$SHA" 'TF_Extension_PC_MAC_REV385_HOLDING_TABLE3_SOURCE_FIX.zip' > "$OUT.sha256"
-          echo "PC_SHA=$SHA" >> "$GITHUB_ENV"
-      - name: Publish stable
+          printf '%s  %s\n' "$SHA" 'TF_Extension_PC_MAC_REV385_HOLDING_ACCURACY_FIX.zip' > "$OUT.sha256"
+          echo "PC_SHA256=$SHA" >> "$GITHUB_ENV"
+      - name: Publish REV385
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           TAG=v1.16.98
-          OUT=/tmp/TF_Extension_PC_MAC_REV385_HOLDING_TABLE3_SOURCE_FIX.zip
+          OUT=/tmp/TF_Extension_PC_MAC_REV385_HOLDING_ACCURACY_FIX.zip
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.98 — REV385' --notes-file deliverables/RELEASE_NOTES_REV385.md --latest
             gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
           else
             gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.98 — REV385' --notes-file deliverables/RELEASE_NOTES_REV385.md --latest
           fi
-          echo "REV385 PC published SHA256=$PC_SHA"
+          echo "Published REV385 SHA256=$PC_SHA256"
