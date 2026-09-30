@@ -1,16 +1,15 @@
 REV383 diagnostic
-Wed Sep 30 06:28:52 UTC 2026
+Wed Sep 30 06:31:53 UTC 2026
 Downloading baseline...
 download_exit=0
--rw-r--r-- 1 runner runner 811704 Sep 30 06:28 /tmp/base379.zip
+-rw-r--r-- 1 runner runner 811704 Sep 30 06:31 /tmp/base379.zip
 531d5cbe418af77d4e32d987161b4bbf6166ed3390691954a9b8260d55686ac8  /tmp/base379.zip
 Compiling builder...
 compile_exit=0
 Running builder...
-Traceback (most recent call last):
-  File "/home/runner/work/tf-multi-analyst-releases/tf-multi-analyst-releases/build_release_rev383.py", line 442, in <module>
-    assert m,'integrity map missing'
-           ^
-AssertionError: integrity map missing
-builder_exit=1
-ls: cannot access 'deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip*': No such file or directory
+output=/home/runner/work/tf-multi-analyst-releases/tf-multi-analyst-releases/deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip
+integrity_entries=233
+sha256=32a319f2b5e581ffee053dc5fa3288f7de69d02d33875055dfb80dd4fd1cde9a
+builder_exit=0
+-rw-r--r-- 1 runner runner 821058 Sep 30 06:31 deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip
+-rw-r--r-- 1 runner runner    133 Sep 30 06:31 deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip.sha256
