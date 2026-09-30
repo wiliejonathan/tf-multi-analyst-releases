@@ -1,0 +1,268 @@
+name: Publish PC Mac REV395 all analyst name colors
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV395/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev395
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV394 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev395
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.07 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV394_RISK_ICON_LAYOUT.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch aggregate analyst-name colors and healthy check
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev395/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          old="""const byAnalyst = new Map();
+          byPair.forEach((st) => {
+          if (!st || !st.severity) return;
+          const key = tf_latestRiskNormAnalyst(st.analyst);"""
+          new="""const byAnalyst = new Map();
+          byPair.forEach((st) => {
+          if (!st) return;
+          const key = tf_latestRiskNormAnalyst(st.analyst);"""
+          assert old in s, 'aggregate analyst-state anchor missing'
+          s=s.replace(old,new,1)
+
+          old="""function tf_latestRiskReason(st) {
+          if (!st || !st.severity) return '';
+          const month = st.monthKey ? (' · ' + st.monthKey) : '';
+          if (st.severity >= 2) return 'CRITICAL' + month + ': Drawdown + Consecutive Loss';
+          if (st.drawdown) return 'WARNING' + month + ': Drawdown';
+          if (st.consecutiveLoss) return 'WARNING' + month + ': Consecutive Loss';
+          return '';
+          }"""
+          new="""function tf_latestRiskReason(st) {
+          if (!st) return '';
+          const month = st.monthKey ? (' · ' + st.monthKey) : '';
+          if (st.severity >= 2) return 'CRITICAL' + month + ': Drawdown + Consecutive Loss';
+          if (st.drawdown) return 'WARNING' + month + ': Drawdown';
+          if (st.consecutiveLoss) return 'WARNING' + month + ': Consecutive Loss';
+          return 'HEALTHY' + month + ': No Drawdown / Consecutive Loss';
+          }"""
+          assert old in s, 'reason anchor missing'
+          s=s.replace(old,new,1)
+
+          old="""if (!st || !st.severity) {
+          if (el.dataset && el.dataset.tfRiskBaseTitle != null) el.title = el.dataset.tfRiskBaseTitle;
+          return null;
+          }
+          el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : 'tf-latest-risk-warning');"""
+          new="""if (!st) {
+          if (el.dataset && el.dataset.tfRiskBaseTitle != null) el.title = el.dataset.tfRiskBaseTitle;
+          return null;
+          }
+          if (st.severity > 0) {
+          el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : 'tf-latest-risk-warning');
+          }"""
+          assert old in s, 'healthy main branch anchor missing'
+          s=s.replace(old,new,1)
+
+          old="""icon.className = 'tf-latest-risk-icon tf-latest-risk-icon-' + pos + ' ' + (st.severity >= 2 ? 'tf-latest-risk-icon-critical' : 'tf-latest-risk-icon-warning');
+          icon.textContent = st.severity >= 2 ? '×' : '!';"""
+          new="""const stateClass = st.severity >= 2 ? 'tf-latest-risk-icon-critical' : (st.severity === 1 ? 'tf-latest-risk-icon-warning' : 'tf-latest-risk-icon-healthy');
+          icon.className = 'tf-latest-risk-icon tf-latest-risk-icon-' + pos + ' ' + stateClass;
+          icon.textContent = st.severity >= 2 ? '×' : (st.severity === 1 ? '!' : '✓');"""
+          assert old in s, 'healthy icon anchor missing'
+          s=s.replace(old,new,1)
+
+          helper_end="""catch (e) { return null; }
+          }
+          // REV394 presentation: smaller icons, left placement, ticker color-only."""
+          helper_new="""catch (e) { return null; }
+          }
+          // REV395: analyst NAME color is aggregate across all pairs; pair state is icon-only where needed.
+          function tf_applyLatestRiskPairIconOnly(el, analyst, pair, iconPosition) {
+          try {
+          if (!el) return null;
+          el.querySelectorAll && el.querySelectorAll('[data-tf-latest-risk-icon="1"]').forEach((x) => x.remove());
+          const st = tf_getLatestRiskState(analyst, pair);
+          if (!st) return null;
+          const icon = document.createElement('span');
+          icon.setAttribute('data-tf-latest-risk-icon','1');
+          const pos = String(iconPosition || 'right').toLowerCase() === 'left' ? 'left' : 'right';
+          const stateClass = st.severity >= 2 ? 'tf-latest-risk-icon-critical' : (st.severity === 1 ? 'tf-latest-risk-icon-warning' : 'tf-latest-risk-icon-healthy');
+          icon.className = 'tf-latest-risk-icon tf-latest-risk-icon-' + pos + ' ' + stateClass;
+          icon.textContent = st.severity >= 2 ? '×' : (st.severity === 1 ? '!' : '✓');
+          icon.setAttribute('aria-label', tf_latestRiskReason(st));
+          icon.title = tf_latestRiskReason(st);
+          if (pos === 'left') el.insertBefore(icon, el.firstChild || null);
+          else el.appendChild(icon);
+          return st;
+          }
+          catch (e) { return null; }
+          }
+          // REV394 presentation: smaller icons, left placement, ticker color-only.
+          // REV395 presentation: every analyst NAME uses aggregate analyst severity across all pairs."""
+          assert helper_end in s, 'pair icon helper insertion anchor missing'
+          s=s.replace(helper_end,helper_new,1)
+
+          # Table 2 analyst/pair name = aggregate color only.
+          old="tf_applyLatestRiskToElement(nameCell, a.baseName || a.name, a.pair || getPrimaryPairForAnalyst(a), false);"
+          assert old in s, 'Table2 pair-name anchor missing'
+          s=s.replace(old,"tf_applyLatestRiskToElement(nameCell, a.baseName || a.name, null, false);",1)
+
+          # Table 3 name = aggregate color, pair-specific icon.
+          old="tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true, 'left');"
+          assert old in s, 'Table3 anchor missing'
+          s=s.replace(old,"tf_applyLatestRiskToElement(analystCell, row.analyst || '', null, false);\ntf_applyLatestRiskPairIconOnly(analystCell, row.analyst || '', row.pair || '', 'left');",1)
+
+          # Holding pair row = aggregate color + pair-specific icon.
+          candidates=[
+            "tf_applyLatestRiskToElement(tdName,name.slice(0,sep),name.slice(sep+3),true,'left');",
+            "tf_applyLatestRiskToElement(n,name.slice(0,sep),name.slice(sep+3),true,'left');"
+          ]
+          changed=False
+          for old in candidates:
+              if old in s:
+                  var='tdName' if old.startswith('tf_applyLatestRiskToElement(tdName') else 'n'
+                  s=s.replace(old,f"tf_applyLatestRiskToElement({var},name.slice(0,sep),null,false);tf_applyLatestRiskPairIconOnly({var},name.slice(0,sep),name.slice(sep+3),'left');",1)
+                  changed=True
+                  break
+          assert changed, 'Holding pair-name anchor missing'
+
+          # Users Management Details = aggregate color only.
+          old="tf_applyLatestRiskToElement(analystLink, entry.baseName, entry.pair, false);"
+          assert old in s, 'Details pair-color anchor missing'
+          s=s.replace(old,"tf_applyLatestRiskToElement(analystLink, entry.baseName, null, false);",1)
+
+          app.write_text(s)
+
+          css=root/'assets/7e95b596e5bf8dff.css'
+          cs=css.read_text()
+          if '.tf-latest-risk-icon-healthy' not in cs:
+              anchor=""".tf-latest-risk-icon-warning{
+            background:#facc15;
+            border:1px solid #fde047;
+            color:#111827;
+            box-shadow:0 0 0 1px rgba(250,204,21,.16);
+          }"""
+              insert=""".tf-latest-risk-icon-healthy{
+            background:#22c55e;
+            border:1px solid #4ade80;
+            color:#fff;
+            font-size:7px;
+            box-shadow:0 0 0 1px rgba(34,197,94,.16);
+          }
+          """+anchor
+              assert anchor in cs, 'warning icon CSS anchor missing'
+              cs=cs.replace(anchor,insert,1)
+          css.write_text(cs)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.8'
+          m['version_name']='REV395'
+          m['description']='REV395: every analyst name uses aggregate severity across all pairs; healthy analysts/pairs get a small green check on icon-enabled surfaces.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV395.md').write_text(
+              '# REV395 — All Analyst Name Colors + Healthy Check\n\n'
+              '- All analyst-name text uses aggregate analyst severity across pairs.\n'
+              '- Healthy state (no DD / no consecutive loss) shows green check on icon-enabled surfaces.\n'
+              '- Tickers/sidebar/Users Details remain icon-free.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S); assert mm
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['README_REV395.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV395 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('REV395 patched',len(newmap),'protected files')
+          PY
+          node --check /tmp/tf-rev395/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev395/src/assets/7b6af0cb4001a684.js
+          node --check /tmp/tf-rev395/src/assets/tf-latest-risk-sidebar-rev393.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev395/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          side=(root/'assets/tf-latest-risk-sidebar-rev393.js').read_text()
+          assert 'function tf_applyLatestRiskPairIconOnly' in app
+          assert "tf_applyLatestRiskToElement(nameCell, a.baseName || a.name, null, false);" in app
+          assert "tf_applyLatestRiskToElement(analystCell, row.analyst || '', null, false);" in app
+          assert "tf_applyLatestRiskPairIconOnly(analystCell, row.analyst || '', row.pair || '', 'left');" in app
+          assert "tf_applyLatestRiskToElement(analystLink, entry.baseName, null, false);" in app
+          assert "tf_applyLatestRiskToElement(nameSpan, name, null, false);" in app
+          assert "icon.textContent = st.severity >= 2 ? '×' : (st.severity === 1 ? '!' : '✓');" in app
+          assert '.tf-latest-risk-icon-healthy' in css
+          assert '#22c55e' in css
+          assert 'REV393 SIDEBAR' in side
+          assert 'data-tf-latest-risk-icon' not in side
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.8' and m['version_name']=='REV395'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S); assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for p,h in d.items():
+              fp=root/p
+              a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV395 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV395_ALL_ANALYST_NAME_COLORS.zip
+          cd /tmp/tf-rev395/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.08
+          OUT=/tmp/TF_Extension_PC_MAC_REV395_ALL_ANALYST_NAME_COLORS.zip
+          NOTES=deliverables/RELEASE_NOTES_REV395.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.08 — REV395 All Analyst Name Colors' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.08 — REV395 All Analyst Name Colors' --notes-file "$NOTES" --latest
+          fi
