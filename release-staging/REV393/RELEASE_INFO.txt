@@ -1,0 +1,2 @@
+REV393 / v1.17.06
+Latest-month Drawdown / Consecutive Loss warnings.
