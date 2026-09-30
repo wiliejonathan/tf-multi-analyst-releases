@@ -168,13 +168,8 @@ jobs:
           assert old in s, 'Drawdown alignment anchor missing'
           s=s.replace(old,new,1)
 
-          old="""const cell = scoreRows[idx] ? scoreRows[idx].querySelector('.tf-score-analyst') : null;
-                if (cell) tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left');"""
-          new="""const cell = scoreRows[idx] ? scoreRows[idx].querySelector('.tf-score-analyst') : null;
-                if (cell) {
-                  cell.classList.add('tf-risk-name-left');
-                  tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left');
-                }"""
+          old="if (cell) tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left');"
+          new="if (cell) { cell.classList.add('tf-risk-name-left'); tf_applyLatestRiskToElement(cell, entry.name, null, true, 'left'); }"
           assert old in s, 'Score alignment anchor missing'
           s=s.replace(old,new,1)
 
