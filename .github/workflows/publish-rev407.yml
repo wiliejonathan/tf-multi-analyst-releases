@@ -1,0 +1,49 @@
+name: Publish PC Mac REV407 risk explanation popup
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV407/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev407/src
+          gh release download v1.17.19 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV406_LAYOUT_SCROLL_FIX.zip' --output /tmp/tf-rev407/base.zip
+          unzip -q /tmp/tf-rev407/base.zip -d /tmp/tf-rev407/src
+          python3 tools/patch_rev407.py /tmp/tf-rev407/src
+          TF_PC_GATE=/tmp/tf-rev407/src/assets/tf-device-lock.js node --test tests/activation404.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev407/src/assets/4b4d6b8dc315a95c.js node --test tests/risk405.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev407/src/assets/4b4d6b8dc315a95c.js node --test tests/performance406.cjs
+          npm install --no-save playwright
+          npx playwright install chromium
+          TF_RISK_SOURCE=/tmp/tf-rev407/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev407/src/assets/7e95b596e5bf8dff.css node tests/browser406.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev407/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev407/src/assets/7e95b596e5bf8dff.css node tests/popup407.cjs
+          find /tmp/tf-rev407/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev407/src')
+          registry=json.loads(re.search(r'const FILES\s*=\s*(\{.*?\});',(root/'assets/7b6af0cb4001a684.js').read_text(),re.S).group(1))
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in registry.items())
+          assert json.loads((root/'manifest.json').read_text())['version']=='1.17.20'
+          print('Hashes PASS',len(registry))
+          CHECK
+          (cd /tmp/tf-rev407/src && zip -qr /tmp/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip
+          sha256sum /tmp/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip > /tmp/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip.sha256
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.17.20 /tmp/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.20 — REV407 Risk Explanation' --notes-file deliverables/RELEASE_NOTES_REV407.md --latest
