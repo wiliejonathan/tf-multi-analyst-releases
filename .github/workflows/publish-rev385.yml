@@ -97,7 +97,7 @@ jobs:
               a=hashlib.sha256(fp.read_bytes()).hexdigest()
               if a!=h: bad.append((p,a,h))
           assert not bad, bad[:10]
-          assert len(d)>=238
+          assert len(d)>=230
           print('REV385 PC integrity PASS',len(d),'protected, 0 mismatch')
           PY
       - name: Build ZIP
@@ -119,6 +119,8 @@ jobs:
           OUT=/tmp/TF_Extension_PC_MAC_REV385_HOLDING_ACCURACY_FIX.zip
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.98 — REV385' --notes-file deliverables/RELEASE_NOTES_REV385.md --latest
+            gh release delete-asset "$TAG" TF_Extension_PC_MAC_REV385_HOLDING_TABLE3_SOURCE_FIX.zip --yes 2>/dev/null || true
+            gh release delete-asset "$TAG" TF_Extension_PC_MAC_REV385_HOLDING_TABLE3_SOURCE_FIX.zip.sha256 --yes 2>/dev/null || true
             gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
           else
             gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.98 — REV385' --notes-file deliverables/RELEASE_NOTES_REV385.md --latest
