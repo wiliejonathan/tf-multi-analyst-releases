@@ -1,0 +1,165 @@
+name: Publish PC Mac REV401 JSON remembered-links restore
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV401/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev401
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV400 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev401
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.13 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV400_ANALYST_NAME_SPAN_FIX.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch remembered analyst links recovery
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev401/src')
+          popup=root/'assets/927ecbd63036f61b.js'
+          s=popup.read_text()
+
+          old="if (!storage[TF_REMEMBERED_LINKS_KEY] && storage[TF_ANALYST_SOURCES_KEY] && typeof storage[TF_ANALYST_SOURCES_KEY] === 'object') {"
+          new="if ((!Array.isArray(storage[TF_REMEMBERED_LINKS_KEY]) || storage[TF_REMEMBERED_LINKS_KEY].length === 0) && storage[TF_ANALYST_SOURCES_KEY] && typeof storage[TF_ANALYST_SOURCES_KEY] === 'object' && !Array.isArray(storage[TF_ANALYST_SOURCES_KEY])) {"
+          assert old in s,'REV401 import remembered-links anchor missing'
+          s=s.replace(old,new,1)
+
+          old2="""try {
+          outStorage[TF_REMEMBERED_LINKS_KEY] = tf_enrichRememberedLinksWithNames(outStorage[TF_REMEMBERED_LINKS_KEY] || [], outStorage[TF_ANALYST_SOURCES_KEY] || {});
+          outStorage[TF_REMEMBER_LINKS_ENABLED_KEY] = Array.isArray(outStorage[TF_REMEMBERED_LINKS_KEY]) && outStorage[TF_REMEMBERED_LINKS_KEY].length > 0;
+          }"""
+          new2="""try {
+          if ((!Array.isArray(outStorage[TF_REMEMBERED_LINKS_KEY]) || outStorage[TF_REMEMBERED_LINKS_KEY].length === 0) && outStorage[TF_ANALYST_SOURCES_KEY] && typeof outStorage[TF_ANALYST_SOURCES_KEY] === 'object' && !Array.isArray(outStorage[TF_ANALYST_SOURCES_KEY])) {
+          const __tfSourcesV401 = outStorage[TF_ANALYST_SOURCES_KEY];
+          outStorage[TF_REMEMBERED_LINKS_KEY] = Object.keys(__tfSourcesV401 || {}).sort().map((n) => {
+          const it = __tfSourcesV401[n] || {};
+          return { name: n, url: it.url || it.link || '', pairs: Array.isArray(it.pairs) && it.pairs.length ? it.pairs.slice() : ['__ALL__'] };
+          }).filter((x) => x.url);
+          }
+          outStorage[TF_REMEMBERED_LINKS_KEY] = tf_enrichRememberedLinksWithNames(outStorage[TF_REMEMBERED_LINKS_KEY] || [], outStorage[TF_ANALYST_SOURCES_KEY] || {});
+          outStorage[TF_REMEMBER_LINKS_ENABLED_KEY] = Array.isArray(outStorage[TF_REMEMBERED_LINKS_KEY]) && outStorage[TF_REMEMBERED_LINKS_KEY].length > 0;
+          }"""
+          assert old2 in s,'REV401 combine remembered-links anchor missing'
+          s=s.replace(old2,new2,1)
+          popup.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.14'
+          m['version_name']='REV401'
+          m['description']='REV401: JSON Import/Combine rebuilds empty remembered analyst links from tfAnalystSources; REV400 table/holding/color fixes retained.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV401.md').write_text(
+              '# REV401 — JSON Remembered Links Restore\n\n'
+              '- Empty tfRememberedAnalystLinks no longer blocks recovery.\n'
+              '- Import rebuilds analyst links from tfAnalystSources.\n'
+              '- Combine performs the same recovery.\n'
+              '- REV400 analyst-name/holding fixes retained.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV401.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV401 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev401/src/assets/927ecbd63036f61b.js
+          node --check /tmp/tf-rev401/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev401/src')
+          p=(root/'assets/927ecbd63036f61b.js').read_text()
+          assert "length === 0" in p
+          assert "const __tfSourcesV401" in p
+          assert "tfRememberLinksEnabled" in p
+          assert "function tf_isRecognizedImportStorageV399" in p
+          assert "function tf_hasImportContentV399" in p
+          assert "Data lama tidak dihapus." in p
+          assert "name: n, url: it.url || it.link || ''" in p
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.14' and m['version_name']=='REV401'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for path,h in d.items():
+              fp=root/path
+              a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h: bad.append((path,a,h))
+          assert not bad,bad[:10]
+          print('REV401 PC JSON remembered-links QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          node - <<'NODE'
+          const storage={
+            tfRememberedAnalystLinks:[],
+            tfRememberLinksEnabled:false,
+            tfAnalystSources:{
+              A:{url:'https://account.tradersfamily.id/channels/1',pairs:['XAUUSD']},
+              B:{url:'https://account.tradersfamily.id/channels/2',pairs:['EURUSD','GBPUSD']}
+            }
+          };
+          if ((!Array.isArray(storage.tfRememberedAnalystLinks) || storage.tfRememberedAnalystLinks.length === 0) && storage.tfAnalystSources && typeof storage.tfAnalystSources === 'object' && !Array.isArray(storage.tfAnalystSources)) {
+            storage.tfRememberedAnalystLinks=Object.keys(storage.tfAnalystSources).sort().map(n=>{
+              const it=storage.tfAnalystSources[n]||{};
+              return {name:n,url:it.url||it.link||'',pairs:Array.isArray(it.pairs)&&it.pairs.length?it.pairs.slice():['__ALL__']};
+            }).filter(x=>x.url);
+          }
+          storage.tfRememberLinksEnabled=Array.isArray(storage.tfRememberedAnalystLinks)&&storage.tfRememberedAnalystLinks.length>0;
+          if(storage.tfRememberedAnalystLinks.length!==2 || !storage.tfRememberLinksEnabled) throw new Error('REV401 recovery simulation failed');
+          console.log('REV401 empty remembered-links simulation PASS');
+          NODE
+          OUT=/tmp/TF_Extension_PC_MAC_REV401_JSON_LINK_RESTORE_FIX.zip
+          cd /tmp/tf-rev401/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.14
+          OUT=/tmp/TF_Extension_PC_MAC_REV401_JSON_LINK_RESTORE_FIX.zip
+          NOTES=deliverables/RELEASE_NOTES_REV401.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.14 — REV401 JSON Link Restore Fix' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.14 — REV401 JSON Link Restore Fix' --notes-file "$NOTES" --latest
+          fi
