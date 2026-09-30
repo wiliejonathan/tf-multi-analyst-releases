@@ -1,0 +1,1 @@
+REV398 / v1.17.11\nHard inline analyst colors for Tables 1/2/3/4.\n
