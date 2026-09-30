@@ -1,0 +1,73 @@
+name: Publish PC REV383 with diagnostic
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV383/PUBLISH_DIAG'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build publish and record
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set +e
+          mkdir -p audit
+          {
+            echo "REV383 publish diagnostic"
+            date -u
+            gh release download v1.16.92 --pattern 'TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip' --output /tmp/base379.zip
+            echo "download_exit=$?"
+            python3 build_release_rev383.py /tmp/base379.zip
+            BUILD=$?
+            echo "builder_exit=$BUILD"
+            if [ "$BUILD" -eq 0 ]; then
+              ZIP=deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip
+              SHA="$ZIP.sha256"
+              unzip -tq "$ZIP"
+              sha256sum -c "$SHA"
+              TAG=v1.16.96
+              if gh release view "$TAG" >/dev/null 2>&1; then
+                gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.96 — REV383' --notes-file deliverables/RELEASE_NOTES_REV383.md --latest
+                REL=$?
+                gh release upload "$TAG" "$ZIP" "$SHA" --clobber
+                UP=$?
+              else
+                gh release create "$TAG" "$ZIP" "$SHA" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.16.96 — REV383' --notes-file deliverables/RELEASE_NOTES_REV383.md --latest
+                REL=$?
+                UP=$REL
+              fi
+              echo "release_exit=$REL upload_exit=$UP"
+              if [ "$REL" -eq 0 ] && [ "$UP" -eq 0 ]; then
+                gh api repos/$GITHUB_REPOSITORY/releases/tags/$TAG > /tmp/release383.json
+                API=$?
+                echo "release_api_exit=$API"
+                if [ "$API" -eq 0 ]; then
+                  python3 - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('/tmp/release383.json').read_text())
+          name='TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip'
+          a=next(x for x in r['assets'] if x['name']==name)
+          sha=Path('deliverables/'+name+'.sha256').read_text().split()[0]
+          d={'schema':1,'available':True,'revision':383,'tag_name':r['tag_name'],'release_url':r['html_url'],'published_at':r['published_at'],'asset':{'id':a['id'],'name':a['name'],'url':a['browser_download_url'],'size':a['size'],'digest':a.get('digest','') or ('sha256:'+sha),'updated_at':a['updated_at']}}
+          Path('/tmp/latest383.json').write_text(json.dumps(d,indent=2)+'\n')
+          PY
+                fi
+              fi
+            fi
+          } > audit/REV383_PUBLISH_DIAGNOSTIC.txt 2>&1
+          cat audit/REV383_PUBLISH_DIAGNOSTIC.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin main
+          if [ -f /tmp/latest383.json ]; then cp /tmp/latest383.json latest.json; fi
+          git add audit/REV383_PUBLISH_DIAGNOSTIC.txt latest.json
+          git commit -m 'Record REV383 publish result' || true
+          git push origin HEAD:main
+          exit 0
