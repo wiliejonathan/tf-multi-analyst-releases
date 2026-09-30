@@ -1,0 +1,57 @@
+name: Publish PC Mac REV410 sidebar fixed columns
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV410/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev410/src
+          gh release download v1.17.22 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip' --output /tmp/tf-rev410/base.zip
+          unzip -q /tmp/tf-rev410/base.zip -d /tmp/tf-rev410/src
+          cp /tmp/tf-rev410/src/assets/927ecbd63036f61b.js /tmp/tf-rev410/base-sidebar.js
+          python3 tools/patch_rev410.py /tmp/tf-rev410/src
+          TF_PC_GATE=/tmp/tf-rev410/src/assets/tf-device-lock.js node --test tests/activation404.cjs tests/activation409.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev410/src/assets/4b4d6b8dc315a95c.js node --test tests/risk405.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev410/src/assets/4b4d6b8dc315a95c.js node --test tests/performance406.cjs
+          npm install --no-save playwright
+          TF_BROWSER_CHANNEL=chrome TF_BASE_SIDEBAR=/tmp/tf-rev410/base-sidebar.js TF_SIDEBAR_SOURCE=/tmp/tf-rev410/src/assets/927ecbd63036f61b.js TF_SIDEBAR_CSS=/tmp/tf-rev410/src/assets/6f5f92e21ebd9721.css node tests/layout410.cjs
+          TF_BROWSER_CHANNEL=chrome TF_VAULT_SOURCE=tests/fixtures/vault409.html node tests/vault409.cjs
+          TF_BROWSER_CHANNEL=chrome TF_SIDEBAR_SOURCE=/tmp/tf-rev410/src/assets/927ecbd63036f61b.js node tests/pair-delete408.cjs
+          TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev410/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev410/src/assets/7e95b596e5bf8dff.css node tests/browser406.cjs
+          TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev410/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev410/src/assets/7e95b596e5bf8dff.css node tests/popup407.cjs
+          find /tmp/tf-rev410/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev410/src')
+          registry=json.loads(re.search(r'const FILES\s*=\s*(\{.*?\});',(root/'assets/7b6af0cb4001a684.js').read_text(),re.S).group(1))
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in registry.items())
+          assert json.loads((root/'manifest.json').read_text())['version']=='1.17.23'
+          print('Hashes PASS',len(registry))
+          CHECK
+          (cd /tmp/tf-rev410/src && zip -qr /tmp/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip
+          sha256sum /tmp/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip > /tmp/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip.sha256
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view v1.17.23 >/dev/null 2>&1; then
+            gh release edit v1.17.23 --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.23 — REV410 Sidebar Fixed Columns' --notes-file release-staging/REV410/RELEASE_NOTES.md --latest
+            gh release upload v1.17.23 /tmp/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip --clobber
+          else
+            gh release create v1.17.23 /tmp/TF_Extension_PC_MAC_REV410_SIDEBAR_FIXED_COLUMNS.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.23 — REV410 Sidebar Fixed Columns' --notes-file release-staging/REV410/RELEASE_NOTES.md --latest
+          fi
