@@ -111,14 +111,13 @@ jobs:
           s=s.replace(old,new,1)
 
           # Multi-pair icon fallback to aggregate analyst state.
-          old="const st = tf_getLatestRiskState(analyst, pair);\n          if (!st) return null;"
-          new="const st = tf_getLatestRiskState(analyst, pair) || tf_getLatestRiskState(analyst, null);\n          if (!st) return null;"
           # target helper occurrence after PairIconOnly.
           p=s.find('function tf_applyLatestRiskPairIconOnly')
           assert p>=0
+          old="const st = tf_getLatestRiskState(analyst, pair);"
           q=s.find(old,p)
           assert q>=0, 'pair helper state missing'
-          s=s[:q]+s[q:].replace(old,new,1)
+          s=s[:q]+s[q:].replace(old,"const st = tf_getLatestRiskState(analyst, pair) || tf_getLatestRiskState(analyst, null);",1)
 
           # Holding duration fixed-width numeric units.
           old="""function tf_formatHoldingDuration(ms) {
