@@ -1,0 +1,203 @@
+name: Publish PC Mac REV398 hard inline analyst colors
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV398/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev398
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV397 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev398
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.10 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV397_ALL_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch REV398 hard inline analyst colors
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev398/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          anchor='function tf_applyLatestRiskToElement(el, analyst, pair, showIcon, iconPosition) {'
+          helper="""function tf_forceLatestRiskTextColor(el, st) {
+          try {
+          if (!el || !st) return;
+          const color = st.severity >= 2 ? '#ef4444' : (st.severity === 1 ? '#facc15' : '#22c55e');
+          el.style && el.style.setProperty('color', color, 'important');
+          if (el.querySelectorAll) {
+          el.querySelectorAll('*').forEach((child) => {
+          if (!child || (child.matches && child.matches('[data-tf-latest-risk-icon="1"], [data-tf-latest-risk-icon="1"] *'))) return;
+          if (child.style) child.style.setProperty('color', color, 'important');
+          });
+          }
+          } catch (e) { }
+          }
+
+          // REV398: hard inline analyst-name colors beat all table/sticky white styles.
+          """
+          assert anchor in s
+          if 'function tf_forceLatestRiskTextColor' not in s:
+              s=s.replace(anchor,helper+anchor,1)
+
+          classline="el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : (st.severity === 1 ? 'tf-latest-risk-warning' : 'tf-latest-risk-healthy'));"
+          p=s.find(anchor)
+          q=s.find(classline,p)
+          assert q>=0
+          if 'tf_forceLatestRiskTextColor(el, st);' not in s[q:q+len(classline)+100]:
+              s=s[:q]+s[q:].replace(classline,classline+"\ntf_forceLatestRiskTextColor(el, st);",1)
+
+          cfn=s.find('function tf_applyLatestRiskColorOnly')
+          assert cfn>=0
+          q=s.find(classline,cfn)
+          assert q>=0
+          if 'tf_forceLatestRiskTextColor(el, st);' not in s[q:q+len(classline)+100]:
+              s=s[:q]+s[q:].replace(classline,classline+"\ntf_forceLatestRiskTextColor(el, st);",1)
+
+          sweep=s.find('function tf_colorEveryRenderedAnalystName')
+          assert sweep>=0
+          old="tf_applyLatestRiskColorOnly(el,n,pair||null);"
+          if old in s[sweep:sweep+9000]:
+              s=s[:sweep]+s[sweep:].replace(old,"const st=tf_applyLatestRiskColorOnly(el,n,pair||null);if(st)tf_forceLatestRiskTextColor(el,st);",1)
+          else:
+              old2="tf_applyLatestRiskColorOnly(el,name,pair || null);"
+              assert old2 in s[sweep:sweep+9000]
+              s=s[:sweep]+s[sweep:].replace(old2,"const st=tf_applyLatestRiskColorOnly(el,name,pair || null);if(st)tf_forceLatestRiskTextColor(el,st);",1)
+
+          # Fix drawdown name cell selection if legacy sweep still points to first control cell.
+          s=s.replace("const el=r&&r.children?r.children[0]:null;if(el)apply(el,el.textContent,null);",
+                      "const el=r&&r.children?(r.children[1]||r.children[0]):null;if(el)apply(el,el.textContent,null);")
+          s=s.replace("const el=row && row.children ? row.children[0] : null;",
+                      "const el=row && row.children ? (row.children[1] || row.children[0]) : null;")
+
+          # Add exact pass before sweep ends.
+          end='scope.querySelectorAll(\'.analyst-filter-name\').forEach(el=>apply(el,el.title||el.textContent,null));\n          } catch(e){}'
+          exact="""scope.querySelectorAll('.analyst-filter-name').forEach(el=>apply(el,el.title||el.textContent,null));
+          // REV398 exact pass for Table 1/2/3/4 analyst cells.
+          scope.querySelectorAll('#summary-table tbody tr').forEach(r=>{const el=r?r.querySelector('td.monthly-sticky-col-2'):null;const p=r&&r.children[1]?String(r.children[1].textContent||'').trim():null;if(el)apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,p);});
+          scope.querySelectorAll('#monthly-table tbody tr').forEach(r=>{const el=r?r.querySelector('td.monthly-sticky-col-2'):null;const p=r&&r.children[2]?String(r.children[2].textContent||'').trim():null;if(el)apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,p);});
+          scope.querySelectorAll('#history-table tbody tr').forEach(r=>{const el=r?r.querySelector('td[data-history-col="analyst"]'):null;const pe=r?r.querySelector('td[data-history-col="pair"]'):null;if(el)apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,pe?pe.textContent:null);});
+          scope.querySelectorAll('#tf-score-summary-body .tf-score-analyst,.tf-score-summary-table .tf-score-analyst').forEach(el=>apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,null));
+          } catch(e){}"""
+          if 'REV398 exact pass for Table 1/2/3/4' not in s:
+              assert end in s,'sweep end anchor missing'
+              s=s.replace(end,exact,1)
+
+          # Deterministic analyst identity attributes.
+          old="""const nameCell = document.createElement('td');
+          nameCell.textContent = a.baseName || a.name;"""
+          if old in s:
+              s=s.replace(old,"""const nameCell = document.createElement('td');
+          nameCell.setAttribute('data-analyst', baseName);
+          nameCell.textContent = a.baseName || a.name;""",1)
+
+          old="""const nameCell = document.createElement('td');
+          nameCell.textContent = formatAnalystDisplayName(a.baseName || a.name);
+          nameCell.removeAttribute('title');"""
+          if old in s:
+              s=s.replace(old,"""const nameCell = document.createElement('td');
+          nameCell.setAttribute('data-analyst', String(a.baseName || a.name || '').trim());
+          nameCell.textContent = formatAnalystDisplayName(a.baseName || a.name);
+          nameCell.removeAttribute('title');""",1)
+
+          old="""const analystCell = tf_markHistoryCell(document.createElement('td'), 'analyst');
+          analystCell.classList.add('tf-risk-name-left');"""
+          if old in s:
+              s=s.replace(old,"""const analystCell = tf_markHistoryCell(document.createElement('td'), 'analyst');
+          if (!isWithdrawRow) analystCell.setAttribute('data-analyst', String(row.analyst || '').trim());
+          analystCell.classList.add('tf-risk-name-left');""",1)
+
+          old="""const summary = '<tr class="tf-score-summary-row"><td class="tf-score-analyst">' + esc(name) + '</td>"""
+          if old in s:
+              s=s.replace(old,"""const summary = '<tr class="tf-score-summary-row"><td class="tf-score-analyst" data-analyst="' + esc(name) + '">' + esc(name) + '</td>""",1)
+
+          app.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text());m['version']='1.17.11';m['version_name']='REV398'
+          m['description']='REV398: hard inline !important analyst-name colors for Tables 1/2/3/4; no white override possible.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV398.md').write_text('# REV398\nHard inline analyst-name colors on Tables 1/2/3/4.\n')
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text();mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV398.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0:marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:];cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0:runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV398 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev398/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev398/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev398/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          assert 'function tf_forceLatestRiskTextColor' in app
+          assert "style.setProperty('color', color, 'important')" in app
+          assert 'REV398 exact pass for Table 1/2/3/4' in app
+          assert '#summary-table tbody tr' in app
+          assert '#monthly-table tbody tr' in app
+          assert '#history-table tbody tr' in app
+          assert '#tf-score-summary-body .tf-score-analyst' in app
+          m=json.loads((root/'manifest.json').read_text());assert m['version']=='1.17.11' and m['version_name']=='REV398'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text();mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for p,h in d.items():
+              fp=root/p;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV398 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip
+          cd /tmp/tf-rev398/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.11
+          OUT=/tmp/TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip
+          NOTES=deliverables/RELEASE_NOTES_REV398.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.11 — REV398 Hard Inline Analyst Colors' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.11 — REV398 Hard Inline Analyst Colors' --notes-file "$NOTES" --latest
+          fi
