@@ -138,18 +138,19 @@ jobs:
           s=s[:a]+new+s[b:]
 
           # Table 3 row text follows PNL%, analyst cell keeps analyst status.
-          old="""tr.appendChild(balanceCell);
-          return tr;
-          }"""
-          new="""tr.appendChild(balanceCell);
-          if (!isWithdrawRow) {
+          a=s.find('function tfMobileCreateHistoryRow(')
+          b=s.find('\nfunction tf_parseHistoryTableDateMs',a)
+          assert a>=0 and b>a, 'Table3 function bounds missing'
+          seg=s[a:b]
+          pos=seg.rfind('return tr;')
+          assert pos>=0, 'Table3 return missing'
+          insert="""if (!isWithdrawRow) {
           const __pnlPctForRow = Number.isFinite(Number(row.pnlPercent)) ? Number(row.pnlPercent) : Number(row.pnlDollar || 0);
           tr.classList.add(__pnlPctForRow >= 0 ? 'tf-history-row-pnl-positive' : 'tf-history-row-pnl-negative');
           }
-          return tr;
-          }"""
-          assert old in s, 'Table3 return anchor missing'
-          s=s.replace(old,new,1)
+          """
+          seg=seg[:pos]+insert+seg[pos:]
+          s=s[:a]+seg+s[b:]
           app.write_text(s)
 
           css=root/'assets/7e95b596e5bf8dff.css'
