@@ -23,7 +23,9 @@ jobs:
           F="$ROOT/src/assets/927ecbd63036f61b.js"
           echo '=== IMPORT FUNCTION ==='
           grep -n -A220 -B30 'function tf_importPayloadToStorage' "$F" || true
-          echo '=== FILE IMPORT HANDLERS ==='
-          grep -n -A120 -B20 -E 'FileReader|Import / Combine|tf_importPayloadToStorage|chrome\.storage\.local\.set|location\.reload|reload\(' "$F" | tail -n 1200 || true
+          echo '=== IMPORT WRITE TAIL ==='
+          sed -n '5420,5585p' "$F" | nl -ba -v5420
+          echo '=== IMPORT CALL SITES ==='
+          grep -n -A80 -B30 'tf_importPayloadToStorage(' "$F" | tail -n 700 || true
           echo '=== LOADING TEXT ==='
           grep -RIn -E 'Memuat data|Memuat Data|Membangun dashboard|loading|Loading' "$ROOT/src" | head -n 300 || true
