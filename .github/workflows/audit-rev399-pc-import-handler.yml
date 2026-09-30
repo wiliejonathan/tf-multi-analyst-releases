@@ -1,0 +1,29 @@
+name: Audit REV398 PC import handler
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV399-pc-import-handler/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show PC import handler
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev398-pc-import-handler
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.11 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          f="$ROOT/src/assets/894f18e8a37bd7c6.js"
+          echo '=== LINES 220-340 ==='
+          sed -n '220,340p' "$f"
+          echo '=== tf_importPayloadToStorage ==='
+          grep -n -A100 -B40 'tf_importPayloadToStorage' "$f" || true
+          echo '=== IMPORT UI IDs ==='
+          grep -n -A80 -B40 -E 'import.*input|import.*file|Import JSON|Import / Combine' "$f" | head -n 500 || true
