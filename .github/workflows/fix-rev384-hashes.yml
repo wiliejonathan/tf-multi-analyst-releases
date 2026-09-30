@@ -1,0 +1,121 @@
+name: Fix REV384 protected hashes
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV384-hash-fix/READY'
+permissions:
+  contents: write
+concurrency:
+  group: fix-rev384-hashes
+  cancel-in-progress: false
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download current REV384 stable asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev384-hash-fix
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.16.97 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+      - name: Regenerate single authoritative integrity registry
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json,hashlib
+          root=Path('/tmp/rev384-hash-fix/src')
+          loader=root/'assets/7b6af0cb4001a684.js'
+          s=loader.read_text()
+          m=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S)
+          assert m, 'FILES registry not found'
+          files=json.loads(m.group(1))
+          pat=re.compile(r"FILES\[(?:'([^']+)'|\"([^\"]+)\")\]\s*=\s*(?:'([0-9a-f]{64})'|\"([0-9a-f]{64})\")")
+          for mm in pat.finditer(s,m.end()):
+              files[mm.group(1) or mm.group(2)]=mm.group(3) or mm.group(4)
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          newmap={}
+          for p in sorted(files):
+              fp=root/p
+              assert fp.is_file(), 'Missing protected file: '+p
+              newmap[p]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          func_start=s.find('// The integrity loader is intentionally not self-hashed')
+          ready_pos=s.find('window.tfIntegrityReady =')
+          assert func_start>=0 and ready_pos>func_start
+          bootstrap=s[func_start:ready_pos]
+          cut=bootstrap.find('// REV284 integrity overrides')
+          if cut>=0:
+              bootstrap=bootstrap[:cut].rstrip()+'\n'
+          final=s[ready_pos:]
+          out="(() => {\n'use strict';\n"
+          out+='// REV384 HASH FIX: single authoritative SHA-256 registry regenerated from exact packaged bytes.\n'
+          out+='const FILES = '+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'
+          out+=bootstrap
+          out+='// No historical hash overrides below this point. The map above is the sole source of truth.\n'
+          out+=final
+          loader.write_text(out)
+          print('Protected entries:',len(newmap))
+          PY
+          node --check /tmp/rev384-hash-fix/src/assets/7b6af0cb4001a684.js
+      - name: Verify every protected hash and package
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json,hashlib
+          root=Path('/tmp/rev384-hash-fix/src')
+          s=(root/'assets/7b6af0cb4001a684.js').read_text()
+          m=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S)
+          assert m
+          d=json.loads(m.group(1))
+          assert 'assets/7b6af0cb4001a684.js' not in d
+          bad=[]
+          for p,h in d.items():
+              fp=root/p
+              if not fp.is_file(): bad.append((p,'missing')); continue
+              actual=hashlib.sha256(fp.read_bytes()).hexdigest()
+              if actual!=h: bad.append((p,actual,h))
+          assert not bad, bad[:10]
+          assert len(d)>=230
+          print('Integrity PASS:',len(d),'protected files, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip
+          cd /tmp/rev384-hash-fix/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          SHA=$(sha256sum "$OUT" | awk '{print $1}')
+          printf '%s  %s\n' "$SHA" 'TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip' > "$OUT.sha256"
+          echo "FIXED_SHA=$SHA" >> "$GITHUB_ENV"
+      - name: Replace REV384 stable release asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          OUT=/tmp/TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip
+          gh release upload v1.16.97 "$OUT" "$OUT.sha256" --repo "$GITHUB_REPOSITORY" --clobber
+          cat > /tmp/rev384-notes.md <<EOF
+          # TF Analyzer Analyst v1.16.97 — REV384
+
+          ## Holding Alignment + Integrity Hash Fix
+
+          - Holding Period columns aligned 48% / 26% / 26%.
+          - Max/Avg headers and values centered with tabular numerals.
+          - No inner Holding scrollbars.
+          - Table 3 cursor-follow glow remains disabled for performance.
+          - **Protected integrity registry regenerated from the exact final packaged bytes.**
+          - **Historical layered hash overrides removed; one authoritative SHA-256 registry is now used.**
+          - Verified protected hashes: 0 mismatch.
+
+          Fixed ZIP SHA-256: $FIXED_SHA
+          EOF
+          gh release edit v1.16.97 --repo "$GITHUB_REPOSITORY" --notes-file /tmp/rev384-notes.md --latest
+          echo "REV384 hash-fixed release SHA256=$FIXED_SHA"
