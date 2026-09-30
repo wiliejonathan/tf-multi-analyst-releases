@@ -1,0 +1,50 @@
+name: Publish PC Mac REV409 device identity recovery
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV409/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev409/src
+          gh release download v1.17.21 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV408_PAIR_DATA_DELETE.zip' --output /tmp/tf-rev409/base.zip
+          unzip -q /tmp/tf-rev409/base.zip -d /tmp/tf-rev409/src
+          python3 tools/patch_rev409.py /tmp/tf-rev409/src
+          TF_PC_GATE=/tmp/tf-rev409/src/assets/tf-device-lock.js node --test tests/activation404.cjs tests/activation409.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev409/src/assets/4b4d6b8dc315a95c.js node --test tests/risk405.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev409/src/assets/4b4d6b8dc315a95c.js node --test tests/performance406.cjs
+          npm install --no-save playwright
+          TF_BROWSER_CHANNEL=chrome TF_VAULT_SOURCE=tests/fixtures/vault409.html node tests/vault409.cjs
+          TF_BROWSER_CHANNEL=chrome TF_SIDEBAR_SOURCE=/tmp/tf-rev409/src/assets/927ecbd63036f61b.js node tests/pair-delete408.cjs
+          TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev409/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev409/src/assets/7e95b596e5bf8dff.css node tests/browser406.cjs
+          TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev409/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev409/src/assets/7e95b596e5bf8dff.css node tests/popup407.cjs
+          find /tmp/tf-rev409/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev409/src')
+          registry=json.loads(re.search(r'const FILES\s*=\s*(\{.*?\});',(root/'assets/7b6af0cb4001a684.js').read_text(),re.S).group(1))
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in registry.items())
+          assert json.loads((root/'manifest.json').read_text())['version']=='1.17.22'
+          print('Hashes PASS',len(registry))
+          CHECK
+          (cd /tmp/tf-rev409/src && zip -qr /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip
+          sha256sum /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip > /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip.sha256
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.17.22 /tmp/TF_Extension_PC_MAC_REV409_DEVICE_IDENTITY_RECOVERY.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.22 — REV409 Device Identity Recovery' --notes-file release-staging/REV409/RELEASE_NOTES.md --latest

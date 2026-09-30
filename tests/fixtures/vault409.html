@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>TF Device Vault</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: #f4f6f8;
+      color: #17212b;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      padding: 28px;
+      border: 1px solid #dfe5ea;
+      border-radius: 16px;
+      background: #ffffff;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 25px;
+      text-align: center;
+    }
+
+    .description {
+      margin: 0 0 24px;
+      color: #697681;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .status-box {
+      padding: 18px;
+      border-radius: 12px;
+      background: #f7f9fb;
+      border: 1px solid #e4e9ed;
+      text-align: center;
+    }
+
+    .spinner {
+      width: 34px;
+      height: 34px;
+      margin: 0 auto 14px;
+      border: 4px solid #dce3e8;
+      border-top-color: #00a84f;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .status-title {
+      margin-bottom: 7px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .status-message {
+      color: #697681;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .device-section {
+      display: none;
+      margin-top: 22px;
+    }
+
+    .label {
+      margin-bottom: 8px;
+      color: #697681;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .device-id {
+      padding: 14px;
+      border: 1px solid #d9e0e5;
+      border-radius: 10px;
+      background: #f7f9fb;
+      font-family: Consolas, Monaco, monospace;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.5;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    .verification {
+      margin-top: 14px;
+      padding: 11px;
+      border-radius: 9px;
+      background: rgba(0, 180, 81, 0.1);
+      color: #007d39;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .error {
+      background: rgba(210, 35, 42, 0.08);
+      color: #b61f25;
+    }
+
+    .note {
+      margin-top: 20px;
+      color: #7b8790;
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card">
+    <h1>TF Device Vault</h1>
+
+    <p class="description">
+      Menyiapkan identitas perangkat untuk sistem lisensi TF Extension.
+    </p>
+
+    <section id="statusBox" class="status-box">
+      <div id="spinner" class="spinner"></div>
+
+      <div id="statusTitle" class="status-title">
+        Menyiapkan Device Vault
+      </div>
+
+      <div id="statusMessage" class="status-message">
+        Mohon tunggu...
+      </div>
+    </section>
+
+    <section id="deviceSection" class="device-section">
+      <div class="label">Device ID</div>
+
+      <div id="deviceId" class="device-id">
+        -
+      </div>
+
+      <div id="verification" class="verification">
+        Memeriksa kunci perangkat...
+      </div>
+    </section>
+
+    <p class="note">
+      Device ID ini tidak mengambil IMEI, serial motherboard,
+      password, email, ataupun token lisensi.
+    </p>
+  </main>
+
+  <script>
+    "use strict";
+
+    const DB_NAME = "tf-device-vault";
+    const DB_VERSION = 1;
+    const STORE_NAME = "device_keys";
+    const KEY_RECORD_ID = "tf-device-keypair-v1";
+
+    function openDatabase() {
+      return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+        request.onupgradeneeded = () => {
+          const database = request.result;
+
+          if (!database.objectStoreNames.contains(STORE_NAME)) {
+            database.createObjectStore(STORE_NAME, {
+              keyPath: "id"
+            });
+          }
+        };
+
+        request.onsuccess = () => {
+          resolve(request.result);
+        };
+
+        request.onerror = () => {
+          reject(
+            request.error ||
+            new Error("Gagal membuka penyimpanan Device Vault.")
+          );
+        };
+      });
+    }
+
+    async function readKeyRecord() {
+      const database = await openDatabase();
+
+      try {
+        return await new Promise((resolve, reject) => {
+          const transaction = database.transaction(
+            STORE_NAME,
+            "readonly"
+          );
+
+          const store = transaction.objectStore(STORE_NAME);
+          const request = store.get(KEY_RECORD_ID);
+
+          request.onsuccess = () => {
+            resolve(request.result || null);
+          };
+
+          request.onerror = () => {
+            reject(
+              request.error ||
+              new Error("Gagal membaca kunci perangkat.")
+            );
+          };
+        });
+      } finally {
+        database.close();
+      }
+    }
+
+    async function saveKeyRecord(record) {
+      const database = await openDatabase();
+
+      try {
+        await new Promise((resolve, reject) => {
+          const transaction = database.transaction(
+            STORE_NAME,
+            "readwrite"
+          );
+
+          const store = transaction.objectStore(STORE_NAME);
+          store.put(record);
+
+          transaction.oncomplete = () => {
+            resolve();
+          };
+
+          transaction.onerror = () => {
+            reject(
+              transaction.error ||
+              new Error("Gagal menyimpan kunci perangkat.")
+            );
+          };
+
+          transaction.onabort = () => {
+            reject(
+              transaction.error ||
+              new Error("Penyimpanan kunci perangkat dibatalkan.")
+            );
+          };
+        });
+      } finally {
+        database.close();
+      }
+    }
+
+    async function createKeyPair() {
+      return crypto.subtle.generateKey(
+        {
+          name: "ECDSA",
+          namedCurve: "P-256"
+        },
+        false,
+        ["sign", "verify"]
+      );
+    }
+
+    function isValidKeyRecord(record) {
+      return Boolean(
+        record &&
+        record.privateKey instanceof CryptoKey &&
+        record.publicKey instanceof CryptoKey &&
+        record.privateKey.type === "private" &&
+        record.publicKey.type === "public"
+      );
+    }
+
+    async function loadOrCreateKeyPair() {
+      const existingRecord = await readKeyRecord();
+
+      if (isValidKeyRecord(existingRecord)) {
+        return {
+          privateKey: existingRecord.privateKey,
+          publicKey: existingRecord.publicKey,
+          createdAt: existingRecord.createdAt,
+          isNew: false
+        };
+      }
+
+      if (existingRecord) throw new Error('Kunci perangkat tersimpan tidak dapat dibaca. Data tidak ditimpa; jangan hapus data browser.');
+      const keyPair = await createKeyPair();
+
+      const record = {
+        id: KEY_RECORD_ID,
+        privateKey: keyPair.privateKey,
+        publicKey: keyPair.publicKey,
+        createdAt: new Date().toISOString()
+      };
+
+      await saveKeyRecord(record);
+
+      return {
+        privateKey: keyPair.privateKey,
+        publicKey: keyPair.publicKey,
+        createdAt: record.createdAt,
+        isNew: true
+      };
+    }
+
+    let keyPairPromise = null;
+    function getOrCreateKeyPair() {
+      if (!keyPairPromise) {
+        keyPairPromise = (async () => {
+          if (!navigator.locks) throw new Error('Browser belum mendukung penguncian Device Vault. Perbarui Chrome; kunci tidak diubah.');
+          return navigator.locks.request('tf-device-keypair-v1', loadOrCreateKeyPair);
+        })().catch(error => { keyPairPromise = null; throw error; });
+      }
+      return keyPairPromise;
+    }
+
+    function bytesToHex(bytes) {
+      return Array.from(bytes)
+        .map(byte => byte.toString(16).padStart(2, "0"))
+        .join("")
+        .toUpperCase();
+    }
+
+    async function createDeviceId(publicKey) {
+      const exportedPublicKey = await crypto.subtle.exportKey(
+        "spki",
+        publicKey
+      );
+
+      const digest = await crypto.subtle.digest(
+        "SHA-256",
+        exportedPublicKey
+      );
+
+      const fullHex = bytesToHex(new Uint8Array(digest));
+
+      const shortParts = fullHex
+        .slice(0, 24)
+        .match(/.{1,4}/g);
+
+      return {
+        fullDeviceId: `TFDEV-${fullHex}`,
+        displayDeviceId: `TFDEV-${shortParts.join("-")}`
+      };
+    }
+
+    async function verifyKeyPair(privateKey, publicKey) {
+      const challenge = crypto.getRandomValues(
+        new Uint8Array(32)
+      );
+
+      const signature = await crypto.subtle.sign(
+        {
+          name: "ECDSA",
+          hash: "SHA-256"
+        },
+        privateKey,
+        challenge
+      );
+
+      return crypto.subtle.verify(
+        {
+          name: "ECDSA",
+          hash: "SHA-256"
+        },
+        publicKey,
+        signature,
+        challenge
+      );
+    }
+
+    function showSuccess(deviceData, isNew) {
+      document.getElementById("spinner").style.display = "none";
+
+      document.getElementById("statusTitle").textContent =
+        isNew
+          ? "Device Vault berhasil dibuat"
+          : "Device Vault berhasil ditemukan";
+
+      document.getElementById("statusMessage").textContent =
+        isNew
+          ? "Kunci perangkat baru sudah disimpan pada browser ini."
+          : "Kunci perangkat lama berhasil digunakan kembali.";
+
+      document.getElementById("deviceId").textContent =
+        deviceData.displayDeviceId;
+
+      document.getElementById("deviceId").dataset.fullDeviceId =
+        deviceData.fullDeviceId;
+
+      document.getElementById("verification").textContent =
+        "✓ Kunci perangkat valid dan dapat digunakan";
+
+      document.getElementById("deviceSection").style.display =
+        "block";
+    }
+
+    function showError(error) {
+      console.error("TF Device Vault Error:", error);
+
+      document.getElementById("spinner").style.display = "none";
+
+      document.getElementById("statusBox").classList.add("error");
+
+      document.getElementById("statusTitle").textContent =
+        "Device Vault gagal dibuat";
+
+      document.getElementById("statusMessage").textContent =
+        error instanceof Error
+          ? error.message
+          : "Terjadi kesalahan yang tidak diketahui.";
+    }
+
+    async function initializeDeviceVault() {
+      try {
+        if (!window.isSecureContext) {
+          throw new Error(
+            "Device Vault hanya dapat dijalankan melalui HTTPS."
+          );
+        }
+
+        if (!window.crypto || !window.crypto.subtle) {
+          throw new Error(
+            "Browser ini tidak mendukung Web Crypto API."
+          );
+        }
+
+        if (!window.indexedDB) {
+          throw new Error(
+            "Browser ini tidak mendukung IndexedDB."
+          );
+        }
+
+        const keyPair = await getOrCreateKeyPair();
+
+        const deviceData = await createDeviceId(
+          keyPair.publicKey
+        );
+
+        const isVerified = await verifyKeyPair(
+          keyPair.privateKey,
+          keyPair.publicKey
+        );
+
+        if (!isVerified) {
+          throw new Error(
+            "Verifikasi kunci perangkat tidak berhasil."
+          );
+        }
+
+        showSuccess(deviceData, keyPair.isNew);
+      } catch (error) {
+        showError(error);
+      }
+    }
+function tfArrayBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+}
+
+async function tfGetDeviceVaultInfo() {
+  const keyPair = await getOrCreateKeyPair();
+
+  const deviceData = await createDeviceId(
+    keyPair.publicKey
+  );
+
+  const exportedPublicKey = await crypto.subtle.exportKey(
+    "spki",
+    keyPair.publicKey
+  );
+
+  return {
+    fullDeviceId: deviceData.fullDeviceId,
+    displayDeviceId: deviceData.displayDeviceId,
+    publicKeySpki: tfArrayBufferToBase64(
+      exportedPublicKey
+    ),
+    createdAt: keyPair.createdAt
+  };
+}
+
+/**
+ * Jembatan komunikasi antara halaman Device Vault
+ * dengan content script TF Extension.
+ */
+function tfBufferToBase64(buffer) {
+  const bytes = new Uint8Array(buffer);
+  let binary = "";
+
+  for (const byte of bytes) {
+    binary += String.fromCharCode(byte);
+  }
+
+  return btoa(binary);
+}
+
+async function tfSignDeviceChallenge(challenge) {
+  const normalizedChallenge = String(challenge || "").trim();
+
+  if (normalizedChallenge.length < 16) {
+    throw new Error(
+      "Challenge perangkat terlalu pendek."
+    );
+  }
+
+  if (normalizedChallenge.length > 2048) {
+    throw new Error(
+      "Challenge perangkat terlalu panjang."
+    );
+  }
+
+  const keyPair = await getOrCreateKeyPair();
+
+  const challengeBytes = new TextEncoder().encode(
+    normalizedChallenge
+  );
+
+  const signature = await crypto.subtle.sign(
+    {
+      name: "ECDSA",
+      hash: "SHA-256"
+    },
+    keyPair.privateKey,
+    challengeBytes
+  );
+
+  /*
+   * Verifikasi lokal untuk memastikan private key
+   * dan public key masih merupakan pasangan yang valid.
+   */
+  const verified = await crypto.subtle.verify(
+    {
+      name: "ECDSA",
+      hash: "SHA-256"
+    },
+    keyPair.publicKey,
+    signature,
+    challengeBytes
+  );
+
+  if (!verified) {
+    throw new Error(
+      "Tanda tangan perangkat gagal diverifikasi."
+    );
+  }
+
+  const deviceData = await createDeviceId(
+    keyPair.publicKey
+  );
+
+  return {
+    fullDeviceId: deviceData.fullDeviceId,
+    displayDeviceId: deviceData.displayDeviceId,
+    challenge: normalizedChallenge,
+    signatureBase64: tfBufferToBase64(signature),
+    algorithm: "ECDSA-P256-SHA256",
+    signedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * Jembatan komunikasi Device Vault dengan TF Extension.
+ *
+ * Mendukung:
+ * 1. TF_VAULT_GET_INFO
+ * 2. TF_VAULT_SIGN_CHALLENGE
+ */
+window.addEventListener("message", async event => {
+  if (event.source !== window) {
+    return;
+  }
+
+  if (event.origin !== window.location.origin) {
+    return;
+  }
+
+  const message = event.data;
+
+  if (
+    !message ||
+    message.source !== "TF_EXTENSION" ||
+    typeof message.requestId !== "string"
+  ) {
+    return;
+  }
+
+  /*
+   * Membaca identitas Device Vault.
+   */
+  if (message.type === "TF_VAULT_GET_INFO") {
+    try {
+      const deviceInfo = await tfGetDeviceVaultInfo();
+
+      window.postMessage(
+        {
+          source: "TF_DEVICE_VAULT",
+          type: "TF_VAULT_GET_INFO_RESULT",
+          requestId: message.requestId,
+          ok: true,
+          data: deviceInfo
+        },
+        window.location.origin
+      );
+    } catch (error) {
+      window.postMessage(
+        {
+          source: "TF_DEVICE_VAULT",
+          type: "TF_VAULT_GET_INFO_RESULT",
+          requestId: message.requestId,
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Gagal membaca Device Vault."
+        },
+        window.location.origin
+      );
+    }
+
+    return;
+  }
+
+  /*
+   * Menandatangani challenge dari server.
+   */
+  if (message.type === "TF_VAULT_SIGN_CHALLENGE") {
+    try {
+      const signatureData =
+        await tfSignDeviceChallenge(
+          message.challenge
+        );
+
+      window.postMessage(
+        {
+          source: "TF_DEVICE_VAULT",
+          type:
+            "TF_VAULT_SIGN_CHALLENGE_RESULT",
+          requestId: message.requestId,
+          ok: true,
+          data: signatureData
+        },
+        window.location.origin
+      );
+    } catch (error) {
+      window.postMessage(
+        {
+          source: "TF_DEVICE_VAULT",
+          type:
+            "TF_VAULT_SIGN_CHALLENGE_RESULT",
+          requestId: message.requestId,
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Gagal menandatangani challenge."
+        },
+        window.location.origin
+      );
+    }
+  }
+});
+    window.addEventListener(
+      "DOMContentLoaded",
+      initializeDeviceVault
+    );
+  </script>
+</body>
+</html>
