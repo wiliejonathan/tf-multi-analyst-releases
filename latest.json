@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 407,
-  "tag_name": "v1.17.20",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.20",
-  "published_at": "2026-09-30T16:55:28Z",
+  "revision": 408,
+  "tag_name": "v1.17.21",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.21",
+  "published_at": "2026-09-30T17:24:11Z",
   "asset": {
-    "id": 601394600,
-    "name": "TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.20/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip",
-    "size": 847050,
-    "digest": "sha256:ce7fb7c61cff7a3199a926823492c08a80d1eeba8011de91979d61003b2b4ba9",
-    "updated_at": "2026-09-30T16:55:27Z"
+    "id": 601440461,
+    "name": "TF_Extension_PC_MAC_REV408_PAIR_DATA_DELETE.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.21/TF_Extension_PC_MAC_REV408_PAIR_DATA_DELETE.zip",
+    "size": 849282,
+    "digest": "sha256:8a8bb927335cab8a2effd8f21b50ed774a982a1469139640c0b591c0d7f1844d",
+    "updated_at": "2026-09-30T17:24:11Z"
   }
 }
