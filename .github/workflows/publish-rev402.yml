@@ -1,0 +1,176 @@
+name: Publish PC Mac REV402 fast JSON import
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV402/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev402
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV401 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev402
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.14 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV401_JSON_LINK_RESTORE_FIX.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch fast import completion path
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev402/src')
+          popup=root/'assets/927ecbd63036f61b.js'
+          s=popup.read_text()
+
+          old="""setStatus('Import selesai ✅');
+          try {
+          loadPopupStateFromStorage();
+          }
+          catch (e) { }
+          try {
+          tf_refreshTimeRangeUIFromStorage();
+          }
+          catch (e) { }
+          try {
+          tf_renderSavedChannelsStatusFromStorage();
+          }
+          catch (e) { }
+          if (typeof afterImport === 'function') {"""
+          new="""setStatus('Import selesai ✅');
+          try {
+          loadPopupStateFromStorage();
+          }
+          catch (e) { }
+          // REV402: do not block the import-complete frame with duplicate sidebar/time-range work.
+          const __tfPostImportRefreshV402 = () => {
+          try { tf_refreshTimeRangeUIFromStorage(); } catch (e) { }
+          try { tf_renderSavedChannelsStatusFromStorage(); } catch (e) { }
+          };
+          try {
+          if (typeof requestIdleCallback === 'function') requestIdleCallback(__tfPostImportRefreshV402, { timeout: 350 });
+          else setTimeout(__tfPostImportRefreshV402, 0);
+          } catch (e) { setTimeout(__tfPostImportRefreshV402, 0); }
+          if (typeof afterImport === 'function') {"""
+          assert old in s,'REV402 import completion anchor missing'
+          s=s.replace(old,new,1)
+
+          old2="""try {
+          tf_renderSavedChannelsStatusFromStorage();
+          }
+          catch (e) { }
+          try {
+          const ownerCount = files.length > 1"""
+          new2="""// REV402: saved-channel rendering is already scheduled once by tf_importPayloadToStorage.
+          try {
+          const ownerCount = files.length > 1"""
+          assert old2 in s,'REV402 duplicate callback render anchor missing'
+          s=s.replace(old2,new2,1)
+
+          old3="""try { window.dispatchEvent(new CustomEvent('tf-remote-prewarm-drive-v292',{detail:{reason:'import-combine',at:Date.now()}})); } catch (e) { }"""
+          new3="""try {
+          setTimeout(() => {
+          try { window.dispatchEvent(new CustomEvent('tf-remote-prewarm-drive-v292',{detail:{reason:'import-combine',at:Date.now()}})); } catch (e) { }
+          }, 1400);
+          } catch (e) { }"""
+          assert old3 in s,'REV402 Drive prewarm anchor missing'
+          s=s.replace(old3,new3,1)
+
+          popup.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.15'
+          m['version_name']='REV402'
+          m['description']='REV402: fast JSON import completion; removes duplicate sidebar render and defers secondary refresh/Drive prewarm. REV401/REV400 retained.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV402.md').write_text(
+              '# REV402 — Fast JSON Import\n\n'
+              '- One primary sidebar state load after import.\n'
+              '- Time Range + saved-channel refresh moves to idle.\n'
+              '- Drive prewarm delayed 1.4 seconds.\n'
+              '- REV401 remembered-links restore retained.\n'
+              '- REV400 Holding Period / analyst color fixes retained.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV402.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV402 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev402/src/assets/927ecbd63036f61b.js
+          node --check /tmp/tf-rev402/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev402/src')
+          p=(root/'assets/927ecbd63036f61b.js').read_text()
+          assert 'const __tfPostImportRefreshV402' in p
+          assert "requestIdleCallback(__tfPostImportRefreshV402, { timeout: 350 })" in p
+          assert "setTimeout(() => {" in p and "tf-remote-prewarm-drive-v292" in p and "}, 1400);" in p
+          assert 'saved-channel rendering is already scheduled once' in p
+          assert 'const __tfSourcesV401' in p
+          assert 'function tf_isRecognizedImportStorageV399' in p
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.15' and m['version_name']=='REV402'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for path,h in d.items():
+              fp=root/path;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((path,a,h))
+          assert not bad,bad[:10]
+          print('REV402 PC fast import QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip
+          cd /tmp/tf-rev402/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.15
+          OUT=/tmp/TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip
+          NOTES=deliverables/RELEASE_NOTES_REV402.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.15 — REV402 Fast JSON Import' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.15 — REV402 Fast JSON Import' --notes-file "$NOTES" --latest
+          fi
