@@ -1,0 +1,139 @@
+name: Publish PC Mac REV403 table column sizing
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV403/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev403
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV402 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev403
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.15 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch Table 3 and Table 4 widths
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev403/src')
+          css=root/'assets/7e95b596e5bf8dff.css'
+          s=css.read_text()
+          block="""
+
+          /* REV403 — Table 3/Table 4 column sizing polish. */
+          #history-table td[data-history-col="analyst"]{
+            width:max-content !important;
+            min-width:190px !important;
+            max-width:none !important;
+            white-space:nowrap !important;
+            overflow:visible !important;
+            padding-left:10px !important;
+            padding-right:10px !important;
+          }
+          .tf-score-summary-table th:nth-child(1),
+          .tf-score-summary-table td:nth-child(1){width:44% !important;}
+          .tf-score-summary-table th:nth-child(2),
+          .tf-score-summary-table td:nth-child(2){width:38% !important;}
+          .tf-score-summary-table th:nth-child(3),
+          .tf-score-summary-table td:nth-child(3){width:18% !important;}
+          """
+          if 'REV403 — Table 3/Table 4 column sizing polish' not in s:
+              s += block
+          css.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.16'
+          m['version_name']='REV403'
+          m['description']='REV403: Table 3 analyst column expands for long names; Table 4 analyst column reduced and rebalanced. REV402 fast JSON import retained.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV403.md').write_text(
+              '# REV403 — Table Column Sizing\n\n'
+              '- Table 3 analyst column min 190px and content-sized.\n'
+              '- Table 4 columns 44/38/18.\n'
+              '- REV402 fast JSON import retained.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV403.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV403 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev403/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev403/src')
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          assert 'REV403 — Table 3/Table 4 column sizing polish' in css
+          assert 'min-width:190px' in css
+          assert 'width:44%' in css and 'width:38%' in css and 'width:18%' in css
+          p=(root/'assets/927ecbd63036f61b.js').read_text()
+          assert 'const __tfPostImportRefreshV402' in p
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.16' and m['version_name']=='REV403'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for path,h in d.items():
+              fp=root/path;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((path,a,h))
+          assert not bad,bad[:10]
+          print('REV403 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV403_TABLE_COLUMN_SIZING.zip
+          cd /tmp/tf-rev403/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.16
+          OUT=/tmp/TF_Extension_PC_MAC_REV403_TABLE_COLUMN_SIZING.zip
+          NOTES=deliverables/RELEASE_NOTES_REV403.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.16 — REV403 Table Column Sizing' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.16 — REV403 Table Column Sizing' --notes-file "$NOTES" --latest
+          fi
