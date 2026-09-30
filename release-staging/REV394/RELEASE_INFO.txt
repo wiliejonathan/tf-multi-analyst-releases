@@ -1,0 +1,1 @@
+REV394 / v1.17.07\nSmaller left risk icons; ticker/Table2 analyst color-only; row alignment fixes.\n
