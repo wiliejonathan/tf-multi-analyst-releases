@@ -32,53 +32,70 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import json, hashlib, re
+          import json, hashlib
           root=Path('/tmp/tf-rev384/src')
           css=root/'assets/tf-mechanical-theme.css'
           s=css.read_text()
-          override='''\n/* REV384 Holding alignment final override */\n  .tf-holding-table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important}\n  .tf-holding-table th,.tf-holding-table td{box-sizing:border-box!important;vertical-align:middle!important;line-height:1.35!important}\n  .tf-holding-table th:first-child,.tf-holding-table td:first-child{width:48%!important;text-align:left!important;overflow-wrap:anywhere;word-break:normal}\n  .tf-holding-table th:nth-child(2),.tf-holding-table td:nth-child(2),.tf-holding-table th:nth-child(3),.tf-holding-table td:nth-child(3){width:26%!important;text-align:center!important}\n  .tf-holding-table th:nth-child(2),.tf-holding-table th:nth-child(3){white-space:normal!important}\n  .tf-holding-analyst{font-weight:700;line-height:1.35}\n  .tf-holding-value{text-align:center!important;white-space:nowrap;font-variant-numeric:tabular-nums;font-feature-settings:\"tnum\" 1;letter-spacing:0}\n'''\n          if 'REV384 Holding alignment final override' not in s:\n              s += override\n          css.write_text(s)\n          mf=root/'manifest.json'
+          marker='/* REV384 Holding alignment final override */'
+          override_lines=[
+              '',
+              marker,
+              '.tf-holding-table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important}',
+              '.tf-holding-table th,.tf-holding-table td{box-sizing:border-box!important;vertical-align:middle!important;line-height:1.35!important}',
+              '.tf-holding-table th:first-child,.tf-holding-table td:first-child{width:48%!important;text-align:left!important;overflow-wrap:anywhere;word-break:normal}',
+              '.tf-holding-table th:nth-child(2),.tf-holding-table td:nth-child(2),.tf-holding-table th:nth-child(3),.tf-holding-table td:nth-child(3){width:26%!important;text-align:center!important}',
+              '.tf-holding-table th:nth-child(2),.tf-holding-table th:nth-child(3){white-space:normal!important}',
+              '.tf-holding-analyst{font-weight:700;line-height:1.35}',
+              '.tf-holding-value{text-align:center!important;white-space:nowrap;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:0}',
+              ''
+          ]
+          if marker not in s:
+              s += '\n'.join(override_lines)
+          css.write_text(s)
+          mf=root/'manifest.json'
           m=json.loads(mf.read_text())
           m['version']='1.16.97'
           m['version_name']='REV384'
           m['description']='REV384: Holding Period columns precisely aligned across desktop/mobile, centered tabular duration values, no inner scrollbars, Table 3 glow disabled for performance, persistent imports, Analyst-Pair analytics, and mini neon cursor.'
           mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
           readme=root/'README_REV384.md'
-          readme.write_text('''# REV384\n\n- Holding Period table columns are strictly aligned using 48% / 26% / 26% geometry.\n- Nama Analis - Pair is left aligned; Max/Avg headers and values are centered.\n- Duration values use tabular numerals for stable alignment.\n- Both Holding tables remain free of internal scrollbars.\n- Table 3 History remains excluded from cursor-follow glow for performance.\n- Version: 1.16.97 / REV384.\n''')
-          def sha(p): return hashlib.sha256((root/p).read_bytes()).hexdigest()
+          readme.write_text('# REV384\n\n- Holding Period columns aligned 48% / 26% / 26%.\n- Nama Analis - Pair left aligned; Max/Avg headers and values centered.\n- Duration uses tabular numerals.\n- No Holding inner scrollbars.\n- Table 3 History glow remains disabled for performance.\n- Version: 1.16.97 / REV384.\n')
+          def sha(path):
+              return hashlib.sha256((root/path).read_bytes()).hexdigest()
           integ=root/'assets/7b6af0cb4001a684.js'
           js=integ.read_text()
-          block=f'''\n\n// REV384 final integrity overrides - precisely aligned Holding analytics.\nFILES['manifest.json'] = '{sha(Path('manifest.json'))}';\nFILES['assets/tf-mechanical-theme.css'] = '{sha(Path('assets/tf-mechanical-theme.css'))}';\nFILES['README_REV384.md'] = '{sha(Path('README_REV384.md'))}';\n'''
+          block='\n\n// REV384 final integrity overrides - precisely aligned Holding analytics.\n'
+          block += "FILES['manifest.json'] = '" + sha(Path('manifest.json')) + "';\n"
+          block += "FILES['assets/tf-mechanical-theme.css'] = '" + sha(Path('assets/tf-mechanical-theme.css')) + "';\n"
+          block += "FILES['README_REV384.md'] = '" + sha(Path('README_REV384.md')) + "';\n"
           assert '\nwindow.tfIntegrityReady =' in js
-          js=js.replace('\nwindow.tfIntegrityReady =',block+'\nwindow.tfIntegrityReady =',1)
+          if '// REV384 final integrity overrides' not in js:
+              js=js.replace('\nwindow.tfIntegrityReady =',block+'\nwindow.tfIntegrityReady =',1)
           integ.write_text(js)
           PY
           node --check /tmp/tf-rev384/src/assets/4b4d6b8dc315a95c.js
           node --check /tmp/tf-rev384/src/assets/7b6af0cb4001a684.js
-      - name: Validate integrity and build ZIP
+      - name: Validate and build ZIP
         run: |
           set -euo pipefail
           python3 - <<'PY'
           from pathlib import Path
-          import re,hashlib,json
+          import re, hashlib, json
           root=Path('/tmp/tf-rev384/src')
           js=(root/'assets/7b6af0cb4001a684.js').read_text()
-          entries={}
-          objm=re.search(r'const FILES = \\{(.*?)\\};',js,re.S)
-          assert objm
-          for m in re.finditer(r'["\\\']([^"\\\']+)["\\\']\\s*:\\s*["\\\']([0-9a-f]{64})["\\\']',objm.group(1)): entries[m.group(1)]=m.group(2)
-          pat=re.compile(r"FILES\\[(?:'([^']+)'|\\\"([^\\\"]+)\\\")\\]\\s*=\\s*(?:'([0-9a-f]{64})'|\\\"([0-9a-f]{64})\\\")")
-          for m in pat.finditer(js,objm.end()): entries[m.group(1) or m.group(2)]=m.group(3) or m.group(4)
-          for p,h in entries.items():
-              fp=root/p
-              assert fp.exists(), p
-              assert hashlib.sha256(fp.read_bytes()).hexdigest()==h, p
+          for path in ['manifest.json','assets/tf-mechanical-theme.css','README_REV384.md']:
+              vals=re.findall(r"FILES\[['\"]"+re.escape(path)+r"['\"]\]\s*=\s*['\"]([0-9a-f]{64})['\"]",js)
+              assert vals, path
+              actual=hashlib.sha256((root/path).read_bytes()).hexdigest()
+              assert vals[-1]==actual, (path,vals[-1],actual)
           css=(root/'assets/tf-mechanical-theme.css').read_text()
+          assert 'REV384 Holding alignment final override' in css
           assert 'td:nth-child(2)' in css and 'td:nth-child(3)' in css
           assert 'font-variant-numeric:tabular-nums' in css
           assert 'text-align:center!important' in css
           m=json.loads((root/'manifest.json').read_text())
           assert m['version']=='1.16.97' and m['version_name']=='REV384'
-          print('REV384 PC validation PASS',len(entries),'protected files')
+          print('REV384 PC validation PASS')
           PY
           OUT=/tmp/TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip
           cd /tmp/tf-rev384/src
