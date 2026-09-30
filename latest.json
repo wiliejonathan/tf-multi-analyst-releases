@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 411,
-  "tag_name": "v1.17.24",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.24",
-  "published_at": "2026-09-30T18:41:58Z",
+  "revision": 412,
+  "tag_name": "v1.17.25",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.25",
+  "published_at": "2026-09-30T19:59:01Z",
   "asset": {
-    "id": 601567926,
-    "name": "TF_Extension_PC_MAC_REV411_SIDEBAR_SQUARE_STATUS.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.24/TF_Extension_PC_MAC_REV411_SIDEBAR_SQUARE_STATUS.zip",
-    "size": 850546,
-    "digest": "sha256:f24a37cfe0d73afaad43b7b7a8a77c1d91350ac9dd5415e4a8cfadc5737197e1",
-    "updated_at": "2026-09-30T18:41:57Z"
+    "id": 601695381,
+    "name": "TF_Extension_PC_MAC_REV412_EQUITY_ISIGNAL_OVERVIEW.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.25/TF_Extension_PC_MAC_REV412_EQUITY_ISIGNAL_OVERVIEW.zip",
+    "size": 861771,
+    "digest": "sha256:c25067ec15a5ffabd02ab44de0383480bd19364fb493c6d58ee49a86e4522c21",
+    "updated_at": "2026-09-30T19:59:00Z"
   }
 }
