@@ -1,0 +1,1 @@
+Plugin only: small X button beside stored analyst pairs. No / Yes confirmation shows analyst and pair; No leaves data unchanged. Yes removes only the chosen pair's history, monthly stats, SL cache, no-data entry and remembered selection, retaining the analyst row and other pairs. Deletion is blocked during scanning. Existing disabled checkboxes remain unchanged. ZIP asset only.
