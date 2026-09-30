@@ -1,0 +1,2 @@
+REV383 / v1.16.96
+Holding no-scroll + centered headers + Table 3 glow performance fix + import persistence.
