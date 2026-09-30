@@ -58,7 +58,7 @@ jobs:
           assert "root.closest&&root.closest(HISTORY_SECTION)" in glow
           loader=(root/'assets/7b6af0cb4001a684.js').read_text()
           base=json.loads(re.search(r'const FILES = (\{.*?\});',loader,re.S).group(1))
-          for p,d in re.findall(r'FILES\[[\"\']([^\"\']+)[\"\']\]\s*=\s*[\"\']([0-9a-f]{64})[\"\']\s*;',loader):
+          for p,d in re.findall(r"FILES\\[[\"']([^\"']+)[\"']\\]\\s*=\\s*[\"']([0-9a-f]{64})[\"']\\s*;",loader):
               base[p]=d
           bad=[]
           for p,d in base.items():
