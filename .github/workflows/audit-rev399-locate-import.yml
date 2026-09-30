@@ -1,0 +1,23 @@
+name: Locate REV398 import function
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV399-locate-import/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Locate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev398-locate-import
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.11 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          grep -RIn --exclude='*.map' -E 'function tf_importPayloadToStorage|tf_importPayloadToStorage\s*=|Import / Combine|Import JSON|type=.file.|FileReader\(' "$ROOT/src" | head -n 500
