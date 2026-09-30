@@ -137,6 +137,59 @@ jobs:
           }"""
           s=s[:a]+new+s[b:]
 
+          # REV396 FINAL: every Table 1 pair row gets icon + matching text color.
+          s=s.replace("const tf_table1WarnedAnalysts = new Set();\n","")
+          old="""if (!tf_table1WarnedAnalysts.has(tf_latestRiskNormAnalyst(baseName))) {
+            tf_applyLatestRiskToElement(nameCell, baseName, null, true, 'left');
+            tf_table1WarnedAnalysts.add(tf_latestRiskNormAnalyst(baseName));
+          }"""
+          if old in s:
+              s=s.replace(old,"tf_applyLatestRiskToElement(nameCell, baseName, rowPair, true, 'left');",1)
+
+          # Main renderer pair lookup falls back to aggregate analyst state.
+          old="const st = tf_getLatestRiskState(analyst, pair);"
+          p=s.find('function tf_applyLatestRiskToElement(el, analyst, pair, showIcon, iconPosition)')
+          q=s.find(old,p)
+          if q>=0:
+              s=s[:q]+s[q:].replace(old,"const st = tf_getLatestRiskState(analyst, pair) || (pair ? tf_getLatestRiskState(analyst, null) : null);",1)
+
+          # Table 2 analyst text only: never expose diagnostic text in the name cell.
+          s=s.replace("nameCell.title = String(a.baseName || a.name || '').trim();\n","nameCell.removeAttribute('title');\n",1)
+
+          # Table 3 analyst name and icon use the same pair-specific state.
+          old="""if (!isWithdrawRow) tf_applyLatestRiskToElement(analystCell, row.analyst || '', null, false);
+          tf_applyLatestRiskPairIconOnly(analystCell, row.analyst || '', row.pair || '', 'left');"""
+          if old in s:
+              s=s.replace(old,"if (!isWithdrawRow) tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true, 'left');",1)
+
+          # Holding analyst+pair: color and icon come from the same pair state.
+          for old,new in [
+              ("if(sep>0)tf_applyLatestRiskToElement(n,name.slice(0,sep),null,false);tf_applyLatestRiskPairIconOnly(n,name.slice(0,sep),name.slice(sep+3),'left');",
+               "if(sep>0)tf_applyLatestRiskToElement(n,name.slice(0,sep),name.slice(sep+3),true,'left');"),
+              ("if(sep>0)tf_applyLatestRiskToElement(tdName,name.slice(0,sep),null,false);tf_applyLatestRiskPairIconOnly(tdName,name.slice(0,sep),name.slice(sep+3),'left');",
+               "if(sep>0)tf_applyLatestRiskToElement(tdName,name.slice(0,sep),name.slice(sep+3),true,'left');")
+          ]:
+              if old in s: s=s.replace(old,new,1)
+
+          # Holding formatter: always show HH and MM as 2 digits.
+          a=s.find('function tf_formatHoldingDuration(ms) {')
+          b=s.find('\nfunction tf_renderHoldingPeriodTables',a)
+          assert a>=0 and b>a
+          s=s[:a]+"""function tf_formatHoldingDuration(ms) {
+          const raw=Number(ms);
+          if(!Number.isFinite(raw)||raw<0)return '—';
+          let totalMinutes=Math.round(raw/60000);
+          if(totalMinutes<0)totalMinutes=0;
+          const days=Math.floor(totalMinutes/1440); totalMinutes-=days*1440;
+          const hours=Math.floor(totalMinutes/60); const minutes=totalMinutes-hours*60;
+          const pad2=(v)=>String(Math.max(0,Math.floor(Number(v)||0))).padStart(2,'0');
+          const parts=[];
+          if(days>0)parts.push(pad2(days)+'d');
+          parts.push(pad2(hours)+'h');
+          parts.push(pad2(minutes)+'m');
+          return parts.join(' ');
+          }"""+s[b:]
+
           # Table 3 desktop uses a different renderer. Row coloring is applied
           # by CSS :has() against the existing PNL % tp/sl cell below.
           app.write_text(s)
@@ -154,14 +207,20 @@ jobs:
             font-weight:800 !important;
           }
           """+anchor,1)
+          # Precise ✓ ! × vertical alignment and hard color parity.
+          cs=cs.replace("display:inline-grid;\n  place-items:center;","display:inline-flex;\n  align-items:center;\n  justify-content:center;")
+          cs=cs.replace("vertical-align:0;","vertical-align:middle;\n  position:relative;\n  top:-0.5px;",1)
+          cs=cs.replace("line-height:1;","line-height:10px;",1)
           if 'REV396 desktop Table 3 row text follows PNL%' not in cs:
               cs += """
           /* REV396 desktop Table 3 row text follows PNL%; analyst cell follows risk state. */
-          #history-table tbody tr:has(td[data-history-col="pnlPercent"].tp) > td:not([data-history-col="analyst"]){color:var(--success)!important;}
-          #history-table tbody tr:has(td[data-history-col="pnlPercent"].sl) > td:not([data-history-col="analyst"]){color:var(--danger)!important;}
-          #history-table tbody td[data-history-col="analyst"].tf-latest-risk-healthy{color:#22c55e!important;}
-          #history-table tbody td[data-history-col="analyst"].tf-latest-risk-warning{color:#facc15!important;}
-          #history-table tbody td[data-history-col="analyst"].tf-latest-risk-critical{color:#ef4444!important;}
+          #history-table tbody tr:has(td[data-history-col="pnlPercent"].tp) > td:not([data-history-col="analyst"]),
+          #history-table tbody tr:has(td[data-history-col="pnlPercent"].tp) > td:not([data-history-col="analyst"]) *{color:var(--success)!important;}
+          #history-table tbody tr:has(td[data-history-col="pnlPercent"].sl) > td:not([data-history-col="analyst"]),
+          #history-table tbody tr:has(td[data-history-col="pnlPercent"].sl) > td:not([data-history-col="analyst"]) *{color:var(--danger)!important;}
+          #summary-table tbody td.tf-latest-risk-healthy,#monthly-table tbody td.tf-latest-risk-healthy,.tf-perf-name-text.tf-latest-risk-healthy,.tf-holding-analyst.tf-latest-risk-healthy,#history-table tbody td[data-history-col="analyst"].tf-latest-risk-healthy,#drawdown-table tbody td.tf-latest-risk-healthy,.tf-score-analyst.tf-latest-risk-healthy{color:#22c55e!important;}
+          #summary-table tbody td.tf-latest-risk-warning,#monthly-table tbody td.tf-latest-risk-warning,.tf-perf-name-text.tf-latest-risk-warning,.tf-holding-analyst.tf-latest-risk-warning,#history-table tbody td[data-history-col="analyst"].tf-latest-risk-warning,#drawdown-table tbody td.tf-latest-risk-warning,.tf-score-analyst.tf-latest-risk-warning{color:#facc15!important;}
+          #summary-table tbody td.tf-latest-risk-critical,#monthly-table tbody td.tf-latest-risk-critical,.tf-perf-name-text.tf-latest-risk-critical,.tf-holding-analyst.tf-latest-risk-critical,#history-table tbody td[data-history-col="analyst"].tf-latest-risk-critical,#drawdown-table tbody td.tf-latest-risk-critical,.tf-score-analyst.tf-latest-risk-critical{color:#ef4444!important;}
           """
           css.write_text(cs)
 
@@ -225,6 +284,14 @@ jobs:
           assert 'tr:has(td[data-history-col="pnlPercent"].sl)' in css
           assert "el.title = (base ? base + ' · ' : '') + tf_latestRiskReason(st);" not in app
           assert 'tf-sidebar-risk-healthy' in side
+          assert "tf_applyLatestRiskToElement(nameCell, baseName, rowPair, true, 'left');" in app
+          assert 'tf_table1WarnedAnalysts' not in app
+          assert "parts.push(pad2(hours)+'h');" in app
+          assert "nameCell.removeAttribute('title');" in app
+          assert "display:inline-flex;" in css
+          assert "vertical-align:middle;" in css
+          assert "top:-0.5px;" in css
+          assert 'td:not([data-history-col="analyst"]) *' in css
           m=json.loads((root/'manifest.json').read_text()); assert m['version']=='1.17.9' and m['version_name']=='REV396'
           reg=(root/'assets/7b6af0cb4001a684.js').read_text()
           mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S); assert mm
