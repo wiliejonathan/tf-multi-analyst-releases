@@ -1,0 +1,38 @@
+name: Audit REV393 sidebar render
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV393-sidebar-render/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect sidebar render
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev393-side
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.05 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV392_HOLDING_STRICT_TIME_RANGE.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          echo '=== POPUP HTML SCRIPTS ==='
+          grep -n -E '<script|<link|analyst-links-container|analyst-name' "$ROOT/src/popup.html" || true
+          echo '=== ANALYST RENDER JS FILES ==='
+          for f in "$ROOT"/src/assets/*.js; do
+            if grep -q -E 'analyst-name-btn|analyst-links-container|analyst-row' "$f"; then
+              echo "--- $(basename "$f")"
+              grep -n -E 'analyst-name-btn|analyst-links-container|analyst-row' "$f" | head -n 120 || true
+            fi
+          done
+          echo '=== STORAGE HISTORY ACCESS IN SIDEBAR CANDIDATES ==='
+          for f in "$ROOT"/src/assets/*.js; do
+            if grep -q -E 'analyst-name-btn|analyst-links-container' "$f"; then
+              echo "--- $(basename "$f")"
+              grep -n -E 'tfHistorySignals|chrome.storage.local|get\(' "$f" | head -n 80 || true
+            fi
+          done
