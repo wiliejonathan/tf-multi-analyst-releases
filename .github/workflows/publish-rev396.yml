@@ -1,0 +1,276 @@
+name: Publish PC Mac REV396 analyst colors Table3 PNL
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV396/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev396
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV395 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev396
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.08 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV395_ALL_ANALYST_NAME_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch REV396 behavior
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev396/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          # Every known analyst gets an aggregate state, including healthy.
+          anchor="""byPair.forEach((st) => {
+          if (!st) return;
+          const key = tf_latestRiskNormAnalyst(st.analyst);
+          const prev = byAnalyst.get(key);
+          if (!prev || st.severity > prev.severity) {
+          byAnalyst.set(key, {
+          analyst:st.analyst, monthKey:latestMonth,
+          drawdown:!!st.drawdown, consecutiveLoss:!!st.consecutiveLoss,
+          severity:st.severity, sourcePair:st.pair
+          });
+          }
+          });
+          __tfLatestRiskState = { monthKey:latestMonth, byPair, byAnalyst, signature };"""
+          repl="""byPair.forEach((st) => {
+          if (!st) return;
+          const key = tf_latestRiskNormAnalyst(st.analyst);
+          const prev = byAnalyst.get(key);
+          if (!prev || st.severity > prev.severity) {
+          byAnalyst.set(key, {
+          analyst:st.analyst, monthKey:latestMonth,
+          drawdown:!!st.drawdown, consecutiveLoss:!!st.consecutiveLoss,
+          severity:st.severity, sourcePair:st.pair
+          });
+          }
+          });
+          for (let i = 0; i < src.length; i++) {
+          const r = src[i];
+          if (!r || r.isWithdraw) continue;
+          const analyst = String(r.analyst || '').trim();
+          if (!analyst) continue;
+          const key = tf_latestRiskNormAnalyst(analyst);
+          if (!byAnalyst.has(key)) {
+          byAnalyst.set(key, { analyst, monthKey:latestMonth, drawdown:false, consecutiveLoss:false, severity:0, sourcePair:'' });
+          }
+          }
+          __tfLatestRiskState = { monthKey:latestMonth, byPair, byAnalyst, signature };"""
+          assert anchor in s, 'byAnalyst finalizer missing'
+          s=s.replace(anchor,repl,1)
+
+          # Main name renderer: healthy text green; do not append status to name title.
+          old="""function tf_applyLatestRiskToElement(el, analyst, pair, showIcon, iconPosition) {
+          try {
+          if (!el) return null;
+          const st = tf_getLatestRiskState(analyst, pair);
+          el.classList.remove('tf-latest-risk-warning','tf-latest-risk-critical');
+          el.querySelectorAll && el.querySelectorAll('[data-tf-latest-risk-icon="1"]').forEach((x) => x.remove());
+          if (!st) {
+          if (el.dataset && el.dataset.tfRiskBaseTitle != null) el.title = el.dataset.tfRiskBaseTitle;
+          return null;
+          }
+          if (st.severity > 0) {
+          el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : 'tf-latest-risk-warning');
+          }
+          if (el.dataset) {
+          if (el.dataset.tfRiskBaseTitle == null) el.dataset.tfRiskBaseTitle = el.title || '';
+          const base = el.dataset.tfRiskBaseTitle || '';
+          el.title = (base ? base + ' · ' : '') + tf_latestRiskReason(st);
+          }
+          if (showIcon !== false) {"""
+          new="""function tf_applyLatestRiskToElement(el, analyst, pair, showIcon, iconPosition) {
+          try {
+          if (!el) return null;
+          const st = tf_getLatestRiskState(analyst, pair);
+          el.classList.remove('tf-latest-risk-healthy','tf-latest-risk-warning','tf-latest-risk-critical');
+          el.querySelectorAll && el.querySelectorAll('[data-tf-latest-risk-icon="1"]').forEach((x) => x.remove());
+          if (!st) return null;
+          el.classList.add(st.severity >= 2 ? 'tf-latest-risk-critical' : (st.severity === 1 ? 'tf-latest-risk-warning' : 'tf-latest-risk-healthy'));
+          if (showIcon !== false) {"""
+          assert old in s, 'main risk helper block missing'
+          s=s.replace(old,new,1)
+
+          # Multi-pair icon fallback to aggregate analyst state.
+          old="const st = tf_getLatestRiskState(analyst, pair);\n          if (!st) return null;"
+          new="const st = tf_getLatestRiskState(analyst, pair) || tf_getLatestRiskState(analyst, null);\n          if (!st) return null;"
+          # target helper occurrence after PairIconOnly.
+          p=s.find('function tf_applyLatestRiskPairIconOnly')
+          assert p>=0
+          q=s.find(old,p)
+          assert q>=0, 'pair helper state missing'
+          s=s[:q]+s[q:].replace(old,new,1)
+
+          # Holding duration fixed-width numeric units.
+          old="""function tf_formatHoldingDuration(ms) {
+          const raw=Number(ms);
+          if(!Number.isFinite(raw)||raw<0)return '—';
+          let totalMinutes=Math.round(raw/60000);
+          if(totalMinutes<=0)return '0m';
+          const days=Math.floor(totalMinutes/1440); totalMinutes-=days*1440;
+          const hours=Math.floor(totalMinutes/60); const minutes=totalMinutes-hours*60;
+          const parts=[]; if(days>0)parts.push(days+'d'); if(hours>0||days>0)parts.push(hours+'h'); parts.push(minutes+'m');
+          return parts.join(' ');
+          }"""
+          new="""function tf_formatHoldingDuration(ms) {
+          const raw=Number(ms);
+          if(!Number.isFinite(raw)||raw<0)return '—';
+          let totalMinutes=Math.round(raw/60000);
+          if(totalMinutes<=0)return '00m';
+          const days=Math.floor(totalMinutes/1440); totalMinutes-=days*1440;
+          const hours=Math.floor(totalMinutes/60); const minutes=totalMinutes-hours*60;
+          const pad2=(v)=>String(Math.max(0,Math.floor(Number(v)||0))).padStart(2,'0');
+          const parts=[]; if(days>0)parts.push(pad2(days)+'d'); if(hours>0||days>0)parts.push(pad2(hours)+'h'); parts.push(pad2(minutes)+'m');
+          return parts.join(' ');
+          }"""
+          assert old in s, 'Holding formatter missing'
+          s=s.replace(old,new,1)
+
+          # Table 3 row text follows PNL%, analyst cell keeps analyst status.
+          old="""tr.appendChild(balanceCell);
+          return tr;
+          }"""
+          new="""tr.appendChild(balanceCell);
+          if (!isWithdrawRow) {
+          const __pnlPctForRow = Number.isFinite(Number(row.pnlPercent)) ? Number(row.pnlPercent) : Number(row.pnlDollar || 0);
+          tr.classList.add(__pnlPctForRow >= 0 ? 'tf-history-row-pnl-positive' : 'tf-history-row-pnl-negative');
+          }
+          return tr;
+          }"""
+          assert old in s, 'Table3 return anchor missing'
+          s=s.replace(old,new,1)
+          app.write_text(s)
+
+          css=root/'assets/7e95b596e5bf8dff.css'
+          cs=css.read_text()
+          if '.tf-latest-risk-healthy{' not in cs:
+              anchor=""".tf-latest-risk-warning{
+            color:#facc15 !important;
+            font-weight:800 !important;
+          }"""
+              assert anchor in cs
+              cs=cs.replace(anchor,""".tf-latest-risk-healthy{
+            color:#22c55e !important;
+            font-weight:800 !important;
+          }
+          """+anchor,1)
+          if 'tf-history-row-pnl-positive' not in cs:
+              cs += """
+          /* REV396 Table 3 row text follows PNL%; analyst cell follows risk state. */
+          #history-table tbody tr.tf-history-row-pnl-positive > td:not([data-history-col="analyst"]){color:var(--success)!important;}
+          #history-table tbody tr.tf-history-row-pnl-negative > td:not([data-history-col="analyst"]){color:var(--danger)!important;}
+          #history-table tbody td[data-history-col="analyst"].tf-latest-risk-healthy{color:#22c55e!important;}
+          #history-table tbody td[data-history-col="analyst"].tf-latest-risk-warning{color:#facc15!important;}
+          #history-table tbody td[data-history-col="analyst"].tf-latest-risk-critical{color:#ef4444!important;}
+          """
+          css.write_text(cs)
+
+          # Sidebar/ticker: color-only, but healthy analysts are green too.
+          side=root/'assets/tf-latest-risk-sidebar-rev393.js'
+          if side.exists():
+              ss=side.read_text()
+              ss=ss.replace("const W='tf-sidebar-risk-warning', C='tf-sidebar-risk-critical';","const H='tf-sidebar-risk-healthy', W='tf-sidebar-risk-warning', C='tf-sidebar-risk-critical';")
+              ss=ss.replace("if(!sev)return;const k=normA(g.a),prev=byA.get(k);if(!prev||sev>prev)byA.set(k,sev);});\n            state={byAnalyst:byA,monthKey:latest};",
+                            "const k=normA(g.a),prev=byA.get(k);if(prev===undefined||sev>prev)byA.set(k,sev);});\n            (hist||[]).forEach(r=>{if(r&&!r.isWithdraw&&r.analyst){const k=normA(r.analyst);if(!byA.has(k))byA.set(k,0);}});\n            state={byAnalyst:byA,monthKey:latest};")
+              ss=ss.replace("x.el.classList.remove(W,C);const sev=state.byAnalyst.get(normA(x.name))||0;if(sev===2)x.el.classList.add(C);else if(sev===1)x.el.classList.add(W);",
+                            "x.el.classList.remove(H,W,C);const k=normA(x.name);if(!state.byAnalyst.has(k))return;const sev=state.byAnalyst.get(k)||0;if(sev===2)x.el.classList.add(C);else if(sev===1)x.el.classList.add(W);else x.el.classList.add(H);")
+              ss=ss.replace("style.textContent='.'+W+'{color:#facc15!important;font-weight:800!important}.'+C+'{color:#ef4444!important;font-weight:800!important}'",
+                            "style.textContent='.'+H+'{color:#22c55e!important;font-weight:800!important}.'+W+'{color:#facc15!important;font-weight:800!important}.'+C+'{color:#ef4444!important;font-weight:800!important}'")
+              side.write_text(ss)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.9'; m['version_name']='REV396'
+          m['description']='REV396: all analyst names green/yellow/red by status; multi-pair icon fallback; two-digit Holding duration; Table 3 rows follow PNL% color.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV396.md').write_text('# REV396\nAll analyst colors, multi-pair icons, two-digit Holding time, Table3 PNL row colors.\n')
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S); assert mm
+          files=json.loads(mm.group(1)); files.pop('assets/7b6af0cb4001a684.js',None); files['README_REV396.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path; assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV396 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('REV396 patched',len(newmap),'protected files')
+          PY
+          node --check /tmp/tf-rev396/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev396/src/assets/7b6af0cb4001a684.js
+          node --check /tmp/tf-rev396/src/assets/tf-latest-risk-sidebar-rev393.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev396/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          side=(root/'assets/tf-latest-risk-sidebar-rev393.js').read_text()
+          assert '.tf-latest-risk-healthy{' in css
+          assert "tf_getLatestRiskState(analyst, pair) || tf_getLatestRiskState(analyst, null)" in app
+          assert "parts.push(pad2(minutes)+'m');" in app
+          assert "tf-history-row-pnl-positive" in app and "tf-history-row-pnl-positive" in css
+          assert "tf-history-row-pnl-negative" in app and "tf-history-row-pnl-negative" in css
+          assert "el.title = (base ? base + ' · ' : '') + tf_latestRiskReason(st);" not in app
+          assert 'tf-sidebar-risk-healthy' in side
+          m=json.loads((root/'manifest.json').read_text()); assert m['version']=='1.17.9' and m['version_name']=='REV396'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S); assert mm
+          d=json.loads(mm.group(1)); bad=[]
+          for p,h in d.items():
+              fp=root/p; a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h: bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV396 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV396_ANALYST_COLORS_TABLE3_PNL.zip
+          cd /tmp/tf-rev396/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.09
+          OUT=/tmp/TF_Extension_PC_MAC_REV396_ANALYST_COLORS_TABLE3_PNL.zip
+          NOTES=deliverables/RELEASE_NOTES_REV396.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.09 — REV396 Analyst Colors + Table3 PNL' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.09 — REV396 Analyst Colors + Table3 PNL' --notes-file "$NOTES" --latest
+          fi
