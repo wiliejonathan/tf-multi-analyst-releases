@@ -40,7 +40,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v1.17.17 /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip.sha256 --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.17 — REV404 Activation Recovery' --notes-file deliverables/RELEASE_NOTES_REV404.md --latest
+          gh release create v1.17.17 /tmp/TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.17 — REV404 Activation Recovery' --notes-file deliverables/RELEASE_NOTES_REV404.md --latest
       - name: Diagnose backend availability (no customer credentials)
         continue-on-error: true
         run: |
