@@ -1,0 +1,34 @@
+name: Audit REV387 Holding call
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV391/AUDIT'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect REV387 asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/audit
+          gh release download v1.17.00 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV387_HOLDING_TIMEFRAME_PARITY.zip' --output /tmp/audit/base.zip
+          unzip -q /tmp/audit/base.zip -d /tmp/audit/src
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path('/tmp/audit/src/assets/4b4d6b8dc315a95c.js').read_text()
+          for term in ['HoldingPeriod','holdingPeriod','tf_renderHolding','tf-holding','rowsForUi','rowsForCalc']:
+              print('\nTERM',term,'count=',s.count(term))
+              pos=0
+              for n in range(min(10,s.count(term))):
+                  i=s.find(term,pos)
+                  if i<0: break
+                  print('---',i,'---')
+                  print(s[max(0,i-500):i+1000])
+                  pos=i+len(term)
+          PY
