@@ -1,0 +1,125 @@
+name: Publish PC Mac REV391 Holding checkbox parity
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV391/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev391
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV387 base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev391
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.00 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV387_HOLDING_TIMEFRAME_PARITY.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+      - name: Patch Holding to checked Table 3 rows
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev391/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+          old='tf_renderHoldingPeriodTables(rowsForUi);'
+          new='// REV391: Holding uses exactly the checked/enabled Table 3 rows.\ntf_renderHoldingPeriodTables(Array.isArray(rowsForUi) ? rowsForUi.filter(r => tf_isHistoryRowEnabled(r)) : []);'
+          assert s.count(old)==1, ('Holding render call count',s.count(old))
+          s=s.replace(old,new,1)
+          app.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.4'
+          m['version_name']='REV391'
+          m['description']='REV391: Holding Period Max/Avg use only checked/enabled Table 3 rows, so Time Range and Time Range per Month auto-unticked carry-over trades are excluded. Closed At minus Created At remains the duration formula.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV391.md').write_text(
+              '# REV391 — Holding Checkbox Parity\n\n'
+              '- Holding Max/Avg use only checked/enabled Table 3 rows.\n'
+              '- Auto-unticked carry-over trades from Time Range boundaries are excluded.\n'
+              '- Duration remains Closed At - Created At.\n'
+              '- Version v1.17.04 / REV391.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S)
+          assert mm,'FILES registry missing'
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['README_REV391.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV391 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('protected',len(newmap))
+          PY
+          node --check /tmp/tf-rev391/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev391/src/assets/7b6af0cb4001a684.js
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json,hashlib
+          root=Path('/tmp/tf-rev391/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          assert 'REV391: Holding uses exactly the checked/enabled Table 3 rows.' in app
+          assert 'rowsForUi.filter(r => tf_isHistoryRowEnabled(r))' in app
+          assert 'tf_parseHistoryTableDateMs(row.createdDate)' in app
+          assert 'tf_parseHistoryTableDateMs(row.displayDate)' in app
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.4' and m['version_name']=='REV391'
+          s=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for p,h in d.items():
+              fp=root/p;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV391 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV391_HOLDING_CHECKBOX_PARITY.zip
+          cd /tmp/tf-rev391/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.04
+          OUT=/tmp/TF_Extension_PC_MAC_REV391_HOLDING_CHECKBOX_PARITY.zip
+          NOTES=deliverables/RELEASE_NOTES_REV391.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.04 — REV391' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.04 — REV391' --notes-file "$NOTES" --latest
+          fi
