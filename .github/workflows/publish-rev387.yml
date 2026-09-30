@@ -43,7 +43,7 @@ jobs:
           app.write_text(s)
           mf=root/'manifest.json'
           m=json.loads(mf.read_text())
-          m['version']='1.17.00'
+          m['version']='1.17.0'
           m['version_name']='REV387'
           m['description']='REV387: Max and Avg Holding Period both follow the same active Table 3 timeframe/date/analyst/pair filters. Holding remains Closed At minus Created At. Includes REV384 alignment/performance, import persistence, custom cursor, and no-inner-scroll behavior.'
           mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
@@ -85,7 +85,7 @@ jobs:
           assert 'const avgRows = allRows;' in app
           assert 'tf_parseHistoryTableDateMs(row.createdDate)' in app and 'tf_parseHistoryTableDateMs(row.displayDate)' in app
           m=json.loads((root/'manifest.json').read_text())
-          assert m['version']=='1.17.00' and m['version_name']=='REV387'
+          assert m['version']=='1.17.0' and m['version_name']=='REV387'
           s=(root/'assets/7b6af0cb4001a684.js').read_text()
           mm=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S); assert mm
           d=json.loads(mm.group(1)); bad=[]
