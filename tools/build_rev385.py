@@ -79,7 +79,7 @@ function tf_renderHoldingPeriodTables"""
 s,n=pat1.subn(lambda _:helpers,s,count=1)
 assert n==1, 'Holding duration helper block not found'
 
-pat2=re.compile(r"function tf_renderHoldingPeriodTables\(allTickerRows, filteredRows\) \{.*?\n\}\nfunction recomputeHistoryRows\(\) \{",re.S)
+pat2=re.compile(r"function tf_renderHoldingPeriodTables\([^)]*\)\s*\{.*?\n\}\nfunction recomputeHistoryRows\(\)\s*\{",re.S)
 render=r"""function tf_renderHoldingPeriodTables(tableRows) {
 const leftBody = document.getElementById('tf-holding-body-left');
 const rightBody = document.getElementById('tf-holding-body-right');
