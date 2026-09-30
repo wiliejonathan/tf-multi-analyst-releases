@@ -1,0 +1,286 @@
+name: Publish PC Mac REV393 latest risk warnings
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV393/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev393
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV392 plugin and REV393 mobile reference
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev393
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src" "$ROOT/mobile"
+          gh release download v1.17.05 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV392_HOLDING_STRICT_TIME_RANGE.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          gh release download v1.17.06 --repo wiliejonathan/tf-analyzer-analyst-ios --pattern 'TF_Analyzer_Analyst_iOS_BROWSER_REV393_LATEST_RISK_WARNINGS.zip' --output "$ROOT/mobile.zip"
+          unzip -tq "$ROOT/mobile.zip"
+          unzip -q "$ROOT/mobile.zip" -d "$ROOT/mobile"
+
+      - name: Patch desktop dashboard and sidebar
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev393/src')
+          mobile=Path('/tmp/tf-rev393/mobile')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          ms=(mobile/'assets/dashboard-mobile.js').read_text()
+          h1=ms.index('// ===== REV393: Latest-month Drawdown / Consecutive Loss warning system =====')
+          h2=ms.index('// ===== END REV393 latest-month risk warning system =====',h1)
+          h2=ms.index('\n',h2)+1
+          helper=ms[h1:h2]
+          assert 'const severity = (drawdown && consecutiveLoss) ? 2' in helper
+          assert "icon.textContent = st.severity >= 2 ? '×' : '!';" in helper
+          if 'REV393: Latest-month Drawdown / Consecutive Loss warning system' not in s:
+              anchor='function renderSummaryTable() {'
+              assert anchor in s
+              s=s.replace(anchor,helper+'\n'+anchor,1)
+
+          old="const priceBusy = tf_isMyfxbookPriceLoading();\nfilteredAnalysts.forEach((a) => {"
+          assert old in s
+          s=s.replace(old,"const priceBusy = tf_isMyfxbookPriceLoading();\ntry { tf_refreshLatestRiskState(true); } catch (e) { }\nconst tf_table1WarnedAnalysts = new Set();\nfilteredAnalysts.forEach((a) => {",1)
+          old="nameCell.textContent = a.baseName || a.name;\nnameCell.classList.add('monthly-sticky-col-2');"
+          assert old in s
+          s=s.replace(old,"nameCell.textContent = a.baseName || a.name;\nnameCell.classList.add('monthly-sticky-col-2');\nif (!tf_table1WarnedAnalysts.has(tf_latestRiskNormAnalyst(baseName))) {\n  tf_applyLatestRiskToElement(nameCell, baseName, null, true);\n  tf_table1WarnedAnalysts.add(tf_latestRiskNormAnalyst(baseName));\n}",1)
+
+          old='nameSpan.title = String(it.name || "").trim();\ncb.addEventListener("change", () => {'
+          assert old in s
+          s=s.replace(old,'nameSpan.title = String(it.name || "").trim();\ntf_applyLatestRiskToElement(nameSpan, it.name, null, true);\ncb.addEventListener("change", () => {',1)
+
+          old="nameCell.textContent = formatAnalystDisplayName(a.baseName || a.name);\nnameCell.title = String(a.baseName || a.name || '').trim();\nnameCell.classList.add('monthly-sticky-col-2');"
+          assert old in s
+          s=s.replace(old,"nameCell.textContent = formatAnalystDisplayName(a.baseName || a.name);\nnameCell.title = String(a.baseName || a.name || '').trim();\nnameCell.classList.add('monthly-sticky-col-2');\ntf_applyLatestRiskToElement(nameCell, a.baseName || a.name, a.pair || getPrimaryPairForAnalyst(a), true);",1)
+          old="span.textContent = signals + ' Signals';\nlineElements.push(span);"
+          assert old in s
+          s=s.replace(old,"span.textContent = signals + ' Signals';\ntry {\n  const __riskState = tf_refreshLatestRiskState(false);\n  if (__riskState && monthKey === __riskState.monthKey) tf_applyLatestRiskToElement(span, analystName, a.pair || getPrimaryPairForAnalyst(a), true);\n} catch (e) { }\nlineElements.push(span);",1)
+
+          old="analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();\ntr.appendChild(analystCell);"
+          assert old in s
+          s=s.replace(old,"analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();\nif (!isWithdrawRow) tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true);\ntr.appendChild(analystCell);",1)
+
+          old="subset.forEach(name=>{const tr=document.createElement('tr');const n=document.createElement('td');n.className='tf-holding-analyst';n.textContent=name;const m=document.createElement('td');"
+          assert old in s
+          s=s.replace(old,"subset.forEach(name=>{const tr=document.createElement('tr');const n=document.createElement('td');n.className='tf-holding-analyst';n.textContent=name;try{const sep=name.lastIndexOf(' - ');if(sep>0)tf_applyLatestRiskToElement(n,name.slice(0,sep),name.slice(sep+3),true);}catch(e){}const m=document.createElement('td');",1)
+
+          old="const nameCell = document.createElement('td');\nnameCell.textContent = name;\ntr.appendChild(nameCell);"
+          assert old in s
+          s=s.replace(old,"const nameCell = document.createElement('td');\nnameCell.textContent = name;\nif (name !== 'Withdraw') tf_applyLatestRiskToElement(nameCell, name, null, true);\ntr.appendChild(nameCell);",1)
+
+          old="    }).join('');\n  }\n  function boot() {"
+          assert old in s
+          s=s.replace(old,"    }).join('');\n    try {\n      const scoreRows = body.querySelectorAll('tr.tf-score-summary-row');\n      analysts.forEach((entry, idx) => {\n        const cell = scoreRows[idx] ? scoreRows[idx].querySelector('.tf-score-analyst') : null;\n        if (cell) tf_applyLatestRiskToElement(cell, entry.name, null, true);\n      });\n    } catch (e) { }\n  }\n  function boot() {",1)
+
+          old="a.setAttribute('rel', 'noopener noreferrer');\nwrap.appendChild(badge);"
+          assert old in s
+          s=s.replace(old,"a.setAttribute('rel', 'noopener noreferrer');\ntf_applyLatestRiskToElement(a, name, null, true);\nwrap.appendChild(badge);",1)
+
+          old="tf_isignalUsers_applyAnalystLink(analystLink, entry.baseName);\ntf_isignalUsers_applySetBadge(setBadge, setSpinner, cfg, platformId, entry.baseName);"
+          assert old in s
+          s=s.replace(old,"tf_isignalUsers_applyAnalystLink(analystLink, entry.baseName);\ntf_applyLatestRiskToElement(analystLink, entry.baseName, entry.pair, false);\ntf_isignalUsers_applySetBadge(setBadge, setSpinner, cfg, platformId, entry.baseName);",1)
+
+          old="function recomputeHistoryRows() {\nconst selectedAnalysts = null;"
+          assert old in s
+          s=s.replace(old,"function recomputeHistoryRows() {\ntry { tf_refreshLatestRiskState(true); } catch (e) { }\nconst selectedAnalysts = null;",1)
+
+          old="historySignals = Array.isArray(data.tfHistorySignals) ? data.tfHistorySignals : [];\n}\ncatch (e) {\nhistorySignals = [];\n}"
+          assert old in s
+          s=s.replace(old,"historySignals = Array.isArray(data.tfHistorySignals) ? data.tfHistorySignals : [];\ntry { tf_refreshLatestRiskState(true); } catch (e) { }\n}\ncatch (e) {\nhistorySignals = [];\ntry { tf_refreshLatestRiskState(true); } catch (x) { }\n}",1)
+
+          old="__tfIsUsersAnalystMetaCache = { ok: true, entries };\ntry {\nwindow.__tfIsUsersAnalystMetaCache = __tfIsUsersAnalystMetaCache;\n}\ncatch (e) { }\nreturn __tfIsUsersAnalystMetaCache;"
+          assert old in s
+          s=s.replace(old,"__tfIsUsersAnalystMetaCache = { ok: true, entries };\ntry {\nwindow.__tfIsUsersAnalystMetaCache = __tfIsUsersAnalystMetaCache;\n}\ncatch (e) { }\ntry { tf_isignalUsers_renderIsignalAnalystTables(null); } catch (e) { }\nreturn __tfIsUsersAnalystMetaCache;",1)
+
+          assert 'tf_applyLatestRiskToElement(nameSpan, it.name, null, true);' in s
+          assert 'monthKey === __riskState.monthKey' in s
+          assert "tf_applyLatestRiskToElement(analystLink, entry.baseName, entry.pair, false);" in s
+          app.write_text(s)
+
+          css=root/'assets/7e95b596e5bf8dff.css'
+          cs=css.read_text()
+          mcs=(mobile/'assets/dashboard-original.css').read_text()
+          ci=mcs.index('/* REV393 — latest-month Drawdown / Consecutive Loss warning states */')
+          warncss=mcs[ci:]
+          if 'REV393 — latest-month Drawdown / Consecutive Loss warning states' not in cs:
+              cs += '\n'+warncss+'\n'
+          css.write_text(cs)
+
+          sidebar=root/'assets/tf-latest-risk-sidebar-rev393.js'
+          sidebar.write_text(r"""(() => {
+          'use strict';
+          // REV393 SIDEBAR: latest-month risk severity, COLOR ONLY, NO ICON.
+          const W='tf-sidebar-risk-warning', C='tf-sidebar-risk-critical';
+          let state={byAnalyst:new Map(),monthKey:''};
+          const normA=v=>String(v||'').trim().toLowerCase();
+          const normP=v=>String(v||'').trim().toUpperCase();
+          function ts(r){
+            if(!r)return null;
+            const n=Number(r.sortKey); if(Number.isFinite(n)&&n>0)return n;
+            const raw=String(r.displayDate||r.closedDate||r.createdDate||'').replace(/\s*WIB\s*$/i,'').trim();
+            let m=/^(\d{2})-(\d{2})-(\d{4})(?:\s+(\d{1,2}):(\d{2}))?/.exec(raw);
+            if(m)return new Date(+m[3],+m[2]-1,+m[1],+(m[4]||0),+(m[5]||0)).getTime();
+            const d=Date.parse(raw); return Number.isFinite(d)?d:null;
+          }
+          function mk(t){const d=new Date(t);return Number.isFinite(d.getTime())?(d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')):'';}
+          function compute(hist){
+            let max=null;(hist||[]).forEach(r=>{if(!r||r.isWithdraw||!r.analyst||!r.pair)return;const t=ts(r);if(t!=null&&(max==null||t>max))max=t;});
+            const latest=max==null?'':mk(max), groups=new Map();
+            (hist||[]).forEach(r=>{if(!r||r.isWithdraw)return;const a=String(r.analyst||'').trim(),p=normP(r.pair),t=ts(r),v=typeof r.pips==='number'?r.pips:parseFloat(r.pips);if(!a||!p||t==null||mk(t)!==latest||!Number.isFinite(v))return;const k=normA(a)+'|'+p;if(!groups.has(k))groups.set(k,{a,p,rows:[]});groups.get(k).rows.push({t,v});});
+            const byA=new Map();
+            groups.forEach(g=>{g.rows.sort((x,y)=>x.t-y.t);let cum=0,peak=0,run=0,maxRun=0;g.rows.forEach(x=>{cum+=x.v;if(cum>peak)peak=cum;if(x.v<0){run++;if(run>maxRun)maxRun=run;}else run=0;});const dd=cum<peak-1e-9,cl=maxRun>=2,sev=dd&&cl?2:(dd||cl?1:0);if(!sev)return;const k=normA(g.a),prev=byA.get(k);if(!prev||sev>prev)byA.set(k,sev);});
+            state={byAnalyst:byA,monthKey:latest};
+          }
+          function cleanUrl(v){return String(v||'').trim();}
+          function resolveName(row,maps){
+            const el=row.querySelector('.analyst-name-btn,.analyst-name,.analyst-label,.analyst-paste-btn');
+            const txt=String(el&&el.textContent||'').trim();
+            const inp=row.querySelector('.analyst-link-input'),url=cleanUrl(inp&&inp.value);
+            if(url){
+              for(const [name,src] of Object.entries(maps.sources||{})){if(cleanUrl(src&&src.url)===url)return {name,el};}
+              if(maps.cache&&maps.cache[url])return {name:String(maps.cache[url]),el};
+              const rem=(maps.remembered||[]).find(x=>cleanUrl(x&&(x.url||x.link))===url);
+              if(rem&&String(rem.name||rem.analystName||'').trim())return {name:String(rem.name||rem.analystName),el};
+            }
+            return {name:txt.replace(/\s+\([^)]*\)\s*$/,'').trim(),el};
+          }
+          function decorate(maps){
+            document.querySelectorAll('.analyst-row').forEach(row=>{const x=resolveName(row,maps);if(!x.el)return;x.el.classList.remove(W,C);const sev=state.byAnalyst.get(normA(x.name))||0;if(sev===2)x.el.classList.add(C);else if(sev===1)x.el.classList.add(W);});
+          }
+          function refresh(){
+            try{chrome.storage.local.get(['tfHistorySignals','tfAnalystSources','tfAnalystNameCacheByUrl','tfRememberedAnalystLinks'],d=>{try{compute(Array.isArray(d.tfHistorySignals)?d.tfHistorySignals:[]);decorate({sources:d.tfAnalystSources||{},cache:d.tfAnalystNameCacheByUrl||{},remembered:Array.isArray(d.tfRememberedAnalystLinks)?d.tfRememberedAnalystLinks:[]});}catch(_){}});}catch(_){}
+          }
+          const style=document.createElement('style');style.textContent='.'+W+'{color:#facc15!important;font-weight:800!important}.'+C+'{color:#ef4444!important;font-weight:800!important}';document.head.appendChild(style);
+          if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});else refresh();
+          try{chrome.storage.onChanged.addListener((ch,area)=>{if(area==='local'&&(ch.tfHistorySignals||ch.tfAnalystSources||ch.tfAnalystNameCacheByUrl||ch.tfRememberedAnalystLinks))refresh();});}catch(_){}
+          try{new MutationObserver(()=>refresh()).observe(document.documentElement,{childList:true,subtree:true});}catch(_){}
+          })();
+          """)
+
+          popup=root/'popup.html'
+          ps=popup.read_text()
+          needle='assets/7b6af0cb4001a684.js,assets/927ecbd63036f61b.js,assets/tf-remote-sidebar-agent.js'
+          repl='assets/7b6af0cb4001a684.js,assets/927ecbd63036f61b.js,assets/tf-latest-risk-sidebar-rev393.js,assets/tf-remote-sidebar-agent.js'
+          assert needle in ps
+          ps=ps.replace(needle,repl,1)
+          popup.write_text(ps)
+
+          mf=root/'manifest.json'
+          manifest=json.loads(mf.read_text())
+          manifest['version']='1.17.6'
+          manifest['version_name']='REV393'
+          manifest['description']='REV393: latest-month Drawdown / Consecutive Loss warnings. One condition = yellow !; both on the same analyst-pair = red ×. Sidebar and Users Management Details use color-only where requested.'
+          mf.write_text(json.dumps(manifest,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV393.md').write_text(
+              '# REV393 — Latest-Month Risk Warnings\n\n'
+              '- One of Drawdown / Consecutive Loss in newest month: yellow + !.\n'
+              '- Both on same Analyst+Pair: red + ×.\n'
+              '- Sidebar and Users Management > Details: color only, no icon.\n'
+              '- Version v1.17.06 / REV393.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S)
+          assert mm,'FILES registry missing'
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['assets/tf-latest-risk-sidebar-rev393.js']=''
+          files['README_REV393.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV393 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('REV393 patched; protected',len(newmap),'files')
+          PY
+          node --check /tmp/tf-rev393/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev393/src/assets/tf-latest-risk-sidebar-rev393.js
+          node --check /tmp/tf-rev393/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev393/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          side=(root/'assets/tf-latest-risk-sidebar-rev393.js').read_text()
+          popup=(root/'popup.html').read_text()
+          assert 'REV393: Latest-month Drawdown / Consecutive Loss warning system' in app
+          assert 'const drawdown = cumulative < (peak - 1e-9);' in app
+          assert 'const consecutiveLoss = maxLossStreak >= 2;' in app
+          assert 'const severity = (drawdown && consecutiveLoss) ? 2' in app
+          assert "icon.textContent = st.severity >= 2 ? '×' : '!';" in app
+          for needle in [
+            'tf_applyLatestRiskToElement(nameSpan, it.name, null, true);',
+            'monthKey === __riskState.monthKey',
+            "tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true);",
+            "tf_applyLatestRiskToElement(analystLink, entry.baseName, entry.pair, false);",
+            "tf_applyLatestRiskToElement(a, name, null, true);",
+          ]: assert needle in app,needle
+          assert '.tf-latest-risk-warning' in css and '.tf-latest-risk-critical' in css
+          assert '#facc15' in css and '#ef4444' in css
+          assert 'REV393 SIDEBAR' in side
+          assert "x.el.classList.add(C)" in side and "x.el.classList.add(W)" in side
+          assert 'tf-latest-risk-sidebar-rev393.js' in popup
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.6' and m['version_name']=='REV393'
+          registry=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',registry,re.S);assert mm
+          hashes=json.loads(mm.group(1));bad=[]
+          assert 'assets/tf-latest-risk-sidebar-rev393.js' in hashes
+          for p,h in hashes.items():
+              fp=root/p
+              actual=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if actual!=h:bad.append((p,actual,h))
+          assert not bad,bad[:10]
+          print('REV393 PC QA PASS',len(hashes),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV393_LATEST_RISK_WARNINGS.zip
+          cd /tmp/tf-rev393/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: \${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.06
+          OUT=/tmp/TF_Extension_PC_MAC_REV393_LATEST_RISK_WARNINGS.zip
+          NOTES=deliverables/RELEASE_NOTES_REV393.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.06 — REV393 Latest Risk Warnings' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.06 — REV393 Latest Risk Warnings' --notes-file "$NOTES" --latest
+          fi
