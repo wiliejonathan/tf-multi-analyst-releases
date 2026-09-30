@@ -1,0 +1,221 @@
+name: Publish PC Mac REV400 analyst name span fix
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV400/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev400
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Download REV399 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev400
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.12 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV399_JSON_IMPORT_FIX.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch dedicated analyst-name color targets
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev400/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          css=root/'assets/7e95b596e5bf8dff.css'
+          s=app.read_text()
+
+          # Inject target helpers before the existing force-color helper.
+          anchor='function tf_forceLatestRiskTextColor(el, st) {'
+          assert anchor in s
+          if 'function tf_createAnalystNameColorTarget' not in s:
+              helper="""function tf_createAnalystNameColorTarget(text) {
+          const span=document.createElement('span');
+          span.className='tf-analyst-name-color-target';
+          span.textContent=String(text || '');
+          return span;
+          }
+          function tf_ensureAnalystNameColorTarget(el) {
+          try {
+          if (!el || !el.querySelector) return null;
+          let target=el.querySelector('.tf-analyst-name-color-target');
+          if (target) return target;
+          const nodes=Array.from(el.childNodes || []);
+          const textNodes=nodes.filter((n)=>n && n.nodeType===3 && String(n.nodeValue || '').trim());
+          if (!textNodes.length) return null;
+          target=tf_createAnalystNameColorTarget(textNodes.map((n)=>String(n.nodeValue || '')).join(''));
+          const first=textNodes[0];
+          el.insertBefore(target, first);
+          textNodes.forEach((n)=>{ try { n.remove(); } catch (e) { if (n.parentNode) n.parentNode.removeChild(n); } });
+          return target;
+          } catch (e) { return null; }
+          }
+          """
+              s=s.replace(anchor,helper+anchor,1)
+
+          old="if (!el || !st) return;\nconst color = st.severity >= 2 ? '#ef4444' : (st.severity === 1 ? '#facc15' : '#22c55e');"
+          assert old in s
+          s=s.replace(old,"if (!el || !st) return;\ntry { tf_ensureAnalystNameColorTarget(el); } catch (e) { }\nconst color = st.severity >= 2 ? '#ef4444' : (st.severity === 1 ? '#facc15' : '#22c55e');",1)
+
+          # Exact renderers: use a dedicated span where available.
+          reps=[
+          ("""const nameCell = document.createElement('td');
+          nameCell.setAttribute('data-analyst', baseName);
+          nameCell.textContent = a.baseName || a.name;
+          nameCell.classList.add('monthly-sticky-col-2','tf-risk-name-left');""",
+           """const nameCell = document.createElement('td');
+          nameCell.setAttribute('data-analyst', baseName);
+          nameCell.classList.add('monthly-sticky-col-2','tf-risk-name-left');
+          nameCell.appendChild(tf_createAnalystNameColorTarget(a.baseName || a.name));"""),
+          ("""const nameCell = document.createElement('td');
+          nameCell.setAttribute('data-analyst', String(a.baseName || a.name || '').trim());
+          nameCell.textContent = formatAnalystDisplayName(a.baseName || a.name);
+          nameCell.removeAttribute('title');
+          nameCell.classList.add('monthly-sticky-col-2');""",
+           """const nameCell = document.createElement('td');
+          nameCell.setAttribute('data-analyst', String(a.baseName || a.name || '').trim());
+          nameCell.removeAttribute('title');
+          nameCell.classList.add('monthly-sticky-col-2');
+          nameCell.appendChild(tf_createAnalystNameColorTarget(formatAnalystDisplayName(a.baseName || a.name)));""")
+          ]
+          for old,new in reps:
+              if old in s: s=s.replace(old,new,1)
+
+          # Table 3 may have one or more renderers. Replace every matching analyst text assignment.
+          old="""const analystCell = tf_markHistoryCell(document.createElement('td'), 'analyst');
+          if (!isWithdrawRow) analystCell.setAttribute('data-analyst', String(row.analyst || '').trim());
+          analystCell.classList.add('tf-risk-name-left');
+          analystCell.textContent = isWithdrawRow ? 'Withdraw' : formatAnalystDisplayName(row.analyst || '');
+          analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();
+          if (!isWithdrawRow) tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true, 'left');"""
+          new="""const analystCell = tf_markHistoryCell(document.createElement('td'), 'analyst');
+          if (!isWithdrawRow) analystCell.setAttribute('data-analyst', String(row.analyst || '').trim());
+          analystCell.classList.add('tf-risk-name-left');
+          analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();
+          if (isWithdrawRow) analystCell.textContent = 'Withdraw';
+          else {
+          analystCell.appendChild(tf_createAnalystNameColorTarget(formatAnalystDisplayName(row.analyst || '')));
+          tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true, 'left');
+          }"""
+          if old in s: s=s.replace(old,new)
+
+          # Table 4 HTML-generated row.
+          old="""const summary = '<tr class="tf-score-summary-row"><td class="tf-score-analyst" data-analyst="' + esc(name) + '">' + esc(name) + '</td><td class="tf-score-average-cell">' + scoreText(latest.averageScore, latest.averageScoreText) + '</td><td><a href="#" class="tf-score-detail-link" data-score-detail="' + enc + '">' + (isOpen ? 'Tutup' : 'Detail') + '</a></td></tr>';"""
+          new="""const summary = '<tr class="tf-score-summary-row"><td class="tf-score-analyst" data-analyst="' + esc(name) + '"><span class="tf-analyst-name-color-target">' + esc(name) + '</span></td><td class="tf-score-average-cell">' + scoreText(latest.averageScore, latest.averageScoreText) + '</td><td><a href="#" class="tf-score-detail-link" data-score-detail="' + enc + '">' + (isOpen ? 'Tutup' : 'Detail') + '</a></td></tr>';"""
+          if old in s: s=s.replace(old,new,1)
+
+          # Prefer data-analyst over visible text during sweep.
+          old="const name=String(analyst || el.getAttribute('data-analyst') || el.title || el.textContent || '').trim();"
+          if old in s:
+              s=s.replace(old,"const name=String(el.getAttribute('data-analyst') || analyst || el.title || (el.querySelector && el.querySelector('.tf-analyst-name-color-target') ? el.querySelector('.tf-analyst-name-color-target').textContent : el.textContent) || '').trim();",1)
+
+          app.write_text(s)
+
+          cs=css.read_text()
+          if 'REV400 — dedicated analyst-name target' not in cs:
+              cs += """
+          /* REV400 — dedicated analyst-name target */
+          .tf-analyst-name-color-target{color:inherit!important;-webkit-text-fill-color:currentColor!important;font:inherit;}
+          .tf-latest-risk-healthy > .tf-analyst-name-color-target,.tf-latest-risk-healthy .tf-analyst-name-color-target{color:#22c55e!important;-webkit-text-fill-color:#22c55e!important;}
+          .tf-latest-risk-warning > .tf-analyst-name-color-target,.tf-latest-risk-warning .tf-analyst-name-color-target{color:#facc15!important;-webkit-text-fill-color:#facc15!important;}
+          .tf-latest-risk-critical > .tf-analyst-name-color-target,.tf-latest-risk-critical .tf-analyst-name-color-target{color:#ef4444!important;-webkit-text-fill-color:#ef4444!important;}
+          """
+          css.write_text(cs)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.13'
+          m['version_name']='REV400'
+          m['description']='REV400: analyst names use dedicated color-target spans so Table 1/2/3/4 cannot revert to white; REV399 JSON import fix retained.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV400.md').write_text(
+              '# REV400 — Analyst Name Span Fix\n\n'
+              '- Dedicated analyst-name span for Table 1/2/3/4.\n'
+              '- Direct green/yellow/red + webkit text-fill lock.\n'
+              '- Dynamic wrapper catches any legacy renderer.\n'
+              '- REV399 JSON Import fix retained.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV400.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0:marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:];cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0:runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV400 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev400/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev400/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev400/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          popup=(root/'assets/927ecbd63036f61b.js').read_text()
+          assert 'function tf_createAnalystNameColorTarget' in app
+          assert 'function tf_ensureAnalystNameColorTarget' in app
+          assert '.tf-analyst-name-color-target' in css
+          assert '-webkit-text-fill-color:#22c55e!important' in css
+          assert '-webkit-text-fill-color:#facc15!important' in css
+          assert '-webkit-text-fill-color:#ef4444!important' in css
+          assert 'function tf_isRecognizedImportStorageV399' in popup
+          assert 'function tf_hasImportContentV399' in popup
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.13' and m['version_name']=='REV400'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text();mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for path,h in d.items():
+              fp=root/path;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((path,a,h))
+          assert not bad,bad[:10]
+          print('REV400 PC analyst-name span QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV400_ANALYST_NAME_SPAN_FIX.zip
+          cd /tmp/tf-rev400/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.13
+          OUT=/tmp/TF_Extension_PC_MAC_REV400_ANALYST_NAME_SPAN_FIX.zip
+          NOTES=deliverables/RELEASE_NOTES_REV400.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.13 — REV400 Analyst Name Span Fix' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.13 — REV400 Analyst Name Span Fix' --notes-file "$NOTES" --latest
+          fi
