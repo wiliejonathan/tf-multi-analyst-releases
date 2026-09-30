@@ -1,0 +1,14 @@
+REV383 publish diagnostic
+Wed Sep 30 06:34:12 UTC 2026
+download_exit=0
+output=/home/runner/work/tf-multi-analyst-releases/tf-multi-analyst-releases/deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip
+integrity_entries=233
+sha256=32a319f2b5e581ffee053dc5fa3288f7de69d02d33875055dfb80dd4fd1cde9a
+builder_exit=0
+No errors detected in compressed data of deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip.
+sha256sum: 'TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip\n': No such file or directory
+\TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip\\n: FAILED open or read
+sha256sum: WARNING: 1 listed file could not be read
+https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.96
+release_exit=0 upload_exit=0
+release_api_exit=0
