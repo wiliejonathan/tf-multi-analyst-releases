@@ -1,0 +1,116 @@
+name: Publish PC Mac REV387 Holding timeframe parity
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV387/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev387
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV386 base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev387
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.16.99 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV386_HOLDING_TABLE3_FINAL_ACCURACY.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+      - name: Patch Max and Avg to same active timeframe
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev387/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+          old="const allRows = Array.isArray(allTickerRows) ? allTickerRows.filter((r) => r && !r.isWithdraw) : [];\nconst avgRows = Array.isArray(filteredRows) ? filteredRows.filter((r) => r && !r.isWithdraw) : [];"
+          new="// REV387: Max and Avg both use the exact active filtered Table 3 trade rows.\nconst allRows = Array.isArray(filteredRows) ? filteredRows.filter((r) => r && !r.isWithdraw) : [];\nconst avgRows = allRows;"
+          assert old in s, 'REV386 Holding dataset block not found'
+          s=s.replace(old,new,1)
+          app.write_text(s)
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.00'
+          m['version_name']='REV387'
+          m['description']='REV387: Max and Avg Holding Period both follow the same active Table 3 timeframe/date/analyst/pair filters. Holding remains Closed At minus Created At. Includes REV384 alignment/performance, import persistence, custom cursor, and no-inner-scroll behavior.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV387.md').write_text('# REV387 — Holding Timeframe Parity\n\n- Holding = Closed At (displayDate) - Created At (createdDate).\n- Max and Avg both use the same active filtered Table 3 dataset.\n- Time Range, Time Range per Month, Filter Tanggal, Nama Analis and Pair affect both.\n- Version 1.17.00 / REV387.\n')
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S)
+          assert mm, 'FILES registry missing'
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['README_REV387.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV387: single authoritative SHA-256 registry generated from exact packaged bytes.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('protected',len(newmap))
+          PY
+          node --check /tmp/tf-rev387/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev387/src/assets/7b6af0cb4001a684.js
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json,hashlib
+          root=Path('/tmp/tf-rev387/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          assert 'REV387: Max and Avg both use the exact active filtered Table 3 trade rows.' in app
+          assert 'const avgRows = allRows;' in app
+          assert 'tf_parseHistoryTableDateMs(row.createdDate)' in app and 'tf_parseHistoryTableDateMs(row.displayDate)' in app
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.00' and m['version_name']=='REV387'
+          s=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',s,re.S); assert mm
+          d=json.loads(mm.group(1)); bad=[]
+          for p,h in d.items():
+              fp=root/p; a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h: bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV387 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV387_HOLDING_TIMEFRAME_PARITY.zip
+          cd /tmp/tf-rev387/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          SHA=$(sha256sum "$OUT" | awk '{print $1}')
+          printf '%s  %s\n' "$SHA" 'TF_Extension_PC_MAC_REV387_HOLDING_TIMEFRAME_PARITY.zip' > "$OUT.sha256"
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.00
+          OUT=/tmp/TF_Extension_PC_MAC_REV387_HOLDING_TIMEFRAME_PARITY.zip
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.00 — REV387' --notes-file deliverables/RELEASE_NOTES_REV387.md
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.00 — REV387' --notes-file deliverables/RELEASE_NOTES_REV387.md --latest
+          fi
