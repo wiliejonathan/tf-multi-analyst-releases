@@ -1,0 +1,43 @@
+name: Diagnose PC REV383 builder
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV383/DIAG'
+permissions:
+  contents: write
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run diagnostic
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set +e
+          mkdir -p audit
+          {
+            echo "REV383 diagnostic"
+            date -u
+            echo "Downloading baseline..."
+            gh release download v1.16.92 --pattern 'TF_Extension_PC_MAC_REV379_DOM_LOGOUT_SIDEBAR_LOGIN_FIX.zip' --output /tmp/base379.zip
+            echo "download_exit=$?"
+            ls -l /tmp/base379.zip 2>&1
+            sha256sum /tmp/base379.zip 2>&1
+            echo "Compiling builder..."
+            python3 -m py_compile build_release_rev383.py
+            echo "compile_exit=$?"
+            echo "Running builder..."
+            python3 build_release_rev383.py /tmp/base379.zip
+            echo "builder_exit=$?"
+            ls -l deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip* 2>&1
+          } > audit/REV383_DIAGNOSTIC.txt 2>&1
+          cat audit/REV383_DIAGNOSTIC.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add audit/REV383_DIAGNOSTIC.txt
+          git commit -m 'Record REV383 builder diagnostic' || true
+          git push origin HEAD:main
+          exit 0
