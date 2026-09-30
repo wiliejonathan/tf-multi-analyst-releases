@@ -24,6 +24,7 @@ css='''
   border:1px solid rgba(239,68,68,.65)!important;
   line-height:1!important;
 }
+:is(#analyst-links-container,#isignal-links-container) .tf-pair-delete408[hidden] {display:none!important;}
 '''
 f=root/'assets/6f5f92e21ebd9721.css';f.write_text(f.read_text()+css)
 f=root/'manifest.json';m=json.loads(f.read_text());m.update(version='1.17.24',version_name='REV411');f.write_text(json.dumps(m,indent=2)+'\n')
