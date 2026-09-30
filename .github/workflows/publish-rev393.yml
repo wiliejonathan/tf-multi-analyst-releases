@@ -76,9 +76,9 @@ jobs:
           assert old in s
           s=s.replace(old,"analystCell.title = isWithdrawRow ? 'Withdraw' : String(row.analyst || '').trim();\nif (!isWithdrawRow) tf_applyLatestRiskToElement(analystCell, row.analyst || '', row.pair || '', true);\ntr.appendChild(analystCell);",1)
 
-          old="subset.forEach(name=>{const tr=document.createElement('tr');const n=document.createElement('td');n.className='tf-holding-analyst';n.textContent=name;const m=document.createElement('td');"
+          old="const tdName = document.createElement('td');\ntdName.className = 'tf-holding-analyst';\ntdName.textContent = name;\nconst tdMax = document.createElement('td');"
           assert old in s
-          s=s.replace(old,"subset.forEach(name=>{const tr=document.createElement('tr');const n=document.createElement('td');n.className='tf-holding-analyst';n.textContent=name;try{const sep=name.lastIndexOf(' - ');if(sep>0)tf_applyLatestRiskToElement(n,name.slice(0,sep),name.slice(sep+3),true);}catch(e){}const m=document.createElement('td');",1)
+          s=s.replace(old,"const tdName = document.createElement('td');\ntdName.className = 'tf-holding-analyst';\ntdName.textContent = name;\ntry { const sep=name.lastIndexOf(' - '); if(sep>0) tf_applyLatestRiskToElement(tdName,name.slice(0,sep),name.slice(sep+3),true); } catch(e) {}\nconst tdMax = document.createElement('td');",1)
 
           old="const nameCell = document.createElement('td');\nnameCell.textContent = name;\ntr.appendChild(nameCell);"
           assert old in s
