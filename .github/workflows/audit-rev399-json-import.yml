@@ -1,0 +1,29 @@
+name: Audit REV398 JSON import
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV399-json-import/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect current plugin JSON import/export
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev398-import-audit
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.11 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          echo '=== IMPORT / EXPORT FILES ==='
+          grep -RIl --exclude='*.map' -E 'Import JSON|Import / Combine|FileReader|JSON\.parse|tfHistorySignals|tf_multi_analyst_export_v1' "$ROOT/src" | sed "s#$ROOT/src/##" | sort
+          echo '=== IMPORT SNIPPETS ==='
+          for f in $(grep -RIl --exclude='*.map' -E 'JSON\.parse|FileReader' "$ROOT/src" | head -n 20); do
+            echo "--- ${f#$ROOT/src/}"
+            grep -n -E 'Import|JSON\.parse|FileReader|readAsText|tfHistorySignals|tf_multi_analyst_export_v1' "$f" | head -n 160 || true
+          done
