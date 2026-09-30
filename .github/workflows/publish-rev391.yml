@@ -36,10 +36,18 @@ jobs:
           root=Path('/tmp/tf-rev391/src')
           app=root/'assets/4b4d6b8dc315a95c.js'
           s=app.read_text()
-          old='tf_renderHoldingPeriodTables(rowsForUi);'
-          new='// REV391: Holding uses exactly the checked/enabled Table 3 rows.\ntf_renderHoldingPeriodTables(Array.isArray(rowsForUi) ? rowsForUi.filter(r => tf_isHistoryRowEnabled(r)) : []);'
-          assert s.count(old)==1, ('Holding render call count',s.count(old))
-          s=s.replace(old,new,1)
+          old="""try {
+          const tf_holdingFilteredRows = tf_filterRowsByUnifiedDate(baseRows);
+          tf_renderHoldingPeriodTables(tf_holdingAllTickerRows, tf_holdingFilteredRows);
+          }
+          catch (e) { }"""
+          assert old in s, 'REV387 early Holding render block not found'
+          s=s.replace(old,'',1)
+
+          calc="const rowsForCalc = Array.isArray(rowsForUi) ? rowsForUi.filter(r => tf_isHistoryRowEnabled(r)) : [];"
+          assert calc in s, 'rowsForCalc anchor not found'
+          replacement=calc+"\n// REV391: render Holding only after Table 3 enabled/checked state is final.\ntry { tf_renderHoldingPeriodTables(rowsForCalc, rowsForCalc); } catch (e) { }"
+          s=s.replace(calc,replacement,1)
           app.write_text(s)
 
           mf=root/'manifest.json'
@@ -89,8 +97,10 @@ jobs:
           import re,json,hashlib
           root=Path('/tmp/tf-rev391/src')
           app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
-          assert 'REV391: Holding uses exactly the checked/enabled Table 3 rows.' in app
+          assert 'REV391: render Holding only after Table 3 enabled/checked state is final.' in app
+          assert 'tf_renderHoldingPeriodTables(rowsForCalc, rowsForCalc);' in app
           assert 'rowsForUi.filter(r => tf_isHistoryRowEnabled(r))' in app
+          assert 'tf_renderHoldingPeriodTables(tf_holdingAllTickerRows, tf_holdingFilteredRows);' not in app
           assert 'tf_parseHistoryTableDateMs(row.createdDate)' in app
           assert 'tf_parseHistoryTableDateMs(row.displayDate)' in app
           m=json.loads((root/'manifest.json').read_text())
