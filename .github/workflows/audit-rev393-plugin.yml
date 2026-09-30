@@ -1,0 +1,36 @@
+name: Audit REV393 plugin warning targets
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV393-warning-targets/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect REV392 package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev393-audit
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.05 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV392_HOLDING_STRICT_TIME_RANGE.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          echo '=== FILES ==='
+          find "$ROOT/src" -maxdepth 3 -type f | sed "s#$ROOT/src/##" | sort
+          echo '=== SIDEBAR FILES ==='
+          grep -RIl --exclude='*.map' -E 'sidebar|Sidebar|analyst-filter|tfAnalystSources|tfHistorySignals' "$ROOT/src" | sed "s#$ROOT/src/##" | sort || true
+          echo '=== DASHBOARD WARNING TARGET MARKERS ==='
+          for q in 'Performance/Probability Analis' 'Holding Period per Analis' 'drawdown-table' 'tf-score-summary-body' 'tf-isignal-analyst' 'tf-users-detail'; do
+            echo "--- $q"
+            grep -RIl --exclude='*.map' -F "$q" "$ROOT/src" | sed "s#$ROOT/src/##" | sort || true
+          done
+          echo '=== SIDEBAR ANALYST SNIPPETS ==='
+          while IFS= read -r file; do
+            echo "--- $file"
+            grep -n -E 'analyst|Analis|tfAnalystSources|tfHistorySignals' "$ROOT/src/$file" | head -n 80 || true
+          done < <(grep -RIl --exclude='*.map' -E 'sidebar|Sidebar' "$ROOT/src" | sed "s#$ROOT/src/##" | sort)
