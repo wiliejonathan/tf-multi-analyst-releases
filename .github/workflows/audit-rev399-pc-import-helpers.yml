@@ -1,0 +1,29 @@
+name: Inspect REV398 PC import helpers
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'audit/REV399-pc-import-helpers/READY'
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect helpers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/rev398-pc-import-helpers
+          rm -rf "$ROOT" && mkdir -p "$ROOT"
+          gh release download v1.17.11 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV398_HARD_INLINE_ANALYST_COLORS.zip' --output "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+          f="$ROOT/src/assets/927ecbd63036f61b.js"
+          echo '=== SAFE PARSE ==='
+          grep -n -A45 -B15 'function tf_safeJsonParse' "$f" || true
+          echo '=== COMBINE ==='
+          grep -n -A170 -B20 'function tf_combineImportPayloads' "$f" || true
+          echo '=== IMPORT TAIL ==='
+          sed -n '5170,5365p' "$f"
