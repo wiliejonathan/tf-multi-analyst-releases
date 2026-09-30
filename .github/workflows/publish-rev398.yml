@@ -91,18 +91,22 @@ jobs:
           s=s.replace("const el=row && row.children ? row.children[0] : null;",
                       "const el=row && row.children ? (row.children[1] || row.children[0]) : null;")
 
-          # Add exact pass before sweep ends.
-          end='scope.querySelectorAll(\'.analyst-filter-name\').forEach(el=>apply(el,el.title||el.textContent,null));\n          } catch(e){}'
-          exact="""scope.querySelectorAll('.analyst-filter-name').forEach(el=>apply(el,el.title||el.textContent,null));
-          // REV398 exact pass for Table 1/2/3/4 analyst cells.
+          # Add exact pass at the end of the sweep function, regardless of minified formatting.
+          exact="""\n// REV398 exact pass for Table 1/2/3/4 analyst cells.
           scope.querySelectorAll('#summary-table tbody tr').forEach(r=>{const el=r?r.querySelector('td.monthly-sticky-col-2'):null;const p=r&&r.children[1]?String(r.children[1].textContent||'').trim():null;if(el)apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,p);});
           scope.querySelectorAll('#monthly-table tbody tr').forEach(r=>{const el=r?r.querySelector('td.monthly-sticky-col-2'):null;const p=r&&r.children[2]?String(r.children[2].textContent||'').trim():null;if(el)apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,p);});
           scope.querySelectorAll('#history-table tbody tr').forEach(r=>{const el=r?r.querySelector('td[data-history-col="analyst"]'):null;const pe=r?r.querySelector('td[data-history-col="pair"]'):null;if(el)apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,pe?pe.textContent:null);});
           scope.querySelectorAll('#tf-score-summary-body .tf-score-analyst,.tf-score-summary-table .tf-score-analyst').forEach(el=>apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,null));
-          } catch(e){}"""
+          """
           if 'REV398 exact pass for Table 1/2/3/4' not in s:
-              assert end in s,'sweep end anchor missing'
-              s=s.replace(end,exact,1)
+              fs=s.find('function tf_colorEveryRenderedAnalystName')
+              fe=s.find('function tf_applyLatestRiskPairIconOnly',fs)
+              assert fs>=0 and fe>fs,'sweep function bounds missing'
+              segment=s[fs:fe]
+              pos=max(segment.rfind('} catch(e){}'),segment.rfind('} catch (e) { }'))
+              assert pos>=0,'sweep catch anchor missing'
+              segment=segment[:pos]+exact+segment[pos:]
+              s=s[:fs]+segment+s[fe:]
 
           # Deterministic analyst identity attributes.
           old="""const nameCell = document.createElement('td');
