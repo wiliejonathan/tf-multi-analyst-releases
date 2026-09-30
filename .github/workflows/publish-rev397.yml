@@ -1,0 +1,228 @@
+name: Publish PC Mac REV397 all analyst colors
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV397/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev397
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV396 plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev397
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.09 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV396_ANALYST_COLORS_TABLE3_PNL.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+
+      - name: Patch REV397 no-white analyst colors
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev397/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          old="""function tf_latestRiskNormAnalyst(v) {
+          return String(v || '').trim().toLowerCase();
+          }"""
+          new="""function tf_latestRiskNormAnalyst(v) {
+          let raw=String(v || '');
+          try { raw=raw.normalize('NFKC'); } catch (e) { }
+          raw=raw
+          .replace(/[\\u200B-\\u200D\\u2060\\uFEFF]/g,'')
+          .replace(/^\\s*[✓!×]\\s*/,'')
+          .replace(/\\s*·\\s*(?:CRITICAL|WARNING|HEALTHY)\\b.*$/i,'')
+          .replace(/\\s+/g,' ')
+          .trim();
+          raw=raw.replace(/\\s*\\((?:[A-Z]{6}|XAUUSD|XAGUSD|US30|NAS100|BTCUSD|ETHUSD)\\)\\s*$/i,'');
+          raw=raw.replace(/\\s+-\\s+(?:[A-Z]{6}|XAUUSD|XAGUSD|US30|NAS100|BTCUSD|ETHUSD)\\s*$/i,'');
+          return raw.toLowerCase();
+          }"""
+          assert old in s,'analyst normalizer missing'
+          s=s.replace(old,new,1)
+
+          # Register every runtime-known analyst as healthy if it has no risk state.
+          marker="__tfLatestRiskState = { monthKey:latestMonth, byPair, byAnalyst, signature };"
+          assert marker in s
+          add="""try {
+          const reg=(value)=>{
+          const analyst=String(value||'').trim(),key=tf_latestRiskNormAnalyst(analyst);
+          if(analyst&&key&&!byAnalyst.has(key))byAnalyst.set(key,{analyst,monthKey:latestMonth,drawdown:false,consecutiveLoss:false,severity:0,sourcePair:''});
+          };
+          (Array.isArray(ANALYSTS)?ANALYSTS:[]).forEach(a=>reg(a&&(a.baseName||a.name)));
+          Object.keys((analystSourcesByName&&typeof analystSourcesByName==='object')?analystSourcesByName:{}).forEach(reg);
+          Object.keys((selectedAnalystsGlobal&&typeof selectedAnalystsGlobal==='object')?selectedAnalystsGlobal:{}).forEach(reg);
+          } catch(e) {}
+          """+marker
+          s=s.replace(marker,add,1)
+
+          # No null/white state for any displayed non-empty analyst.
+          a=s.index('function tf_getLatestRiskState(analyst, pair) {')
+          b=s.index('\nfunction tf_latestRiskReason',a)
+          assert a>=0 and b>a
+          getter="""function tf_getLatestRiskState(analyst, pair) {
+          const st = tf_refreshLatestRiskState(false);
+          const key = tf_latestRiskNormAnalyst(analyst);
+          if (!key) return null;
+          if (pair) {
+          const exact=st.byPair.get(key + '|' + tf_latestRiskNormPair(pair));
+          if (exact) return exact;
+          }
+          const agg=st.byAnalyst.get(key);
+          if (agg) return agg;
+          return {analyst:String(analyst||'').trim(),pair:pair?tf_latestRiskNormPair(pair):'',monthKey:st.monthKey||'',drawdown:false,consecutiveLoss:false,maxLossStreak:0,endingPips:0,peakPips:0,severity:0,syntheticHealthy:true};
+          }"""
+          s=s[:a]+getter+s[b:]
+
+          # Add color-only sweeper before PairIconOnly.
+          anchor='function tf_applyLatestRiskPairIconOnly(el, analyst, pair, iconPosition) {'
+          assert anchor in s
+          helper="""function tf_applyLatestRiskColorOnly(el, analyst, pair) {
+          try {
+          if(!el)return null;
+          const st=tf_getLatestRiskState(analyst,pair);
+          el.classList.remove('tf-latest-risk-healthy','tf-latest-risk-warning','tf-latest-risk-critical');
+          if(!st)return null;
+          el.classList.add(st.severity>=2?'tf-latest-risk-critical':(st.severity===1?'tf-latest-risk-warning':'tf-latest-risk-healthy'));
+          return st;
+          } catch(e){return null;}
+          }
+          function tf_colorEveryRenderedAnalystName(root) {
+          try {
+          const scope=root&&root.querySelectorAll?root:document;
+          const apply=(el,name,pair)=>{if(!el)return;const n=String(name||el.getAttribute('data-analyst')||el.title||el.textContent||'').trim();if(!n||/^withdraw$/i.test(n))return;tf_applyLatestRiskColorOnly(el,n,pair||null);};
+          scope.querySelectorAll('.tf-perf-name-text').forEach(el=>apply(el,el.title||el.textContent,null));
+          scope.querySelectorAll('.tf-holding-analyst').forEach(el=>{const raw=String(el.textContent||'').replace(/^[✓!×]\\s*/,'').trim();const m=raw.match(/^(.*?)\\s+-\\s+([A-Z0-9]{3,10})$/i);apply(el,m?m[1]:raw,m?m[2]:null);});
+          scope.querySelectorAll('#summary-table tbody td.monthly-sticky-col-2').forEach(el=>{const r=el.parentElement;apply(el,el.textContent,r&&r.children[1]?r.children[1].textContent:null);});
+          scope.querySelectorAll('#monthly-table tbody td.monthly-sticky-col-2').forEach(el=>{const r=el.parentElement;apply(el,el.textContent,r&&r.children[2]?r.children[2].textContent:null);});
+          scope.querySelectorAll('#history-table tbody td[data-history-col="analyst"]').forEach(el=>{const r=el.parentElement,p=r?r.querySelector('td[data-history-col="pair"]'):null;apply(el,el.title||el.textContent,p?p.textContent:null);});
+          scope.querySelectorAll('#drawdown-table tbody tr').forEach(r=>{const el=r&&r.children?r.children[0]:null;if(el)apply(el,el.textContent,null);});
+          scope.querySelectorAll('.tf-score-analyst').forEach(el=>apply(el,el.textContent,null));
+          scope.querySelectorAll('.tf-isignal-analyst-name,.tf-users-analyst-link').forEach(el=>apply(el,el.getAttribute('data-analyst')||el.title||el.textContent,null));
+          scope.querySelectorAll('.analyst-filter-name').forEach(el=>apply(el,el.title||el.textContent,null));
+          } catch(e){}
+          }
+          """+anchor
+          s=s.replace(anchor,helper,1)
+
+          # Global asynchronous render safety net.
+          end='// ===== END REV393 latest-month risk warning system ====='
+          assert end in s
+          observer="""// REV397_ANALYST_COLOR_OBSERVER
+          try {
+          let __tfAnalystColorTimer=null;
+          const refresh=()=>{try{clearTimeout(__tfAnalystColorTimer);}catch(e){}__tfAnalystColorTimer=setTimeout(()=>{try{tf_colorEveryRenderedAnalystName(document);}catch(e){}},40);};
+          if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});else refresh();
+          new MutationObserver(refresh).observe(document.documentElement,{childList:true,subtree:true});
+          } catch(e){}
+          """
+          s=s.replace(end,observer+'\n'+end,1)
+          app.write_text(s)
+
+          css=root/'assets/7e95b596e5bf8dff.css'
+          cs=css.read_text()
+          if 'REV397 — nested analyst name color inheritance' not in cs:
+              cs += """
+          /* REV397 — nested analyst name color inheritance */
+          .tf-latest-risk-healthy :not(.tf-latest-risk-icon){color:#22c55e!important;}
+          .tf-latest-risk-warning :not(.tf-latest-risk-icon){color:#facc15!important;}
+          .tf-latest-risk-critical :not(.tf-latest-risk-icon){color:#ef4444!important;}
+          """
+          css.write_text(cs)
+
+          # Sidebar: every analyst row gets green if no warning/critical state exists.
+          side=root/'assets/tf-latest-risk-sidebar-rev393.js'
+          if side.exists():
+              ss=side.read_text()
+              ss=ss.replace("if(!state.byAnalyst.has(k))return;const sev=state.byAnalyst.get(k)||0;","const sev=state.byAnalyst.has(k)?(state.byAnalyst.get(k)||0):0;")
+              side.write_text(ss)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.10';m['version_name']='REV397'
+          m['description']='REV397: every analyst name is always green/yellow/red; canonical analyst matching and post-render sweep remove all white fallbacks.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV397.md').write_text('# REV397\nEvery analyst name is forced to green/yellow/red; no white fallback.\n')
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text();mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S);assert mm
+          files=json.loads(mm.group(1));files.pop('assets/7b6af0cb4001a684.js',None);files['README_REV397.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0:marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:];cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0:runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path;assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV397 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          PY
+          node --check /tmp/tf-rev397/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev397/src/assets/tf-latest-risk-sidebar-rev393.js
+          node --check /tmp/tf-rev397/src/assets/7b6af0cb4001a684.js
+
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev397/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          css=(root/'assets/7e95b596e5bf8dff.css').read_text()
+          side=(root/'assets/tf-latest-risk-sidebar-rev393.js').read_text()
+          assert 'syntheticHealthy:true' in app
+          assert 'function tf_applyLatestRiskColorOnly' in app
+          assert 'function tf_colorEveryRenderedAnalystName' in app
+          assert 'REV397_ANALYST_COLOR_OBSERVER' in app
+          assert "replace(/^\\s*[✓!×]\\s*/,'')" in app
+          assert 'REV397 — nested analyst name color inheritance' in css
+          assert 'tf-sidebar-risk-healthy' in side
+          m=json.loads((root/'manifest.json').read_text());assert m['version']=='1.17.10' and m['version_name']=='REV397'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text();mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for p,h in d.items():
+              fp=root/p;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV397 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV397_ALL_ANALYST_COLORS.zip
+          cd /tmp/tf-rev397/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.10
+          OUT=/tmp/TF_Extension_PC_MAC_REV397_ALL_ANALYST_COLORS.zip
+          NOTES=deliverables/RELEASE_NOTES_REV397.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.10 — REV397 All Analyst Colors' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.10 — REV397 All Analyst Colors' --notes-file "$NOTES" --latest
+          fi
