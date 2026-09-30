@@ -1,0 +1,44 @@
+name: Publish PC Mac REV405 latest-month risk
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV405/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev405/src
+          gh release download v1.17.17 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV404_ACTIVATION_RECOVERY.zip' --output /tmp/tf-rev405/base.zip
+          unzip -q /tmp/tf-rev405/base.zip -d /tmp/tf-rev405/src
+          python3 tools/patch_rev405.py /tmp/tf-rev405/src
+          TF_PC_GATE=/tmp/tf-rev405/src/assets/tf-device-lock.js node --test tests/activation404.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev405/src/assets/4b4d6b8dc315a95c.js node --test tests/risk405.cjs
+          find /tmp/tf-rev405/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          python3 - <<'CHECK'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev405/src')
+          registry=json.loads(re.search(r'const FILES\s*=\s*(\{.*?\});',(root/'assets/7b6af0cb4001a684.js').read_text(),re.S).group(1))
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in registry.items())
+          assert json.loads((root/'manifest.json').read_text())['version']=='1.17.18'
+          print('Hashes PASS',len(registry))
+          CHECK
+          (cd /tmp/tf-rev405/src && zip -qr /tmp/TF_Extension_PC_MAC_REV405_LATEST_MONTH_RISK.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV405_LATEST_MONTH_RISK.zip
+          sha256sum /tmp/TF_Extension_PC_MAC_REV405_LATEST_MONTH_RISK.zip > /tmp/TF_Extension_PC_MAC_REV405_LATEST_MONTH_RISK.zip.sha256
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v1.17.18 /tmp/TF_Extension_PC_MAC_REV405_LATEST_MONTH_RISK.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.18 — REV405 Latest Month Risk' --notes-file deliverables/RELEASE_NOTES_REV405.md --latest
