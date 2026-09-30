@@ -438,10 +438,10 @@ loader=loader.replace(marker,block+marker,1)
 data[LOADER]=loader.encode()
 
 # Verify effective integrity map after final overrides.
-m=re.search(r'const FILES = (\\{.*?\\});',loader,re.S)
+m=re.search(r'const FILES = (\{.*?\});',loader,re.S)
 assert m,'integrity map missing'
 files=json.loads(m.group(1))
-for path,digest in re.findall(r"FILES\\[[\"']([^\"']+)[\"']\\]\\s*=\\s*[\"']([0-9a-f]{64})[\"']\\s*;",loader):
+for path,digest in re.findall(r"FILES\[[\"']([^\"']+)[\"']\]\s*=\s*[\"']([0-9a-f]{64})[\"']\s*;",loader):
     files[path]=digest
 bad=[]
 for path,expected in files.items():
