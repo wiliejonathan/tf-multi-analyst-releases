@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 384,
-  "tag_name": "v1.16.97",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.16.97",
-  "published_at": "2026-09-30T07:10:43Z",
+  "revision": 402,
+  "tag_name": "v1.17.15",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.15",
+  "published_at": "2026-09-30T13:39:22Z",
   "asset": {
-    "id": 600274204,
-    "name": "TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.16.97/TF_Extension_PC_MAC_REV384_HOLDING_ALIGNMENT_FIX.zip",
-    "size": 837571,
-    "digest": "sha256:2c4e9fde6136b2bdadcb9e5cb8ff369c7f5532311b5e536facc7fc35e5ee515a",
-    "updated_at": "2026-09-30T07:10:41Z"
+    "id": 601013420,
+    "name": "TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.15/TF_Extension_PC_MAC_REV402_FAST_JSON_IMPORT.zip",
+    "size": 842093,
+    "digest": "sha256:472b6d3611e68fd9e9385d566aed57f949ece6c841162bcc0a7cf3be43a544c3",
+    "updated_at": "2026-09-30T13:39:21Z"
   }
 }
