@@ -1,0 +1,234 @@
+name: Publish PC Mac REV392 strict Holding timeframe
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'release-staging/REV392/READY'
+permissions:
+  contents: write
+concurrency:
+  group: publish-pc-rev392
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download REV391 base
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/tf-rev392
+          rm -rf "$ROOT" && mkdir -p "$ROOT/src"
+          gh release download v1.17.04 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV391_HOLDING_CHECKBOX_PARITY.zip' --output "$ROOT/base.zip"
+          unzip -tq "$ROOT/base.zip"
+          unzip -q "$ROOT/base.zip" -d "$ROOT/src"
+      - name: Patch strict Holding time range
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev392/src')
+          app=root/'assets/4b4d6b8dc315a95c.js'
+          s=app.read_text()
+
+          anchor="let tfTradeTimeRangeKey = 'all';"
+          assert anchor in s, 'trade range state anchor missing'
+          if 'let tfTradeRangeStartMonthIdx = null;' not in s:
+              s=s.replace(anchor,anchor+"\n// REV392: exact calendar boundary used by Table 3 auto-checkbox + Holding Period.\nlet tfTradeRangeStartMonthIdx = null;",1)
+
+          a=s.index('function tf_filterRowsByTradeTimeRange(rows, maxMonthIdx) {')
+          b=s.index('\nfunction setupTradeTimeRangeButtons()',a)
+          new_filter="""function tf_filterRowsByTradeTimeRange(rows, maxMonthIdx) {
+          // REV392: preserve exact start month for Table 3 + Holding.
+          tfTradeRangeStartMonthIdx = null;
+          if (tfTradeSingleMonthKey) {
+          tfTradeRangeStartMonthIdx = tf_monthKeyToIndex(tfTradeSingleMonthKey);
+          return (rows || []).filter((r) => {
+          const mk = tf_monthKeyFromSortKey(tf_getPrimarySortKey(r));
+          return mk === tfTradeSingleMonthKey;
+          });
+          }
+          const opt = tf_getRangeOptByKey(tfTradeTimeRangeKey);
+          const monthsBack = opt.monthsBack || 0;
+          if (!monthsBack || monthsBack <= 0)
+          return rows;
+          const endIdx = Number.isFinite(maxMonthIdx) ? maxMonthIdx : null;
+          if (endIdx == null)
+          return rows;
+          const startIdx = endIdx - (monthsBack - 1);
+          tfTradeRangeStartMonthIdx = startIdx;
+          return (rows || []).filter((r) => {
+          const mi = tf_sortKeyToMonthIndex(tf_getPrimarySortKey(r));
+          if (mi == null)
+          return false;
+          return mi >= startIdx;
+          });
+          }"""
+          s=s[:a]+new_filter+s[b:]
+
+          a=s.index('function tf_initAutoUntickStartOfMonthRule(rowsSortedByClosed) {')
+          b=s.index('\nfunction tf_recomputeBalancesSkippingDisabled',a)
+          new_auto="""function tf_initAutoUntickStartOfMonthRule(rowsSortedByClosed) {
+          try {
+          if (!Array.isArray(rowsSortedByClosed) || rowsSortedByClosed.length === 0)
+          return;
+          try {
+          for (let i = 0; i < rowsSortedByClosed.length; i++) {
+          const r0 = rowsSortedByClosed[i];
+          if (!r0) continue;
+          const id0 = tf_historyRowId(r0);
+          if (!id0) continue;
+          if (tf_historyRowManualOverrideSet && tf_historyRowManualOverrideSet.has(id0)) continue;
+          if (tf_historyRowEnabledMap.has(id0)) tf_historyRowEnabledMap.delete(id0);
+          r0.__tfAutoUnticked = false;
+          }
+          } catch (e) { }
+          const timeRangeActive = (String(tfTradeTimeRangeKey || 'all') !== 'all') || !!tfTradeSingleMonthKey;
+          let isCustomDateFilter = false;
+          try {
+          if (equityFilterStart !== null && equityFilterEnd !== null) {
+          if (equityFilterMin !== null && equityFilterMax !== null) {
+          const s = tf_dayKey(equityFilterStart), e = tf_dayKey(equityFilterEnd);
+          const mn = tf_dayKey(equityFilterMin), mx = tf_dayKey(equityFilterMax);
+          if (s !== null && e !== null && mn !== null && mx !== null) isCustomDateFilter = (s !== mn) || (e !== mx);
+          else isCustomDateFilter = true;
+          } else isCustomDateFilter = true;
+          }
+          } catch (e) { }
+          let thresholdDay = null;
+          if (isCustomDateFilter) {
+          try {
+          const x = tf_dayKey(equityFilterStart), y = tf_dayKey(equityFilterEnd);
+          if (x !== null && y !== null) thresholdDay = Math.min(x,y);
+          } catch (e) { }
+          }
+          if (thresholdDay === null && timeRangeActive && Number.isFinite(tfTradeRangeStartMonthIdx)) {
+          const yy = Math.floor(tfTradeRangeStartMonthIdx / 12);
+          const mm = tfTradeRangeStartMonthIdx - (yy * 12);
+          thresholdDay = new Date(yy, mm, 1, 0, 0, 0, 0).getTime();
+          }
+          if (thresholdDay === null && timeRangeActive) {
+          let firstClosedKey = null;
+          for (let i = 0; i < rowsSortedByClosed.length; i++) {
+          const r = rowsSortedByClosed[i];
+          if (!r || r.isWithdraw) continue;
+          const ck = tf_closedKeyOf(r);
+          if (!Number.isFinite(ck) || ck <= 0) continue;
+          if (firstClosedKey === null || ck < firstClosedKey) firstClosedKey = ck;
+          }
+          if (firstClosedKey !== null) thresholdDay = tf_dayKey(firstClosedKey);
+          }
+          if (thresholdDay === null) return;
+          // REV392 HARD RANGE BOUNDARY: Created At must be inside the active range.
+          // Apply to every closed month; stale/manual carry-over overrides are removed.
+          for (let i = 0; i < rowsSortedByClosed.length; i++) {
+          const r = rowsSortedByClosed[i];
+          if (!r || r.isWithdraw) continue;
+          const createdDay = tf_dayKey(tf_createdKeyOf(r));
+          if (createdDay === null) continue;
+          if (createdDay < thresholdDay) {
+          const id = tf_historyRowId(r);
+          if (!id) continue;
+          try { if (tf_historyRowManualOverrideSet) tf_historyRowManualOverrideSet.delete(id); } catch (e) { }
+          tf_historyRowEnabledMap.set(id, false);
+          r.__tfAutoUnticked = true;
+          }
+          }
+          } catch (e) { }
+          }"""
+          s=s[:a]+new_auto+s[b:]
+
+          assert 'tf_renderHoldingPeriodTables(rowsForCalc, rowsForCalc);' in s, 'REV391 checked-row Holding call missing'
+          assert 'REV392 HARD RANGE BOUNDARY' in s
+          assert 'tfTradeRangeStartMonthIdx = startIdx;' in s
+          assert 'if (mk !== firstMonthKey)' not in s
+          app.write_text(s)
+
+          mf=root/'manifest.json'
+          m=json.loads(mf.read_text())
+          m['version']='1.17.5'
+          m['version_name']='REV392'
+          m['description']='REV392: Holding Period uses checked Table 3 rows plus strict Created At time-range boundary. Carry-over trades before 1M/2M/etc are forced unchecked. Android/mobile activation parity is released separately.'
+          mf.write_text(json.dumps(m,indent=2,ensure_ascii=False)+'\n')
+          (root/'README_REV392.md').write_text(
+              '# REV392 — Holding Strict Time Range\n\n'
+              '- Max/Avg Holding uses checked/enabled Table 3 rows only.\n'
+              '- Created At must be inside the selected Time Range boundary.\n'
+              '- Carry-over trades before the range are forced unchecked across all months.\n'
+              '- Version v1.17.05 / REV392.\n'
+          )
+
+          loader=root/'assets/7b6af0cb4001a684.js'
+          ls=loader.read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',ls,re.S)
+          assert mm,'FILES registry missing'
+          files=json.loads(mm.group(1))
+          files.pop('assets/7b6af0cb4001a684.js',None)
+          files['README_REV392.md']=''
+          marker=ls.find('// The integrity loader is intentionally not self-hashed',mm.end())
+          if marker<0: marker=ls.find('async function',mm.end())
+          assert marker>=0
+          runtime=ls[marker:]
+          cut=runtime.find('// REV284 integrity overrides')
+          if cut>=0:
+              ready=runtime.find('window.tfIntegrityReady',cut)
+              if ready>=0: runtime=runtime[:cut].rstrip()+'\n'+runtime[ready:]
+          newmap={}
+          for path in sorted(files):
+              fp=root/path
+              assert fp.is_file(),path
+              newmap[path]=hashlib.sha256(fp.read_bytes()).hexdigest()
+          loader.write_text("(() => {\n'use strict';\n// REV392 authoritative SHA-256 registry.\nconst FILES = "+json.dumps(newmap,separators=(',',':'),ensure_ascii=False)+';\n'+runtime)
+          print('protected',len(newmap))
+          PY
+          node --check /tmp/tf-rev392/src/assets/4b4d6b8dc315a95c.js
+          node --check /tmp/tf-rev392/src/assets/7b6af0cb4001a684.js
+      - name: Validate and build
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re,json,hashlib
+          root=Path('/tmp/tf-rev392/src')
+          app=(root/'assets/4b4d6b8dc315a95c.js').read_text()
+          assert 'REV392 HARD RANGE BOUNDARY' in app
+          assert 'tfTradeRangeStartMonthIdx = startIdx;' in app
+          assert 'tf_renderHoldingPeriodTables(rowsForCalc, rowsForCalc);' in app
+          assert 'rowsForUi.filter(r => tf_isHistoryRowEnabled(r))' in app
+          assert 'if (mk !== firstMonthKey)' not in app
+          m=json.loads((root/'manifest.json').read_text())
+          assert m['version']=='1.17.5' and m['version_name']=='REV392'
+          reg=(root/'assets/7b6af0cb4001a684.js').read_text()
+          mm=re.search(r'const FILES\s*=\s*(\{.*?\});',reg,re.S);assert mm
+          d=json.loads(mm.group(1));bad=[]
+          for p,h in d.items():
+              fp=root/p;a=hashlib.sha256(fp.read_bytes()).hexdigest() if fp.exists() else None
+              if a!=h:bad.append((p,a,h))
+          assert not bad,bad[:10]
+          print('REV392 PC QA PASS',len(d),'protected, 0 mismatch')
+          PY
+          OUT=/tmp/TF_Extension_PC_MAC_REV392_HOLDING_STRICT_TIME_RANGE.zip
+          cd /tmp/tf-rev392/src
+          zip -qr "$OUT" .
+          unzip -tq "$OUT"
+          sha256sum "$OUT" > "$OUT.sha256"
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG=v1.17.05
+          OUT=/tmp/TF_Extension_PC_MAC_REV392_HOLDING_STRICT_TIME_RANGE.zip
+          NOTES=deliverables/RELEASE_NOTES_REV392.md
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.05 — REV392' --notes-file "$NOTES" --latest
+            gh release upload "$TAG" "$OUT" "$OUT.sha256" --clobber
+          else
+            gh release create "$TAG" "$OUT" "$OUT.sha256" --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.05 — REV392' --notes-file "$NOTES" --latest
+          fi
