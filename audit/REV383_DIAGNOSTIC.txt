@@ -1,19 +1,16 @@
 REV383 diagnostic
-Wed Sep 30 06:27:17 UTC 2026
+Wed Sep 30 06:28:52 UTC 2026
 Downloading baseline...
 download_exit=0
--rw-r--r-- 1 runner runner 811704 Sep 30 06:27 /tmp/base379.zip
+-rw-r--r-- 1 runner runner 811704 Sep 30 06:28 /tmp/base379.zip
 531d5cbe418af77d4e32d987161b4bbf6166ed3390691954a9b8260d55686ac8  /tmp/base379.zip
 Compiling builder...
-  File "build_release_rev383.py", line 444
-    for path,digest in re.findall(r'FILES\\[[\"\\']([^\"\\']+)[\"\\']\\]\\s*=\\s*[\"\\']([0-9a-f]{64})[\"\\']\\s*;',loader):
-                                                  ^
-SyntaxError: closing parenthesis ']' does not match opening parenthesis '('
-compile_exit=1
+compile_exit=0
 Running builder...
-  File "/home/runner/work/tf-multi-analyst-releases/tf-multi-analyst-releases/build_release_rev383.py", line 444
-    for path,digest in re.findall(r'FILES\\[[\"\\']([^\"\\']+)[\"\\']\\]\\s*=\\s*[\"\\']([0-9a-f]{64})[\"\\']\\s*;',loader):
-                                                  ^
-SyntaxError: closing parenthesis ']' does not match opening parenthesis '('
+Traceback (most recent call last):
+  File "/home/runner/work/tf-multi-analyst-releases/tf-multi-analyst-releases/build_release_rev383.py", line 442, in <module>
+    assert m,'integrity map missing'
+           ^
+AssertionError: integrity map missing
 builder_exit=1
 ls: cannot access 'deliverables/TF_Extension_PC_MAC_REV383_HOLDING_NO_SCROLL_HISTORY_PERF_FIX.zip*': No such file or directory
