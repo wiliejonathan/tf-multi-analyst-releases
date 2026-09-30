@@ -254,13 +254,11 @@ toSet[TF_REMEMBER_LINKS_ENABLED_KEY] = true;
 catch (e) { }
 '''
 if 'const existingImportedLinks = Array.isArray' not in sidebar:
-    anchor='''try {
-toSet.tfLastScanMeta = null;
+    anchor='''toSet.tfLastScanMeta = null;
 }
 catch (e) { }
 toSet[TF_HAS_IMPORTED_BUNDLE_KEY] = true;'''
-    repl='''try {
-toSet.tfLastScanMeta = null;
+    repl='''toSet.tfLastScanMeta = null;
 }
 catch (e) { }
 '''+persist+'''toSet[TF_HAS_IMPORTED_BUNDLE_KEY] = true;'''
