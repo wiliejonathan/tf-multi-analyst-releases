@@ -19,7 +19,7 @@ jobs:
           node-version: '22'
       - name: Download REV392 plugin and REV393 mobile reference
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           ROOT=/tmp/tf-rev393
@@ -272,7 +272,7 @@ jobs:
 
       - name: Publish
         env:
-          GH_TOKEN: \${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           TAG=v1.17.06
