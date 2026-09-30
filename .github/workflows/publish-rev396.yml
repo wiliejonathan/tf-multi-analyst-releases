@@ -137,20 +137,8 @@ jobs:
           }"""
           s=s[:a]+new+s[b:]
 
-          # Table 3 row text follows PNL%, analyst cell keeps analyst status.
-          a=s.find('function tfMobileCreateHistoryRow(')
-          b=s.find('\nfunction tf_parseHistoryTableDateMs',a)
-          assert a>=0 and b>a, 'Table3 function bounds missing'
-          seg=s[a:b]
-          pos=seg.rfind('return tr;')
-          assert pos>=0, 'Table3 return missing'
-          insert="""if (!isWithdrawRow) {
-          const __pnlPctForRow = Number.isFinite(Number(row.pnlPercent)) ? Number(row.pnlPercent) : Number(row.pnlDollar || 0);
-          tr.classList.add(__pnlPctForRow >= 0 ? 'tf-history-row-pnl-positive' : 'tf-history-row-pnl-negative');
-          }
-          """
-          seg=seg[:pos]+insert+seg[pos:]
-          s=s[:a]+seg+s[b:]
+          # Table 3 desktop uses a different renderer. Row coloring is applied
+          # by CSS :has() against the existing PNL % tp/sl cell below.
           app.write_text(s)
 
           css=root/'assets/7e95b596e5bf8dff.css'
@@ -166,11 +154,11 @@ jobs:
             font-weight:800 !important;
           }
           """+anchor,1)
-          if 'tf-history-row-pnl-positive' not in cs:
+          if 'REV396 desktop Table 3 row text follows PNL%' not in cs:
               cs += """
-          /* REV396 Table 3 row text follows PNL%; analyst cell follows risk state. */
-          #history-table tbody tr.tf-history-row-pnl-positive > td:not([data-history-col="analyst"]){color:var(--success)!important;}
-          #history-table tbody tr.tf-history-row-pnl-negative > td:not([data-history-col="analyst"]){color:var(--danger)!important;}
+          /* REV396 desktop Table 3 row text follows PNL%; analyst cell follows risk state. */
+          #history-table tbody tr:has(td[data-history-col="pnlPercent"].tp) > td:not([data-history-col="analyst"]){color:var(--success)!important;}
+          #history-table tbody tr:has(td[data-history-col="pnlPercent"].sl) > td:not([data-history-col="analyst"]){color:var(--danger)!important;}
           #history-table tbody td[data-history-col="analyst"].tf-latest-risk-healthy{color:#22c55e!important;}
           #history-table tbody td[data-history-col="analyst"].tf-latest-risk-warning{color:#facc15!important;}
           #history-table tbody td[data-history-col="analyst"].tf-latest-risk-critical{color:#ef4444!important;}
@@ -233,8 +221,8 @@ jobs:
           assert '.tf-latest-risk-healthy{' in css
           assert "tf_getLatestRiskState(analyst, pair) || tf_getLatestRiskState(analyst, null)" in app
           assert "parts.push(pad2(minutes)+'m');" in app
-          assert "tf-history-row-pnl-positive" in app and "tf-history-row-pnl-positive" in css
-          assert "tf-history-row-pnl-negative" in app and "tf-history-row-pnl-negative" in css
+          assert 'tr:has(td[data-history-col="pnlPercent"].tp)' in css
+          assert 'tr:has(td[data-history-col="pnlPercent"].sl)' in css
           assert "el.title = (base ? base + ' · ' : '') + tf_latestRiskReason(st);" not in app
           assert 'tf-sidebar-risk-healthy' in side
           m=json.loads((root/'manifest.json').read_text()); assert m['version']=='1.17.9' and m['version_name']=='REV396'
