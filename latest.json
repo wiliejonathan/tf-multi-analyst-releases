@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 406,
-  "tag_name": "v1.17.19",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.19",
-  "published_at": "2026-09-30T16:24:13Z",
+  "revision": 407,
+  "tag_name": "v1.17.20",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.20",
+  "published_at": "2026-09-30T16:55:28Z",
   "asset": {
-    "id": 601339496,
-    "name": "TF_Extension_PC_MAC_REV406_LAYOUT_SCROLL_FIX.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.19/TF_Extension_PC_MAC_REV406_LAYOUT_SCROLL_FIX.zip",
-    "size": 845810,
-    "digest": "sha256:f605b3766dfbc870538e48a3222603171de37dc4589c50cfb18f054445ffc0a8",
-    "updated_at": "2026-09-30T16:24:13Z"
+    "id": 601394600,
+    "name": "TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.20/TF_Extension_PC_MAC_REV407_RISK_EXPLANATION.zip",
+    "size": 847050,
+    "digest": "sha256:ce7fb7c61cff7a3199a926823492c08a80d1eeba8011de91979d61003b2b4ba9",
+    "updated_at": "2026-09-30T16:55:27Z"
   }
 }
