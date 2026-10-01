@@ -31,7 +31,7 @@ jobs:
           TF_RISK_SOURCE=/tmp/tf-rev414/src/assets/4b4d6b8dc315a95c.js node --test tests/animation414.cjs
           npm install --no-save playwright
           gh api repos/wiliejonathan/tf-analyzer-analyst-ios/contents/mobile-chrome-shim.js --jq .content | base64 --decode > /tmp/tf-rev414/shim.js
-          TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev414/src/assets/4b4d6b8dc315a95c.js TF_SHIM_SOURCE=/tmp/tf-rev414/shim.js node tests/chart413.cjs
+          TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev414/src/assets/4b4d6b8dc315a95c.js TF_SHIM_SOURCE=/tmp/tf-rev414/shim.js node tests/chart414.cjs
           TF_BROWSER_CHANNEL=chrome TF_RISK_SOURCE=/tmp/tf-rev414/src/assets/4b4d6b8dc315a95c.js TF_DASHBOARD_CSS=/tmp/tf-rev414/src/assets/7e95b596e5bf8dff.css TF_ISIGNAL_SOURCE=/tmp/tf-rev414/src/assets/894f18e8a37bd7c6.js TF_ISIGNAL_CSS=/tmp/tf-rev414/src/assets/a089ce37692fc17f.css node tests/presentation414.cjs
           TF_BROWSER_CHANNEL=chrome TF_BASE_SIDEBAR=/tmp/tf-rev414/base-sidebar.js TF_SIDEBAR_SOURCE=/tmp/tf-rev414/src/assets/927ecbd63036f61b.js TF_SIDEBAR_CSS=/tmp/tf-rev414/src/assets/6f5f92e21ebd9721.css node tests/layout412.cjs
           TF_BROWSER_CHANNEL=chrome TF_VAULT_SOURCE=tests/fixtures/vault409.html node tests/vault409.cjs
