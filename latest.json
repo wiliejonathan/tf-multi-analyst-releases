@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 414,
-  "tag_name": "v1.17.27",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.27",
-  "published_at": "2026-10-01T00:35:01Z",
+  "revision": 415,
+  "tag_name": "v1.17.28",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.28",
+  "published_at": "2026-10-01T13:25:26Z",
   "asset": {
-    "id": 602085347,
-    "name": "TF_Extension_PC_MAC_REV414_SMOOTH_EQUITY_MOBILE_CARDS.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.27/TF_Extension_PC_MAC_REV414_SMOOTH_EQUITY_MOBILE_CARDS.zip",
-    "size": 863322,
-    "digest": "sha256:162b1f1948ac03955c3dc18219e5be293083bbc43254d82ebc3a62bcbf7bad9a",
-    "updated_at": "2026-10-01T00:35:00Z"
+    "id": 603321059,
+    "name": "TF_Extension_PC_MAC_REV415_PIPS_ANALYST_FILTERS.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.28/TF_Extension_PC_MAC_REV415_PIPS_ANALYST_FILTERS.zip",
+    "size": 864475,
+    "digest": "sha256:b9a05897a4c6d4d00bd4e393a0ce7b3fb27be696c357b35c16581ed437413298",
+    "updated_at": "2026-10-01T13:25:25Z"
   }
 }
