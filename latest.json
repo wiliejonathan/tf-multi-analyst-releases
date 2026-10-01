@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 413,
-  "tag_name": "v1.17.26",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.26",
-  "published_at": "2026-09-30T20:33:57Z",
+  "revision": 414,
+  "tag_name": "v1.17.27",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.27",
+  "published_at": "2026-10-01T00:35:01Z",
   "asset": {
-    "id": 601750218,
-    "name": "TF_Extension_PC_MAC_REV413_EQUITY_CHART_RESTORE.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.26/TF_Extension_PC_MAC_REV413_EQUITY_CHART_RESTORE.zip",
-    "size": 861846,
-    "digest": "sha256:c7f1d8760d7182a3e873141a25cd8a95c17084fc24b7bf825112b19c980c2220",
-    "updated_at": "2026-09-30T20:33:57Z"
+    "id": 602085347,
+    "name": "TF_Extension_PC_MAC_REV414_SMOOTH_EQUITY_MOBILE_CARDS.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.27/TF_Extension_PC_MAC_REV414_SMOOTH_EQUITY_MOBILE_CARDS.zip",
+    "size": 863322,
+    "digest": "sha256:162b1f1948ac03955c3dc18219e5be293083bbc43254d82ebc3a62bcbf7bad9a",
+    "updated_at": "2026-10-01T00:35:00Z"
   }
 }
