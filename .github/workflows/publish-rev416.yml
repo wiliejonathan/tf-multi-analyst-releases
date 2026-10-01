@@ -1,0 +1,50 @@
+name: Publish plugin REV416 pair selector delete recovery
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV416/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and QA
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev416/base /tmp/tf-rev416/src
+          gh release download v1.17.28 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV415_PIPS_ANALYST_FILTERS.zip' --output /tmp/tf-rev416/base.zip
+          unzip -q /tmp/tf-rev416/base.zip -d /tmp/tf-rev416/base
+          cp -a /tmp/tf-rev416/base/. /tmp/tf-rev416/src/
+          python3 tools/patch_rev416.py /tmp/tf-rev416/src
+          npm install --no-save playwright
+          TF_BROWSER_CHANNEL=chrome TF_EXPECT_BROKEN=1 TF_SIDEBAR_SOURCE=/tmp/tf-rev416/base/assets/927ecbd63036f61b.js TF_SIDEBAR_CSS=/tmp/tf-rev416/base/assets/6f5f92e21ebd9721.css node tests/pair-delete416.cjs
+          TF_BROWSER_CHANNEL=chrome TF_SIDEBAR_SOURCE=/tmp/tf-rev416/src/assets/927ecbd63036f61b.js TF_SIDEBAR_CSS=/tmp/tf-rev416/src/assets/6f5f92e21ebd9721.css node tests/pair-delete416.cjs
+          TF_PC_GATE=/tmp/tf-rev416/src/assets/tf-device-lock.js node --test tests/activation404.cjs tests/activation409.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev416/src/assets/4b4d6b8dc315a95c.js node --test tests/risk405.cjs tests/risk415.cjs tests/equity412.cjs tests/animation414.cjs
+          find /tmp/tf-rev416/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import json,re,hashlib
+          root=Path('/tmp/tf-rev416/src');base=Path('/tmp/tf-rev416/base')
+          changed=[str(p.relative_to(root)) for p in root.rglob('*') if p.is_file() and p.read_bytes()!=(base/p.relative_to(root)).read_bytes()]
+          assert set(changed)=={'manifest.json','assets/927ecbd63036f61b.js','assets/7b6af0cb4001a684.js'},changed
+          registry=json.loads(re.search(r'const FILES\s*=\s*(\{.*?\});',(root/'assets/7b6af0cb4001a684.js').read_text(),re.S)[1])
+          assert all(hashlib.sha256((root/p).read_bytes()).hexdigest()==h for p,h in registry.items())
+          assert json.loads((root/'manifest.json').read_text())['version']=='1.17.29'
+          print('REV416 scope/integrity PASS',len(registry))
+          PY
+          (cd /tmp/tf-rev416/src && zip -qr /tmp/TF_Extension_PC_MAC_REV416_PAIR_DELETE_FIX.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV416_PAIR_DELETE_FIX.zip
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.29 /tmp/TF_Extension_PC_MAC_REV416_PAIR_DELETE_FIX.zip --target "$GITHUB_SHA" --title 'TF Analyzer Analyst v1.17.29 - REV416 Pair Delete Fix' --notes-file release-staging/REV416/RELEASE_NOTES.md --latest
