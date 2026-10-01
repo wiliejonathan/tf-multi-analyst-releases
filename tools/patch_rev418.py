@@ -9,6 +9,11 @@ old='    if (head) screen.insertBefore(head, perf);';assert s.count(old)==1
 s=s.replace(old,old+"\n    const adjustment = document.getElementById('tf-user-adjustment415');\n    if (adjustment) screen.insertBefore(adjustment, head || perf);",1)
 p.write_text(s)
 if mobile:
+ # Attach the new Performance screen before resolving controls by document ID.
+ # A detached screen makes the helper return early and price-panel cleanup can
+ # otherwise remove the original adjustment group before it is relocated.
+ p=root/'mobile-app-shell.js';t=p.read_text();old='    section.appendChild(perf);\n    tf_ensureBalanceCards414(section);';assert t.count(old)==1;t=t.replace(old,'    section.appendChild(perf);',1)
+ old='    else host.appendChild(section);\n\n    return section;';assert t.count(old)>=1;t=t.replace(old,'    else host.appendChild(section);\n\n    tf_ensureBalanceCards414(section);\n    return section;',1);p.write_text(t)
  for p in root.iterdir():
   if p.is_file() and p.suffix in ['.js','.html']:
    t=p.read_text().replace('rev=417','rev=418')
