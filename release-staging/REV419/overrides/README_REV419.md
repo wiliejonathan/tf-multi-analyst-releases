@@ -19,7 +19,7 @@ History default 6 bulan, Closed at, pair XAUUSD; bisa diganti GBPJPY dan pair la
 
 ## Progres dan kontrol
 - Tidak ada batas jumlah analis. Card dimuat sampai Load More selesai lalu semuanya dievaluasi. Card gagal Losing Month langsung skip.
-- Dua progress bar: keseluruhan card (selesai / total) dan tahapan pemeriksaan satu analis. Pada History jumlah total signal tidak disediakan TF, sehingga bar tahap disertai jumlah signal yang sudah dimuat.
+- Progress bar tahapan pemeriksaan satu analis muncul setelah card dibuka. Jumlah card ditampilkan sebagai teks setelah seluruh hasil filter dimuat. Pada History jumlah total signal tidak disediakan TF, sehingga bar tahap disertai jumlah signal yang sudah dimuat.
 - Saat aktif, **Submit berubah menjadi Stop**. **Stop** membatalkan runner dan menutup tab TF khusus milik scan; hasil analis yang sudah selesai tetap tersimpan. Scan yang di-stop tidak otomatis dilanjutkan.
 - **Pause** membatalkan pekerjaan card yang sedang berjalan dan menyimpan checkpoint. Tombol berubah **Resume**. Resume mengulang hanya card yang belum selesai; hasil sebelumnya tidak diduplikasi. Pause/Resume/Stop tersedia di sidebar dan dashboard.
 - Hanya satu runner dapat berjalan. Batch utama yang masih berjalan harus dihentikan sebelum memulai scanner multi-link.
@@ -38,3 +38,5 @@ History dianggap mencapai akhir DOM setelah dua percobaan scroll tidak menambah 
 UI integrasi dan aturan checkbox diuji melalui pratinjau lokal. Runner diuji dengan 501 card, pembatalan saat History berjalan, Pause/Resume, deduplikasi, batas tanggal dan data DOM dari 12 analis sebelumnya. ZIP, referensi asset, sintaks dan SHA-256 registry diperiksa. Aktivasi lisensi dan full scan sebagai extension terpasang di Chrome belum diuji end-to-end; release tidak mengklaim uji tersebut.
 
 Data multi-link menggunakan namespace terpisah (`tfMulti…V419`), sehingga tidak menimpa data dashboard utama. Tidak ada subscription, transaksi, atau upload hasil analis ke server lain. Proses pemeriksaan integritas dan aktivasi plugin utama tetap dipertahankan.
+
+Import JSON dan Export JSON di bawah Back To Main Dashboard hanya mengelola hasil Multi-Link. Export menyimpan hasil, filter, dan bukti pemeriksaan. Import memuat hasil ke Dashboard; Stop scan sebelum import. Import tidak menjalankan scan otomatis dan tidak mengganti data dashboard utama.
