@@ -1,0 +1,1 @@
+REV428: selector DOM dan kolom count diuji dengan hasil nyata REV427. Engine unchanged; default ON; 501-card cancellation/regression tests; integrity/ZIP checks.
