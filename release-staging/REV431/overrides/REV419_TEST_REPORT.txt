@@ -1,0 +1,1 @@
+REV429: regression 501 card; Stop closes only owned tab; explicit Resume completes unfinished card without duplicate results. UI tested in installed Chrome.
