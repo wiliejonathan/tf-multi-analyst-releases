@@ -1,0 +1,17 @@
+REV419 / v1.17.32 — integration validation
+
+PASS: JS syntax for original and newly integrated scripts.
+PASS: simulation of 501 cards; all evaluated, no analyst count cap.
+PASS: per-card stage progress and accurate completed-card count.
+PASS: pending History aborted by Pause; Resume rechecks the unfinished card without duplicated results.
+PASS: pending Profile aborted by Stop; stopped job cannot auto-resume; only runner-owned tab is closed.
+PASS: real DOM evidence from 12 analysts reproduced with exact negative-pips matching.
+PASS: local UI preview showed entry button after main instructions, scanner replacing main controls, Back button beneath update block, Power / Sleep log preserved.
+PASS: two-option checkbox limit tested; unticking re-enables remaining options.
+PASS: Copy Link button feedback changed to Link Copied! and returned after two seconds.
+PASS: valid XLSX export with numeric SL in column C and text escaping.
+PASS: original extension identity, permissions, icons, main dashboard and main sidebar script retained.
+PASS: device/licence gate retained; authoritative integrity hashes regenerated and verified for the new build.
+PASS: ZIP CRC and referenced application scripts.
+
+Not performed: installed-extension activation/licence verification and a complete live scan of all channels using the combined extension. Local previews do not bypass or disable the production licence gate.
