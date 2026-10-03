@@ -1,0 +1,39 @@
+name: Publish PC Mac REV429 Multi-Link Scanner
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV429/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify locally tested files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev429/src
+          gh release download v1.17.31 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV418_ADJUSTMENT_TOP_LAYOUT.zip' --output /tmp/tf-rev429/base.zip
+          echo '9ca50f86db8c0298b01c78af4724efc4390fe45ecaf5633cbd9c02e0a3364709  /tmp/tf-rev429/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf-rev429/base.zip -d /tmp/tf-rev429/src
+          python3 release-staging/REV429/patch429.py /tmp/tf-rev429/src
+          TF_REV419_ROOT=/tmp/tf-rev429/src node release-staging/REV429/test-rev419.cjs
+          find /tmp/tf-rev429/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf-rev429/src && zip -qr /tmp/TF_Extension_PC_MAC_REV429_MULTI_LINK.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV429_MULTI_LINK.zip
+      - name: Publish ZIP and latest update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.42 /tmp/TF_Extension_PC_MAC_REV429_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.42 — REV429 Scrape Multi-Link Analis' --notes-file release-staging/REV429/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.42" > /tmp/tf-rev429/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf-rev429/previous.json
+          python3 release-staging/REV429/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf-rev429/latest-request.json
