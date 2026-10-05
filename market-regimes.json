@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-10-05T14:56:08.981543+00:00",
+  "updatedAt": "2026-10-05T15:01:45.216839+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -9,8 +9,7 @@
     "rangingBelow": 0.25,
     "semiTrendBelow": 0.55,
     "trendingAtLeast": 0.55,
-    "minimumDailyBars": 8,
-    "minimumCurrentMonthDailyBars": 2
+    "minimumDailyBars": 8
   },
   "pairs": {
     "XAUUSD": {
@@ -207,67 +206,76 @@
         "provisional": false
       },
       "2026-01": {
-        "status": "Trending/Rally",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.283267,
+        "dailyBars": 31,
+        "start": "2026-01-01",
+        "end": "2026-01-31",
+        "provisional": false
       },
       "2026-02": {
         "status": "Semi-Trend",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "efficiencyRatio": 0.269957,
+        "dailyBars": 28,
+        "start": "2026-02-01",
+        "end": "2026-02-28",
+        "provisional": false
       },
       "2026-03": {
-        "status": "Ranging",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.329185,
+        "dailyBars": 31,
+        "start": "2026-03-01",
+        "end": "2026-03-31",
+        "provisional": false
       },
       "2026-04": {
         "status": "Ranging",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "efficiencyRatio": 0.110862,
+        "dailyBars": 30,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
       },
       "2026-05": {
         "status": "Ranging",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "efficiencyRatio": 0.06634,
+        "dailyBars": 31,
+        "start": "2026-05-01",
+        "end": "2026-05-31",
+        "provisional": false
       },
       "2026-06": {
-        "status": "Ranging",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.357485,
+        "dailyBars": 30,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
       },
       "2026-07": {
         "status": "Ranging",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "efficiencyRatio": 0.007591,
+        "dailyBars": 31,
+        "start": "2026-07-01",
+        "end": "2026-07-31",
+        "provisional": false
       },
       "2026-08": {
-        "status": "Trending/Rally",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.300055,
+        "dailyBars": 31,
+        "start": "2026-08-01",
+        "end": "2026-08-31",
+        "provisional": false
       },
       "2026-09": {
-        "status": "Semi-Trend",
-        "manual": true,
-        "provisional": true,
-        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
-        "dailyBars": 0
+        "status": "Ranging",
+        "efficiencyRatio": 0.169438,
+        "dailyBars": 30,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
       },
       "2026-10": {
         "status": "Ranging",
@@ -4268,30 +4276,40 @@
       }
     }
   },
-  "errors": [],
+  "errors": [
+    {
+      "pair": "USDJPY",
+      "error": "Unexpected symbol"
+    },
+    {
+      "pair": "XAUUSD",
+      "year": 2026,
+      "error": "HTTP Error 404: Not Found"
+    }
+  ],
   "sources": {
     "GBPJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/GBPJPY%3DX/history/"
     },
     "AUDJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/AUDJPY%3DX/history/"
     },
     "CHFJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/CHFJPY%3DX/history/"
     },
     "CADJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/CADJPY%3DX/history/"
     },
     "EURJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/EURJPY%3DX/history/"
     },
     "NZDJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/NZDJPY%3DX/history/"
     },
     "USDJPY": {
@@ -4299,39 +4317,39 @@
       "url": "https://finance.yahoo.com/quote/USDJPY%3DX/history/"
     },
     "GBPUSD": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/GBPUSD%3DX/history/"
     },
     "EURUSD": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/EURUSD%3DX/history/"
     },
     "AUDUSD": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/AUDUSD%3DX/history/"
     },
     "USDCHF": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/USDCHF%3DX/history/"
     },
     "NZDUSD": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/NZDUSD%3DX/history/"
     },
     "EURNZD": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/EURNZD%3DX/history/"
     },
     "EURGBP": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/EURGBP%3DX/history/"
     },
     "XAUUSD": {
-      "name": "Dukascopy",
+      "name": "Dukascopy daily BID candles",
       "url": "https://www.dukascopy.com/swiss/english/marketwatch/historical/"
     },
     "USDCAD": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/USDCAD%3DX/history/"
     }
   }
