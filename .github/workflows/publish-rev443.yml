@@ -1,0 +1,44 @@
+name: Publish PC Mac REV443 Multi-Link Scanner
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV443/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify locally tested files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev443/src
+          gh release download v1.17.31 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV418_ADJUSTMENT_TOP_LAYOUT.zip' --output /tmp/tf-rev443/base.zip
+          echo '9ca50f86db8c0298b01c78af4724efc4390fe45ecaf5633cbd9c02e0a3364709  /tmp/tf-rev443/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf-rev443/base.zip -d /tmp/tf-rev443/src
+          python3 release-staging/REV443/patch443.py /tmp/tf-rev443/src
+          TF_REV419_ROOT=/tmp/tf-rev443/src node release-staging/REV443/test-rev419.cjs
+          TF_REV419_ROOT=/tmp/tf-rev443/src node release-staging/REV443/test-reset443.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev443/src/assets/4b4d6b8dc315a95c.js node --test release-staging/REV443/test-risk443.cjs
+          npm install --no-save playwright
+          TF_REV419_ROOT=/tmp/tf-rev443/src node release-staging/REV443/test-rescan443.cjs
+          TF_REV419_ROOT=/tmp/tf-rev443/src node release-staging/REV443/test-sidebar-boot443.cjs
+          find /tmp/tf-rev443/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf-rev443/src && zip -qr /tmp/TF_Extension_PC_MAC_REV443_MULTI_LINK.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV443_MULTI_LINK.zip
+      - name: Publish ZIP and latest update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.56 /tmp/TF_Extension_PC_MAC_REV443_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.56 — REV443 Scrape Multi-Link Analis' --notes-file release-staging/REV443/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.56" > /tmp/tf-rev443/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf-rev443/previous.json
+          python3 release-staging/REV443/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf-rev443/latest-request.json
