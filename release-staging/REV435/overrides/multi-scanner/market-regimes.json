@@ -1,0 +1,4338 @@
+{
+  "schema": 1,
+  "updatedAt": "2026-10-05T14:56:08.981543+00:00",
+  "source": "Dukascopy daily BID candles",
+  "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
+  "method": {
+    "name": "daily-close-directional-efficiency",
+    "formula": "abs(last close - first close) / sum(abs(daily close change))",
+    "rangingBelow": 0.25,
+    "semiTrendBelow": 0.55,
+    "trendingAtLeast": 0.55,
+    "minimumDailyBars": 8,
+    "minimumCurrentMonthDailyBars": 2
+  },
+  "pairs": {
+    "XAUUSD": {
+      "2024-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.122044,
+        "dailyBars": 31,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.068712,
+        "dailyBars": 29,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.475248,
+        "dailyBars": 31,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.090243,
+        "dailyBars": 30,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.007729,
+        "dailyBars": 31,
+        "start": "2024-05-01",
+        "end": "2024-05-31",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.005117,
+        "dailyBars": 30,
+        "start": "2024-06-01",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.235116,
+        "dailyBars": 31,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.156724,
+        "dailyBars": 31,
+        "start": "2024-08-01",
+        "end": "2024-08-31",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.383198,
+        "dailyBars": 30,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.238988,
+        "dailyBars": 31,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.145237,
+        "dailyBars": 30,
+        "start": "2024-11-01",
+        "end": "2024-11-30",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.05815,
+        "dailyBars": 31,
+        "start": "2024-12-01",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.471795,
+        "dailyBars": 31,
+        "start": "2025-01-01",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.135792,
+        "dailyBars": 28,
+        "start": "2025-02-01",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.60826,
+        "dailyBars": 31,
+        "start": "2025-03-01",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.145919,
+        "dailyBars": 30,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.056556,
+        "dailyBars": 31,
+        "start": "2025-05-01",
+        "end": "2025-05-31",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.003982,
+        "dailyBars": 30,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.105638,
+        "dailyBars": 31,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.230286,
+        "dailyBars": 31,
+        "start": "2025-08-01",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.653366,
+        "dailyBars": 30,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.099371,
+        "dailyBars": 31,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.265596,
+        "dailyBars": 30,
+        "start": "2025-11-01",
+        "end": "2025-11-30",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.141423,
+        "dailyBars": 31,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Trending/Rally",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-02": {
+        "status": "Semi-Trend",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-06": {
+        "status": "Ranging",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-08": {
+        "status": "Trending/Rally",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      },
+      "2026-10": {
+        "status": "Ranging",
+        "manual": true,
+        "provisional": true,
+        "source": "Klasifikasi yang diberikan pengguna; belum diverifikasi dari harga harian",
+        "dailyBars": 0
+      }
+    },
+    "AUDJPY": {
+      "2024-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.148388,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.285122,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.178637,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.347981,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.29305,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.345339,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.608558,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.124559,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.020972,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.178878,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.155613,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.013765,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.205729,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.230193,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.016554,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.126609,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.017928,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.287151,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.313048,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.175854,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.29799,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.306885,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.132319,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.342102,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.309008,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.217936,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.068415,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.30248,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.159268,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.260586,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.069989,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.538414,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.464881,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "CHFJPY": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.277669,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.120262,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.147248,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.355192,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.329399,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.621721,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.545004,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.011937,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.139879,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.500282,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.316073,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.213502,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.267523,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.254361,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.143144,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.264626,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.046694,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.640318,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.271484,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.049519,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.202235,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.59433,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.180648,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.304883,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.154923,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.052501,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.349344,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.098565,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.33424,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.18774,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.174938,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.235375,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.471589,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "CADJPY": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.391858,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.283692,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.176501,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.339832,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.14139,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.360939,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.573368,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.006048,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.16039,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.344364,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.108776,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.232299,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.363636,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.150618,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.01804,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.070168,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.100312,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.097483,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.431376,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.021879,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.095478,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.40185,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.17314,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.326803,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.074267,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.015624,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.057674,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.200638,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.015827,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.185106,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.000884,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.529346,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.49661,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "GBPJPY": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.546894,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.46974,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.140292,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.392643,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.281735,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.321822,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.461237,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.034963,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.001257,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.372379,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.268463,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.373221,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.284181,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.110398,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.185857,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.144424,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.053558,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.229883,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.156777,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.302759,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.034061,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.235781,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.357688,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.370507,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.017947,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.098577,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.003511,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.226245,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.115176,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.054141,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.016351,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.37617,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.377991,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "EURJPY": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.321373,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.590898,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.104594,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.395485,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.245973,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.215258,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.565114,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.026311,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.081738,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.575444,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.520854,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.346835,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.174773,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.229549,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.252118,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.019984,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.071478,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.53386,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.223478,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.164951,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.16183,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.442327,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.335675,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.292608,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.066676,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.003869,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.077849,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.024577,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.258072,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.016875,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.03342,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.582664,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.445597,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "NZDJPY": {
+      "2024-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.192732,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.3361,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.121125,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.287271,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.469078,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.258902,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.724005,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.209249,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.017434,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.142508,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.20851,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.0,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.158688,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.29027,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.038308,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.050567,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.00564,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.285642,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.176796,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.071697,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.230834,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.325537,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.163308,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.184974,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.32338,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.013517,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.295494,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.177066,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.341758,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.362995,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.276855,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.292897,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.660897,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "USDJPY": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.54664,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.409487,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.123541,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.52926,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.097101,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.402356,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.621396,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.214169,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.147625,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.592415,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.049944,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.5043,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.293897,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.336013,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.060312,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.296144,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.088236,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.001056,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.491858,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.02285,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.078672,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.421453,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.23709,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.042318,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.268649,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.050164,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.133252,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.167058,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.426433,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.659909,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.237405,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.300905,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.156205,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "GBPUSD": {
+      "2024-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.05305,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.023644,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.015978,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.063459,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.336093,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.146395,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.330649,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.458213,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.252086,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.43241,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.168851,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.180841,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.084966,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.322792,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.361002,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.245111,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.201105,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.256926,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.540014,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.281677,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.096003,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.416535,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.169458,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.338379,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.344935,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.212516,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.123537,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.29122,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.149423,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.279714,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.181585,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.110609,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.376872,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "EURUSD": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.447302,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.065397,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.0216,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.110238,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.240036,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.165703,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.219298,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.38043,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.138877,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.411272,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.329161,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.224232,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.061461,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.179932,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.411888,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.343386,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.079292,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.464939,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.483744,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.140639,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.021947,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.263185,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.170665,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.348318,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.260457,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.084161,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.155365,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.172982,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.150799,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.393104,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.253811,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.151734,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.637723,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "USDCHF": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.368505,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.290124,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.333586,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.243705,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.249379,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.019928,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.380128,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.315785,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.073565,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.409015,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.273654,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.347271,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.031376,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.236521,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.314123,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.373278,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.075611,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.397659,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.426217,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.072085,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.058114,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.086796,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.006443,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.265535,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.333687,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.00739,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.415804,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.195941,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.015709,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.437889,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.055757,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.020863,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.522916,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "USDCAD": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.254264,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.198269,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.069196,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.259675,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.058841,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.120954,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.151191,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.672335,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.064989,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.73168,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.07371,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.395218,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.135099,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.269856,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.057836,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.446865,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.052,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.200998,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.289902,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.078068,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.305043,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.108844,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.019379,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.532885,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.314785,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.069785,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.374064,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.377896,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.497852,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.686307,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.417459,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.243533,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.515078,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "AUDUSD": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.45227,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.13298,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.065607,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.013728,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.178678,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.035531,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.277615,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.5512,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.221065,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.548655,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.092234,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.508261,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.044847,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.152875,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.035941,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.105967,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.07614,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.258635,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.278276,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.190228,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.094688,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.131055,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.025557,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.398765,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.665297,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.21819,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.126375,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.331852,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.055045,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.507541,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.298197,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.282179,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.464268,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "NZDUSD": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.442702,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.026616,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.202866,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.119202,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.43553,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.121037,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.249559,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.525159,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.141686,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.659869,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.109717,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.527262,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.087275,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.104978,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.113006,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.223572,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.091426,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.224704,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.41157,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.040973,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.179852,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.281415,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.018122,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.162897,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.628489,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.064855,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.238944,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.213507,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.126819,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.542548,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.403583,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.058865,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.637496,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "EURGBP": {
+      "2024-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.407964,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.152647,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.071665,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.061867,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.194361,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.097578,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.261158,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.124005,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.258133,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.096759,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.33113,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.021908,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.26036,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.261368,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.252562,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.193875,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.18469,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.421725,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.105598,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.201994,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.278567,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.28291,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.050536,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.142248,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.185797,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.272497,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.085791,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.437345,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.096991,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.142065,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.018744,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.091093,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.149246,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    },
+    "EURNZD": {
+      "2024-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.190206,
+        "dailyBars": 23,
+        "start": "2024-01-01",
+        "end": "2024-01-31",
+        "provisional": false
+      },
+      "2024-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.099123,
+        "dailyBars": 21,
+        "start": "2024-02-01",
+        "end": "2024-02-29",
+        "provisional": false
+      },
+      "2024-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.417291,
+        "dailyBars": 22,
+        "start": "2024-03-01",
+        "end": "2024-03-31",
+        "provisional": false
+      },
+      "2024-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.104151,
+        "dailyBars": 22,
+        "start": "2024-04-01",
+        "end": "2024-04-30",
+        "provisional": false
+      },
+      "2024-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.434291,
+        "dailyBars": 22,
+        "start": "2024-05-01",
+        "end": "2024-05-30",
+        "provisional": false
+      },
+      "2024-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.066454,
+        "dailyBars": 21,
+        "start": "2024-06-02",
+        "end": "2024-06-30",
+        "provisional": false
+      },
+      "2024-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.410916,
+        "dailyBars": 23,
+        "start": "2024-07-01",
+        "end": "2024-07-31",
+        "provisional": false
+      },
+      "2024-08": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.289977,
+        "dailyBars": 21,
+        "start": "2024-08-01",
+        "end": "2024-08-29",
+        "provisional": false
+      },
+      "2024-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.092075,
+        "dailyBars": 22,
+        "start": "2024-09-01",
+        "end": "2024-09-30",
+        "provisional": false
+      },
+      "2024-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.472779,
+        "dailyBars": 22,
+        "start": "2024-10-01",
+        "end": "2024-10-31",
+        "provisional": false
+      },
+      "2024-11": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.311449,
+        "dailyBars": 21,
+        "start": "2024-11-01",
+        "end": "2024-11-29",
+        "provisional": false
+      },
+      "2024-12": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.363198,
+        "dailyBars": 22,
+        "start": "2024-12-02",
+        "end": "2024-12-31",
+        "provisional": false
+      },
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.046758,
+        "dailyBars": 22,
+        "start": "2025-01-02",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.084445,
+        "dailyBars": 20,
+        "start": "2025-02-03",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.29329,
+        "dailyBars": 22,
+        "start": "2025-03-03",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.061986,
+        "dailyBars": 20,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.040893,
+        "dailyBars": 21,
+        "start": "2025-05-01",
+        "end": "2025-05-29",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.332233,
+        "dailyBars": 22,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.040889,
+        "dailyBars": 23,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.212291,
+        "dailyBars": 21,
+        "start": "2025-08-03",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.36572,
+        "dailyBars": 22,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.008644,
+        "dailyBars": 22,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.068951,
+        "dailyBars": 20,
+        "start": "2025-11-03",
+        "end": "2025-11-28",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.074433,
+        "dailyBars": 22,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-01": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 0.575515,
+        "dailyBars": 21,
+        "start": "2026-01-02",
+        "end": "2026-01-30",
+        "provisional": false
+      },
+      "2026-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.026211,
+        "dailyBars": 20,
+        "start": "2026-02-02",
+        "end": "2026-02-27",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.283563,
+        "dailyBars": 23,
+        "start": "2026-03-02",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.207921,
+        "dailyBars": 22,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
+        "provisional": false
+      },
+      "2026-05": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.279607,
+        "dailyBars": 21,
+        "start": "2026-05-03",
+        "end": "2026-05-31",
+        "provisional": false
+      },
+      "2026-06": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.547748,
+        "dailyBars": 22,
+        "start": "2026-06-01",
+        "end": "2026-06-30",
+        "provisional": false
+      },
+      "2026-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.373347,
+        "dailyBars": 22,
+        "start": "2026-07-01",
+        "end": "2026-07-30",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.063891,
+        "dailyBars": 22,
+        "start": "2026-08-02",
+        "end": "2026-08-31",
+        "provisional": false
+      },
+      "2026-09": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.452261,
+        "dailyBars": 22,
+        "start": "2026-09-01",
+        "end": "2026-09-30",
+        "provisional": false
+      }
+    }
+  },
+  "errors": [],
+  "sources": {
+    "GBPJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/GBPJPY%3DX/history/"
+    },
+    "AUDJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/AUDJPY%3DX/history/"
+    },
+    "CHFJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/CHFJPY%3DX/history/"
+    },
+    "CADJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/CADJPY%3DX/history/"
+    },
+    "EURJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/EURJPY%3DX/history/"
+    },
+    "NZDJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/NZDJPY%3DX/history/"
+    },
+    "USDJPY": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/USDJPY%3DX/history/"
+    },
+    "GBPUSD": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/GBPUSD%3DX/history/"
+    },
+    "EURUSD": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/EURUSD%3DX/history/"
+    },
+    "AUDUSD": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/AUDUSD%3DX/history/"
+    },
+    "USDCHF": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/USDCHF%3DX/history/"
+    },
+    "NZDUSD": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/NZDUSD%3DX/history/"
+    },
+    "EURNZD": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/EURNZD%3DX/history/"
+    },
+    "EURGBP": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/EURGBP%3DX/history/"
+    },
+    "XAUUSD": {
+      "name": "Dukascopy",
+      "url": "https://www.dukascopy.com/swiss/english/marketwatch/historical/"
+    },
+    "USDCAD": {
+      "name": "Yahoo Finance",
+      "url": "https://finance.yahoo.com/quote/USDCAD%3DX/history/"
+    }
+  }
+}

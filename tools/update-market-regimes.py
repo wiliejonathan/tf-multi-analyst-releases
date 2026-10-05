@@ -52,22 +52,50 @@ def classify(rows):
     result={}
     for month,candles in months.items():
         candles=sorted(candles,key=lambda c:c['date']);values=[c['close'] for c in candles]
-        if len(values)<8:continue
+        minimum=2 if month==TODAY.strftime('%Y-%m') else 8
+        if len(values)<minimum:continue
         # Kaufman-style directional efficiency, not an AI or a provider's official market label.
         travel=sum(abs(b-a) for a,b in zip(values,values[1:]));er=abs(values[-1]-values[0])/travel if travel else 0
         status='Trending/Rally' if er>=.55 else 'Semi-Trend' if er>=.25 else 'Ranging'
         year,number=map(int,month.split('-'));last=datetime.date(year,number,calendar.monthrange(year,number)[1])
         result[month]={'status':status,'efficiencyRatio':round(er,6),'dailyBars':len(values),'start':candles[0]['date'],'end':candles[-1]['date'],'provisional':last>=TODAY}
     return result
+def fetch_fx(pair):
+    url=f'https://query1.finance.yahoo.com/v8/finance/chart/{pair}=X?interval=1d&range=5y'
+    raw=json.loads(urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Mozilla/5.0'}),timeout=20).read())
+    result=raw['chart']['result'][0]
+    allowed={pair+'=X'}
+    if pair=='USDCAD':allowed.add('CAD=X')
+    if result['meta']['symbol'] not in allowed:raise ValueError('Unexpected symbol')
+    closes=result['indicators']['quote'][0]['close'];rows=[]
+    for timestamp,close in zip(result['timestamp'],closes):
+        date=datetime.datetime.fromtimestamp(timestamp,datetime.timezone.utc).date()
+        if close is not None and close>0 and datetime.date(2024,1,1)<=date<TODAY:rows.append({'date':date.isoformat(),'close':close})
+    if not rows:raise ValueError('Empty FX history')
+    return pair,rows
+
 def main():
-    tasks=[(pair,year) for pair in PAIRS for year in range(2024,TODAY.year+1)];allrows={pair:[] for pair in PAIRS};errors=[]
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
-        for pair,year,rows,error in pool.map(fetch,tasks):
-            allrows[pair].extend(rows)
-            if error:errors.append({'pair':pair,'year':year,'error':error})
-    data={'schema':1,'updatedAt':datetime.datetime.now(datetime.timezone.utc).isoformat(),'source':'Dukascopy daily BID candles','sourceUrl':'https://www.dukascopy.com/swiss/english/marketwatch/historical/','method':{'name':'daily-close-directional-efficiency','formula':'abs(last close - first close) / sum(abs(daily close change))','rangingBelow':.25,'semiTrendBelow':.55,'trendingAtLeast':.55,'minimumDailyBars':8},'pairs':{pair:classify(rows) for pair,rows in allrows.items()},'errors':errors}
-    total=sum(len(v) for v in data['pairs'].values())
-    if total==0:raise RuntimeError('No price data available. Refusing to publish invented market colors.')
-    Path('market-regimes.json').write_text(json.dumps(data,indent=2)+'\n')
-    print('Verified month classifications:',total,'missing feed requests:',len(errors))
+    target=Path('market-regimes.json')
+    data=json.loads(target.read_text(encoding='utf8')) if target.exists() else {'schema':1,'pairs':{}}
+    data.update(updatedAt=datetime.datetime.now(datetime.timezone.utc).isoformat(),method={'name':'daily-close-directional-efficiency','formula':'abs(last close - first close) / sum(abs(daily close change))','rangingBelow':.25,'semiTrendBelow':.55,'trendingAtLeast':.55,'minimumDailyBars':8})
+    data.setdefault('sources',{})
+    errors=[]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+        futures={pool.submit(fetch_fx,pair):pair for pair in PAIRS if pair!='XAUUSD'}
+        for future in concurrent.futures.as_completed(futures):
+            pair=futures[future]
+            try:
+                _,rows=future.result();data['pairs'][pair]=classify(rows)
+                data['sources'][pair]={'name':'Yahoo Finance daily FX closes','url':f'https://finance.yahoo.com/quote/{pair}%3DX/history/'}
+            except Exception as exc:errors.append({'pair':pair,'error':str(exc)})
+    gold=[]
+    for year in range(2024,TODAY.year+1):
+        _,_,rows,error=fetch(('XAUUSD',year));gold.extend(rows)
+        if error:errors.append({'pair':'XAUUSD','year':year,'error':error})
+    if gold:data['pairs'].setdefault('XAUUSD',{}).update(classify(gold))
+    data['sources']['XAUUSD']={'name':'Dukascopy daily BID candles','url':'https://www.dukascopy.com/swiss/english/marketwatch/historical/'}
+    data['errors']=errors
+    if not any(data['pairs'].values()):raise RuntimeError('No verified price history')
+    target.write_text(json.dumps(data,indent=2)+'\n',encoding='utf8')
+    print('Verified classifications:',{p:len(m) for p,m in data['pairs'].items()})
 if __name__=='__main__':main()
