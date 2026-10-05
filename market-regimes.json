@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-10-05T13:40:00.537817+00:00",
+  "updatedAt": "2026-10-05T13:52:18.336001+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -1763,7 +1763,112 @@
     "USDCHF": {},
     "USDCAD": {},
     "AUDUSD": {},
-    "NZDUSD": {},
+    "NZDUSD": {
+      "2025-01": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.07573,
+        "dailyBars": 31,
+        "start": "2025-01-01",
+        "end": "2025-01-31",
+        "provisional": false
+      },
+      "2025-02": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.057626,
+        "dailyBars": 28,
+        "start": "2025-02-01",
+        "end": "2025-02-28",
+        "provisional": false
+      },
+      "2025-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.118493,
+        "dailyBars": 31,
+        "start": "2025-03-01",
+        "end": "2025-03-31",
+        "provisional": false
+      },
+      "2025-04": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.204525,
+        "dailyBars": 30,
+        "start": "2025-04-01",
+        "end": "2025-04-30",
+        "provisional": false
+      },
+      "2025-05": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.058807,
+        "dailyBars": 31,
+        "start": "2025-05-01",
+        "end": "2025-05-31",
+        "provisional": false
+      },
+      "2025-06": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.186521,
+        "dailyBars": 30,
+        "start": "2025-06-01",
+        "end": "2025-06-30",
+        "provisional": false
+      },
+      "2025-07": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.401855,
+        "dailyBars": 31,
+        "start": "2025-07-01",
+        "end": "2025-07-31",
+        "provisional": false
+      },
+      "2025-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.033988,
+        "dailyBars": 31,
+        "start": "2025-08-01",
+        "end": "2025-08-31",
+        "provisional": false
+      },
+      "2025-09": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.176775,
+        "dailyBars": 30,
+        "start": "2025-09-01",
+        "end": "2025-09-30",
+        "provisional": false
+      },
+      "2025-10": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.286215,
+        "dailyBars": 31,
+        "start": "2025-10-01",
+        "end": "2025-10-31",
+        "provisional": false
+      },
+      "2025-11": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.02649,
+        "dailyBars": 30,
+        "start": "2025-11-01",
+        "end": "2025-11-30",
+        "provisional": false
+      },
+      "2025-12": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.07921,
+        "dailyBars": 31,
+        "start": "2025-12-01",
+        "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-08": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.103374,
+        "dailyBars": 31,
+        "start": "2026-08-01",
+        "end": "2026-08-31",
+        "provisional": false
+      }
+    },
     "EURGBP": {
       "2024-01": {
         "status": "Semi-Trend",
@@ -1955,6 +2060,22 @@
         "dailyBars": 31,
         "start": "2025-12-01",
         "end": "2025-12-31",
+        "provisional": false
+      },
+      "2026-03": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.085609,
+        "dailyBars": 31,
+        "start": "2026-03-01",
+        "end": "2026-03-31",
+        "provisional": false
+      },
+      "2026-04": {
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.354736,
+        "dailyBars": 30,
+        "start": "2026-04-01",
+        "end": "2026-04-30",
         "provisional": false
       }
     },
@@ -2157,12 +2278,12 @@
     {
       "pair": "XAUUSD",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "AUDJPY",
       "year": 2026,
-      "error": "The read operation timed out"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "CHFJPY",
@@ -2172,22 +2293,22 @@
     {
       "pair": "CADJPY",
       "year": 2026,
-      "error": "The read operation timed out"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "GBPJPY",
       "year": 2026,
-      "error": "HTTP Error 503: Service Unavailable"
+      "error": "The read operation timed out"
     },
     {
       "pair": "EURJPY",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "NZDJPY",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "The read operation timed out"
     },
     {
       "pair": "USDJPY",
@@ -2197,7 +2318,7 @@
     {
       "pair": "USDJPY",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "The read operation timed out"
     },
     {
       "pair": "GBPUSD",
@@ -2207,7 +2328,7 @@
     {
       "pair": "GBPUSD",
       "year": 2026,
-      "error": "HTTP Error 503: Service Unavailable"
+      "error": "The read operation timed out"
     },
     {
       "pair": "EURUSD",
@@ -2227,7 +2348,7 @@
     {
       "pair": "USDCHF",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "USDCAD",
@@ -2237,12 +2358,12 @@
     {
       "pair": "USDCAD",
       "year": 2025,
-      "error": "The read operation timed out"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "USDCAD",
       "year": 2026,
-      "error": "The read operation timed out"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "AUDUSD",
@@ -2252,27 +2373,22 @@
     {
       "pair": "AUDUSD",
       "year": 2025,
-      "error": "The read operation timed out"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "AUDUSD",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "NZDUSD",
       "year": 2024,
-      "error": "The read operation timed out"
-    },
-    {
-      "pair": "NZDUSD",
-      "year": 2025,
       "error": "HTTP Error 503: Service Unavailable"
     },
     {
       "pair": "NZDUSD",
       "year": 2026,
-      "error": "The read operation timed out"
+      "error": "<urlopen error _ssl.c:993: The handshake operation timed out>"
     },
     {
       "pair": "EURGBP",
