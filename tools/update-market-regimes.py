@@ -25,7 +25,27 @@ def fetch(task):
         except Exception as exc:
             error=str(exc)
             if attempt<2:time.sleep(2*(attempt+1))
-    return pair,year,cached,error
+    # Current-year D1 archive can be absent; complete daily closes can be aggregated from monthly H1 archives.
+    daily={r['date']:r for r in cached}
+    for month in range(1,13 if year<TODAY.year else TODAY.month+1):
+        partial=CACHE/f'{pair}-{year}-{month:02}.json'
+        previous=json.loads(partial.read_text()) if partial.exists() else []
+        if previous and (year,month)<(TODAY.year,TODAY.month):
+            daily.update({r['date']:r for r in previous});continue
+        hourly_url=f'https://datafeed.dukascopy.com/datafeed/{pair}/{year}/{month-1:02}/BID_candles_hour_1.bi5'
+        try:
+            request=urllib.request.Request(hourly_url,headers={'User-Agent':'TF-Market-Regime/1.0'})
+            raw=urllib.request.urlopen(request,timeout=12).read();data=lzma.decompress(raw)
+            if not data or len(data)%24:raise ValueError('invalid hourly candles')
+            start=datetime.datetime(year,month,1,tzinfo=datetime.timezone.utc);last={}
+            for seconds,op,cl,lo,hi,volume in struct.iter_unpack('>5If',data):
+                stamp=start+datetime.timedelta(seconds=seconds);date=stamp.date()
+                if (date.year,date.month)!=(year,month) or min(op,cl,lo,hi)<=0 or lo>min(op,cl) or hi<max(op,cl):raise ValueError('invalid hourly OHLC')
+                if date<TODAY:last[date.isoformat()]={'date':date.isoformat(),'close':cl}
+            previous=list(last.values());partial.write_text(json.dumps(previous,separators=(',',':')))
+        except Exception:pass
+        daily.update({r['date']:r for r in previous})
+    return pair,year,sorted(daily.values(),key=lambda r:r['date']),error
 def classify(rows):
     months={}
     for r in rows:months.setdefault(r['date'][:7],[]).append(r)
@@ -41,7 +61,7 @@ def classify(rows):
     return result
 def main():
     tasks=[(pair,year) for pair in PAIRS for year in range(2024,TODAY.year+1)];allrows={pair:[] for pair in PAIRS};errors=[]
-    with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as pool:
         for pair,year,rows,error in pool.map(fetch,tasks):
             allrows[pair].extend(rows)
             if error:errors.append({'pair':pair,'year':year,'error':error})
