@@ -20,7 +20,7 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/tf-rev440/src
           gh release download v1.17.31 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV418_ADJUSTMENT_TOP_LAYOUT.zip' --output /tmp/tf-rev440/base.zip
-          echo '9ca50f86db8c0298b01c78af4724efc4400fe45ecaf5633cbd9c02e0a3364709  /tmp/tf-rev440/base.zip' | sha256sum -c -
+          echo '9ca50f86db8c0298b01c78af4724efc4390fe45ecaf5633cbd9c02e0a3364709  /tmp/tf-rev440/base.zip' | sha256sum -c -
           unzip -q /tmp/tf-rev440/base.zip -d /tmp/tf-rev440/src
           python3 release-staging/REV440/patch440.py /tmp/tf-rev440/src
           TF_REV419_ROOT=/tmp/tf-rev440/src node release-staging/REV440/test-rev419.cjs
@@ -41,3 +41,4 @@ jobs:
           gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf-rev440/previous.json
           python3 release-staging/REV440/update-latest.py
           gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf-rev440/latest-request.json
+
