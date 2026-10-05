@@ -1,0 +1,30 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),{chromium}=require('playwright');
+const root=process.env.TF_REV419_ROOT||'outputs/TF_Extension_PC_MAC_REV450_MULTI_LINK';
+(async()=>{
+ const browser=await chromium.launch({headless:true,channel:'chrome'});
+ try{
+  const page=await browser.newPage();
+  await page.setContent('<div>All Symbols XAUUSD AUDJPY</div><div class="pos-size-container"><div class="text-symbol-card">Symbol terintegrasi</div><div class="list-symbol-new"><div class="per-symbol"><b>EURJPY</b> | 0.03 Lot</div><div class="per-symbol"><b>GBPJPY</b> | 0.02 Lot</div><div class="per-symbol"><b>USDJPY</b> | 0.02 Lot</div></div></div><div class="pos-size-container"><div class="text-symbol-card">Symbol terintegrasi</div><div class="list-symbol-new"><div class="per-symbol"><b>EURJPY</b></div></div></div>');
+  const content=fs.readFileSync(root+'/assets/dec74fd654ec6d54.js','utf8');
+  await page.addScriptTag({content:content.slice(content.indexOf('function tf_readIntegratedPairs450(){'),content.indexOf('chrome.runtime.onMessage.addListener',content.indexOf('function tf_readIntegratedPairs450(){')))});
+  assert.deepEqual(await page.evaluate(()=>tf_readIntegratedPairs450()),['EURJPY','GBPJPY','USDJPY']);
+  await page.setContent('<div>All Symbols XAUUSD AUDJPY EURJPY</div>');assert.deepEqual(await page.evaluate(()=>tf_readIntegratedPairs450()),[]);
+  const listBlock=content.slice(content.indexOf('const cards = Array.from',content.indexOf("msg.type === 'scanIsignalActiveChannels'")),content.indexOf('sendResponse({ ok: true, items });',content.indexOf("msg.type === 'scanIsignalActiveChannels'")));
+  await page.setContent('<div class="signal-card"><div class="header aktif">Aktif</div><div class="channel-name add"><a href="/channels/126064/"><span class="truncate-text">Pips Gainers</span></a></div><a href="/channels/isignal/6666660">Atur iSignal</a></div><div class="signal-card"><div class="header">Tidak aktif</div><div class="channel-name add"><a href="/channels/9/">Inactive</a></div></div>');
+  const inventory=await page.evaluate(code=>new Function('location','sendResponse',code+';return items;')({origin:'https://account.tradersfamily.id'},()=>{}),listBlock);
+  assert.equal(inventory.length,1);assert.equal(inventory[0].settingsUrl,'https://account.tradersfamily.id/channels/isignal/6666660');
+  const messages=[],writes=[],closed=[],opened=[],store={};let listener;
+  const c={console,URL,Set,Date,Math,setInterval,clearInterval,tf_batchScanState:{active:false},bg_createSilentTab:async(url,owner)=>{opened.push({url,owner});return{id:opened.length};},bg_waitForTabLoaded:async()=>{},bg_waitForContentScriptReady:async()=>true,bg_removeTab:async(id)=>closed.push(id),tf_setScanInProgress:(v,m)=>{store.tfScanInProgress=v;store.tfScanOrigin=m.origin;},bg_sendMessage:async(id,msg)=>{messages.push(msg);return msg.type==='scanIsignalActiveChannels'?{ok:true,items:[inventory[0],{name:'Empty',url:'https://account.tradersfamily.id/channels/7/',settingsUrl:'https://account.tradersfamily.id/channels/isignal/8'}]}:{ok:true,pairs:id===2?['EURJPY','GBPJPY','USDJPY']:[]};},chrome:{runtime:{onMessage:{addListener:f=>listener=f}},storage:{local:{set:(d,cb)=>{Object.assign(store,structuredClone(d));writes.push(structuredClone(d));cb?.();},get:(keys,cb)=>cb({})}}}};
+  vm.createContext(c);vm.runInContext(fs.readFileSync(root+'/assets/tf-multi-isignal-discovery.js','utf8'),c);
+  const start=await new Promise(resolve=>listener({type:'TF_ISIGNAL_DISCOVER_START',ownerTabId:45},{},resolve));assert(start.ok);
+  for(let i=0;i<100&&c.tfIsignalDiscovery450.active;i++)await new Promise(r=>setTimeout(r,5));
+  assert.equal(store.tfIsignalDiscoveryV450.status,'done');assert.deepEqual(store.tfIsignalDiscoveryV450.items[0].pairs,['EURJPY','GBPJPY','USDJPY']);assert.deepEqual(store.tfIsignalDiscoveryV450.items[1].pairs,['__ALL__']);assert.equal(store.tfScanInProgress,false);assert.equal(closed.length,3);assert(opened.every(t=>t.owner===45));assert(writes.some(w=>w.tfTotalAnalystProgressV439?.completed===1));
+  await page.setContent('<button id="scan-from-isignal-btn">Scan From iSignal</button><div id="isignal-links-container"><div class="analyst-row"><input class="analyst-link-input" value="https://account.tradersfamily.id/channels/126064/"><button class="analyst-paste-btn tf-analyst-name-pill">Pips Gainers</button></div></div>');
+  await page.evaluate(()=>{window.opened=[];window.events=[];window.populated=[];window.setStatus=window.setIsignalStatus=()=>{};window.showIsignalSubview=()=>{};window.tf_populateIsignalRows=items=>populated.push(items);window.chrome={windows:{getCurrent:cb=>cb({id:22})},tabs:{create:o=>opened.push(o),query:(o,cb)=>cb([{id:45}])},runtime:{sendMessage:(m,cb)=>{events.push(m);cb?.({ok:true});}},storage:{local:{get:(k,cb)=>cb({})},onChanged:{addListener:f=>window.changed=f}}};});
+  await page.addScriptTag({path:root+'/assets/tf-multi-isignal-sidebar.js'});
+  await page.locator('.tf-analyst-name-pill').click();assert.deepEqual(await page.evaluate(()=>opened),[{url:'https://account.tradersfamily.id/channels/126064/',active:true,windowId:22}]);
+  await page.evaluate(()=>changed({tfIsignalDiscoveryV450:{newValue:{runId:'test',status:'running',total:5,completed:1}}},'local'));assert.equal(await page.locator('#scan-from-isignal-btn').textContent(),'Stop');await page.locator('#scan-from-isignal-btn').click();assert.equal(await page.evaluate(()=>events.at(-1).type),'TF_ISIGNAL_DISCOVER_STOP');
+  await page.evaluate(()=>changed({tfIsignalDiscoveryV450:{newValue:{runId:'test',status:'done',total:1,completed:1,items:[{name:'Pips Gainers',pairs:['EURJPY','GBPJPY','USDJPY']}]}}},'local'));assert.equal(await page.locator('#scan-from-isignal-btn').textContent(),'Scan From iSignal');assert.equal(await page.evaluate(()=>populated[0][0].pairs.length),3);
+  console.log('PASS iSignal integrated-only pairs, deduplication, empty ALL fallback, settings URL, background progress/tab cleanup, same-window analyst link and Stop/restore.');
+ }finally{await browser.close();}
+})().catch(e=>{console.error(e);process.exit(1);});
