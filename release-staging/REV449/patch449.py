@@ -212,7 +212,7 @@ for asset in ['4b4d6b8dc315a95c.js','894f18e8a37bd7c6.js']:
  if 'function tf_createHistoryExcelWorkbookBytes' not in s:continue
  start=s.index('function tf_createHistoryExcelWorkbookBytes');end=s.index('async function exportHistoryToExcel()',start)
  fragment=s[start:end]
- fragment=fragment.replace("x.color.slice(1).toUpperCase()", "({'4ADE80':'15803D','22C55E':'15803D','F97373':'B91C1C','EF4444':'B91C1C','FACC15':'A16207'}[x.color.slice(1).toUpperCase()]||x.color.slice(1).toUpperCase())")
+ if "'4ADE80':'15803D'" not in fragment:fragment=fragment.replace("x.color.slice(1).toUpperCase()", "({'4ADE80':'15803D','22C55E':'15803D','F97373':'B91C1C','EF4444':'B91C1C','FACC15':'A16207'}[x.color.slice(1).toUpperCase()]||x.color.slice(1).toUpperCase())")
  fragment=fragment.replace('<font><sz val="10"/><name val="Calibri"/><color rgb="FF16A34A"/>','<font><b/><sz val="10"/><name val="Calibri"/><color rgb="FF15803D"/>').replace('<font><sz val="10"/><name val="Calibri"/><color rgb="FFDC2626"/>','<font><b/><sz val="10"/><name val="Calibri"/><color rgb="FFB91C1C"/>')
  s=s[:start]+fragment+s[end:];f.write_text(s,'utf8',newline='\n')
 
