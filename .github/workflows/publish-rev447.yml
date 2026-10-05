@@ -1,0 +1,47 @@
+name: Publish PC Mac REV447 Multi-Link Scanner
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV447/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify locally tested files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf-rev447/src
+          gh release download v1.17.31 --repo "$GITHUB_REPOSITORY" --pattern 'TF_Extension_PC_MAC_REV418_ADJUSTMENT_TOP_LAYOUT.zip' --output /tmp/tf-rev447/base.zip
+          echo '9ca50f86db8c0298b01c78af4724efc4390fe45ecaf5633cbd9c02e0a3364709  /tmp/tf-rev447/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf-rev447/base.zip -d /tmp/tf-rev447/src
+          python3 release-staging/REV447/patch447.py /tmp/tf-rev447/src
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-rev419.cjs
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-reset447.cjs
+          TF_RISK_SOURCE=/tmp/tf-rev447/src/assets/4b4d6b8dc315a95c.js node --test release-staging/REV447/test-risk447.cjs
+          npm install --no-save playwright
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-rescan447.cjs
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-sidebar-boot447.cjs
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-rescan-storage447.cjs
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-original-import447.cjs
+          TF_REV419_ROOT=/tmp/tf-rev447/src node release-staging/REV447/test-lock-export447.cjs
+          find /tmp/tf-rev447/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf-rev447/src && zip -qr /tmp/TF_Extension_PC_MAC_REV447_MULTI_LINK.zip .)
+          unzip -tq /tmp/TF_Extension_PC_MAC_REV447_MULTI_LINK.zip
+      - name: Publish ZIP and latest update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.60 /tmp/TF_Extension_PC_MAC_REV447_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.60 — REV447 Scrape Multi-Link Analis' --notes-file release-staging/REV447/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.60" > /tmp/tf-rev447/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf-rev447/previous.json
+          python3 release-staging/REV447/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf-rev447/latest-request.json
