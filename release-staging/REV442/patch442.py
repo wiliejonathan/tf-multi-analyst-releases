@@ -59,7 +59,8 @@ update_ui=out/'assets/tf-github-update-ui.js'
 u=update_ui.read_text('utf8')
 needle='let block = target.previousElementSibling;'
 assert needle in u
-u=u.replace(needle,needle+"\n      if (block?.classList.contains('tf-total-progress')) block = block.previousElementSibling;",1)
+if "if (block?.classList.contains('tf-total-progress'))" not in u:
+    u=u.replace(needle,needle+"\n      if (block?.classList.contains('tf-total-progress')) block = block.previousElementSibling;",1)
 update_ui.write_text(u,'utf8',newline='\n')
 
 # Regenerate the authoritative integrity registry for the authorized new build.
@@ -75,3 +76,4 @@ actual={str(p.relative_to(out)).replace("\\","/"):hashlib.sha256(p.read_bytes())
 print("File differences:", [k for k in set(actual)|set(expected) if actual.get(k)!=expected.get(k)])
 assert actual==expected, "Built files differ from the locally tested package"
 print("PASS: exact file contents match locally verified REV442")
+
