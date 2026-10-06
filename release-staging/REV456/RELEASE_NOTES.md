@@ -7,4 +7,4 @@ REV456 / v1.17.69
 - Preserve completed results and resume unfinished cards without duplicates.
 
 Validation: zero-loss collector and invalid-data tests; three simulated hours of loading; retries and cancellation; 501-card regression; pair selection and responsive progress.
-\nLive Chrome validation: resumed at 86/89, passed SCA25 291 with zero losses, reached 89/89 (10 passed, 79 skipped); Submit restored in dashboard/sidebar and sidebar progress hidden. Installed files match tested build.\n
+\nRename evidence download button to Export JSON. Live Chrome: Resume from 86/89 completed 89/89 (10 passed, 79 skipped); no duplicates; Submit restored and sidebar progress hidden.\n
