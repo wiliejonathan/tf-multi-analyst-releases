@@ -20,7 +20,7 @@ jobs:
           set -euo pipefail
           mkdir -p /tmp/tf454/src
           gh release download v1.17.66 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV453_MULTI_LINK.zip --output /tmp/tf454/base.zip
-          echo '707eccc7a0047dc7480acad20ce875479e492d8587ebc8851fec9090e029279e  /tmp/tf454/base.zip' | sha256sum -c -
+          echo 'bc14d6258ea0cfbe8954027779a0b5534c1ba2cd3846b56935214a523c1395f8  /tmp/tf454/base.zip' | sha256sum -c -
           unzip -q /tmp/tf454/base.zip -d /tmp/tf454/src
           python3 release-staging/REV454/patch454.py /tmp/tf454/src
           npm install --no-save playwright
