@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-10-05T15:01:45.216839+00:00",
+  "updatedAt": "2026-10-06T08:56:22.638226+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -549,6 +549,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "CHFJPY": {
@@ -815,6 +823,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "CADJPY": {
@@ -1081,6 +1097,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "GBPJPY": {
@@ -1347,6 +1371,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "EURJPY": {
@@ -1613,6 +1645,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "NZDJPY": {
@@ -1879,6 +1919,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "USDJPY": {
@@ -2411,6 +2459,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "EURUSD": {
@@ -2677,6 +2733,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "USDCHF": {
@@ -2943,6 +3007,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "USDCAD": {
@@ -3209,6 +3281,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "AUDUSD": {
@@ -3475,6 +3555,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "NZDUSD": {
@@ -3741,6 +3829,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "EURGBP": {
@@ -4007,6 +4103,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     },
     "EURNZD": {
@@ -4273,6 +4377,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Trending/Rally",
+        "efficiencyRatio": 1.0,
+        "dailyBars": 2,
+        "start": "2026-10-01",
+        "end": "2026-10-04",
+        "provisional": true
       }
     }
   },
