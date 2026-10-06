@@ -1,0 +1,1065 @@
+html:not([data-tf-server-authorized="1"])body{overflow:hidden!important;background:#020617!important;}html:not([data-tf-server-authorized="1"])body>:not(#tf-license-root):not(#tf-server-gate){visibility:hidden!important;pointer-events:none!important;user-select:none!important;}html:not([data-tf-server-authorized="1"])#tf-license-root,html:not([data-tf-server-authorized="1"])#tf-server-gate{visibility:visible!important;pointer-events:auto!important;user-select:auto!important;}*,*::before,*::after{box-sizing:border-box;}:root{--bg:#020617;--bg-elevated:#020617;--bg-card:#020617;--bg-soft:#020617;--border-subtle:#1f2937;--accent:#38bdf8;--accent-soft:rgba(56,189,248,0.1);--accent-strong:#0ea5e9;--fg:#f9fafb;--fg-soft:#9ca3af;--danger:#f97373;--success:#4ade80;--font-main:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}body{margin:0;padding:14.4px;font-family:var(--font-main);background:radial-gradient(circle at top,#0f172a,#020617 40%);color:var(--fg);}.page{max-width:1116px;margin:0 auto 36px auto;}h1,h2,h3{margin:0 0 7.2px 0;font-weight:600;}h1{font-size:21.6px;letter-spacing:0.04em;text-transform:uppercase;}h2{font-size:16.2px;}h3{font-size:13.5px;}p{margin:0;}.sub-heading{font-size:11.7px;color:var(--fg-soft);margin-bottom:14.4px;}.dashboard-header{display:flex;justify-content:space-between;align-items:center;gap:14.4px;margin-bottom:16.2px;}.profile-row{display:flex;align-items:center;gap:9px;min-width:0;}.dashboard-avatar{width:36px;height:36px;border-radius:899.1px;object-fit:cover;border:1px solid rgba(148,163,184,0.8);background:#020617;}.profile-main{display:flex;flex-direction:column;gap:1.8px;min-width:0;}.profile-name{font-size:11.7px;font-weight:600;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;}.profile-status{display:flex;align-items:center;gap:5.4px;font-size:9.9px;color:#6d7277;}.status-dot{width:7.2px;height:7.2px;border-radius:899.1px;background:#22c55e;box-shadow:0 0 0 2.7px rgba(34,197,94,0.25);}.title-block{flex:1;min-width:0;text-align:right;}.title-block h1{margin:0 0 3.6px;}.title-block .sub-heading{margin-bottom:0;}.card{background:rgba(15,23,42,0.96);border-radius:12.6px;padding:14.4px 16.2px 16.2px;margin-bottom:18px;border:1px solid rgba(148,163,184,0.25);box-shadow:0 21.6px 54px rgba(15,23,42,0.8),0 0 0 1px rgba(15,23,42,0.8);backdrop-filter:blur(16.2px);}.card-header{display:flex;justify-content:space-between;align-items:flex-end;gap:10.8px;margin-bottom:10.8px;}.card-title-group{display:flex;flex-direction:column;gap:3.6px;}.card-badge{display:inline-flex;align-items:center;gap:5.4px;font-size:9.9px;padding:1.8px 7.2px;border-radius:899.1px;border:1px solid rgba(148,163,184,0.35);color:var(--fg-soft);background:radial-gradient(circle at top left,rgba(56,189,248,0.13),transparent 55%);}.card-badge-dot{width:7.2px;height:7.2px;border-radius:899.1px;background:radial-gradient(circle,var(--accent-strong),transparent 55%);box-shadow:0 0 7.2px rgba(56,189,248,0.65);}.controls-row{display:flex;flex-wrap:wrap;gap:10.8px;align-items:flex-end;margin-bottom:9px;}.form-group{display:flex;flex-direction:column;gap:3.6px;min-width:144px;}.form-label{font-size:9.9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--fg-soft);}.form-input{padding:6.3px 8.1px;border-radius:8.1px;border:1px solid var(--border-subtle);background:rgba(15,23,42,0.85);color:var(--fg);font-size:11.7px;outline:none;min-width:0;transition:border-color 0.15s ease,box-shadow 0.15s ease,background 0.15s ease;}.form-input::placeholder{color:#4b5563;}.form-input:focus{border-color:var(--accent-strong);box-shadow:0 0 0 1px rgba(56,189,248,0.7);background:#020617;}.btn{border-radius:899.1px;border:1px solid transparent;padding:6.3px 12.6px;font-size:10.8px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:5.4px;background:linear-gradient(135deg,var(--accent),var(--accent-strong));color:#0b1120;box-shadow:0 0 0 1px rgba(15,23,42,0.9),0 14.4px 27px rgba(8,47,73,0.9);white-space:nowrap;transition:transform 0.12s ease,box-shadow 0.12s ease,opacity 0.12s ease;}.btn:disabled{opacity:0.5;cursor:not-allowed;}.btn-xs{padding:2.7px 7.2px;font-size:9px;box-shadow:none;gap:3.6px;}.btn-ghost{background:transparent;border-color:rgba(148,163,184,0.5);color:var(--fg-soft);box-shadow:none;}.btn-icon{width:16.2px;height:16.2px;border-radius:8.1px;border:1px solid rgba(15,23,42,0.9);background:radial-gradient(circle,rgba(248,250,252,0.9),rgba(209,213,219,0.8));display:inline-flex;align-items:center;justify-content:center;font-size:9.9px;color:#020617;}.hint{font-size:9.9px;color:var(--fg-soft);margin-top:1.8px;}.table-wrapper{border-radius:9px;border:1px solid var(--border-subtle);overflow:hidden;background:linear-gradient(180deg,rgba(15,23,42,0.97),rgba(15,23,42,0.96));position:relative;}.table-scroll{max-height:324px;overflow-y:auto;overflow-x:hidden;}.table-scroll.drawdown-noscroll{max-height:none;overflow:visible;overflow-y:visible;overflow-x:visible;}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:10.8px;}.monthly-table-scroll{overflow:auto;}#monthly-table{table-layout:auto;min-width:0;}#monthly-table .monthly-sticky-col-1{position:sticky;left:0;z-index:2;background:var(--bg-card);}#monthly-table .monthly-sticky-col-2{position:sticky;left:72px;z-index:2;background:var(--bg-card);}#monthly-table .monthly-sticky-col-3{position:sticky;left:225px;z-index:2;background:var(--bg-card);}#monthly-table{width:auto;table-layout:auto;}#monthly-table th,#monthly-table td{min-width:99px;}#monthly-table th{white-space:pre-line;}#monthly-table thead th{position:sticky;top:0;z-index:4;background:var(--bg-card);}#monthly-table th.monthly-sticky-col-1,#monthly-table td.monthly-sticky-col-1{min-width:72px;width:72px;left:0;}#monthly-table th.monthly-sticky-col-2,#monthly-table td.monthly-sticky-col-2{min-width:153px;width:153px;left:72px;}#monthly-table th.monthly-sticky-col-3,#monthly-table td.monthly-sticky-col-3{min-width:81px;width:81px;left:225px;}#monthly-table thead th.monthly-sticky-col-1,#monthly-table thead th.monthly-sticky-col-2,#monthly-table thead th.monthly-sticky-col-3{z-index:7;}th,td{padding:5.4px 7.2px;border-bottom:1px solid rgba(30,64,175,0.4);vertical-align:top;word-wrap:break-word;word-break:break-word;white-space:normal;}th{background:radial-gradient(circle at top left,rgba(56,189,248,0.18),rgba(15,23,42,0.98));font-size:8.1px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(248,250,252,0.9);}tbody tr:nth-child(even){background:rgba(15,23,42,0.92);}tbody tr:nth-child(odd){background:rgba(15,23,42,0.98);}tbody tr:hover{background:radial-gradient(circle at top left,rgba(56,189,248,0.12),rgba(15,23,42,1));}.text-right{text-align:right;}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;}.monthly-table td[contenteditable="true"]{outline:none;cursor:text;}.monthly-table td[contenteditable="true"]:empty::before{content:"pips \A signals \A $";color:#4b5563;font-style:italic;white-space:pre-line;}.monthly-table td{font-size:9.9px;line-height:1.3;}#monthly-table th:nth-child(1),#monthly-table td:nth-child(1){width:81px;min-width:81px;max-width:81px;}#monthly-table th:nth-child(2),#monthly-table td:nth-child(2){width:135px;min-width:135px;max-width:135px;}#monthly-table .monthly-sticky-col-1{position:sticky;left:0;z-index:3;background:var(--bg-card);}#monthly-table .monthly-sticky-col-2{position:sticky;left:72px;z-index:3;background:var(--bg-card);}.monthly-table th,.monthly-table td{vertical-align:middle;}#monthly-table th,#monthly-table td{text-align:center!important;vertical-align:middle!important;}#history-table{border-collapse:separate;border-spacing:0;table-layout:auto;min-width:1152px;}#section-history .table-scroll{overflow-x:auto;}#history-table th,#history-table td{white-space:nowrap;}#history-table .tf-history-type-buy{color:#22c55e!important;font-weight:700;}#history-table .tf-history-type-sell{color:#ef4444!important;font-weight:700;}#history-table thead th{position:sticky;top:0;z-index:50;background:var(--bg-card)!important;background-clip:padding-box;border-bottom:1px solid rgba(148,163,184,0.35);box-shadow:0 1.8px 0 rgba(0,0,0,0.15);}#history-table th,#history-table td{text-align:center!important;vertical-align:middle!important;}#history-table .text-right,#history-table .text-left{text-align:center!important;}.monthly-cell-line{display:block;}.monthly-val-positive{color:#22c55e;}.monthly-val-negative{color:#ef4444;}.monthly-total-row td{font-weight:600;border-top:1px dashed rgba(148,163,184,0.6);}.section-note{font-size:9.9px;color:var(--fg-soft);}#rule1-withdraw-note,#rule2-withdraw-note,#rule3-withdraw-note{font-size:6.3px;line-height:1.25;}.chip-row{display:flex;flex-wrap:wrap;gap:5.4px;margin-top:3.6px;}.chip{font-size:9px;border-radius:899.1px;padding:1.8px 7.2px;border:1px dashed rgba(148,163,184,0.5);color:var(--fg-soft);}.tf-income-chip-row .chip{font-size:10.8px;font-weight:700;color:#22c55e;border:1px solid rgba(34,197,94,0.55);background:rgba(34,197,94,0.10);}.tf-income-chip-row .mono{color:#22c55e;}.small-muted{font-size:9px;color:#6b7280;}.fxLogo{height:12.6px;width:auto;vertical-align:middle;margin-left:5.4px;}.fxLogoLink{display:inline-flex;align-items:center;text-decoration:none;}.fxLogoLink:hover{opacity:0.9;}#investingProNavMenuItemWhite{display:inline;}#investingProNavMenuItemBlack{display:none;}.tf-note-sep{opacity:0.65;user-select:none;}.tfRefreshPriceLink{display:inline-flex;align-items:center;gap:5.4px;color:inherit;text-decoration:none;cursor:pointer;}.tfRefreshPriceLink:hover{text-decoration:underline;}.tfRefreshPriceLink[aria-disabled="true"]{pointer-events:none;opacity:0.6;text-decoration:none;cursor:default;}.tfRefreshPriceLink .svgMblExtend{width:12.6px;height:12.6px;display:block;}.tfRefreshPriceLink .svgMblExtend path{stroke:currentColor!important;}.tfRefreshPriceLink.is-loading .svgMblExtend{animation:tfRefreshSpin 0.9s linear infinite;}.tf-price-refresh-cell-spinner{margin-left:3.6px;vertical-align:-1.8px;}@keyframes tfRefreshSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}.pip-table-compact th,.pip-table-compact td{text-align:center;vertical-align:middle;white-space:nowrap;}.pip-table-compact th.pipTh{padding:0 9px 1.8px 9px;font-weight:600;color:var(--fg-soft);}.pip-table-compact td{padding:1.8px 9px;}.pip-table-compact .pipGapTh,.pip-table-compact td.pip-gap{width:36px;min-width:36px;padding:0;border:none!important;}.pip-table-compact-wrap{display:flex;gap:16.2px;align-items:flex-start;}.pip-table-compact{border-collapse:collapse;font-size:9.9px;border:1px solid rgba(148,163,184,0.45);}.pip-table-compact th,.pip-table-compact td{text-align:center;vertical-align:middle;white-space:nowrap;padding:1.8px 9px;border-right:1px solid rgba(148,163,184,0.25);border-bottom:1px solid rgba(148,163,184,0.25);}.pip-table-compact th:last-child,.pip-table-compact td:last-child{border-right:none;}.pip-table-compact tbody tr:last-child td{border-bottom:none;}.tf-perf-wrap{display:flex;flex-wrap:wrap;gap:5.4px 16.2px;align-items:flex-start;margin-top:10.8px;margin-bottom:12.6px;}.tf-perf-card{flex:1;min-width:0;}.tf-perf-overall{flex:0 0 100%;width:100%;border:1px solid rgba(148,163,184,0.45);border-radius:9px;padding:7.2px 9px;margin-top:0px;box-sizing:border-box;}.tf-perf-overall-row{display:flex;align-items:center;gap:9px;}.tf-perf-overall-row .tf-perf-bar-track{flex:1;position:relative;}.tf-perf-overall-label{width:135px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:9.9px;font-weight:600;color:var(--fg);}.tf-perf-overall-pct{width:48.6px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--fg-soft);font-size:9.9px;font-weight:600;}.tf-perf-overall-title{font-size:14.4px;font-weight:600;color:var(--fg);margin:0 0 1.8px 0;}.tf-perf-head{flex:0 0 100%;width:100%;display:flex;flex-direction:column;gap:3.6px;margin:0;}.tf-perf-time-range-row{margin-top:0;margin-bottom:0;}.tf-perf-row-off{background:rgba(148,163,184,0.10);}.tf-perf-row-off td{opacity:0.60;}.tf-perf-row-off .tf-perf-bar-fill{opacity:0.55;}.tf-perf-bar-mid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:8.1px;font-weight:700;line-height:9px;color:var(--fg);white-space:nowrap;max-width:calc(100% - 9px);overflow:hidden;text-overflow:ellipsis;pointer-events:none;text-shadow:0 0 1.8px rgba(0,0,0,0.18),0 0 1.8px rgba(255,255,255,0.18);}.tf-perf-analyst-label{display:flex;align-items:center;gap:5.4px;cursor:pointer;user-select:none;width:100%;min-width:0;}.tf-perf-ck{margin:0;transform:translateY(0.5px);accent-color:var(--accent,#3c8dbc);flex:0 0 auto;}.tf-perf-name-text{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}.tf-perf-title{font-size:10.8px;font-weight:600;color:var(--fg);margin:0 0 5.4px 0;}.tf-perf-table{width:100%;border-collapse:collapse;font-size:9.9px;border:1px solid rgba(148,163,184,0.45);table-layout:fixed;}.tf-perf-table td{padding:5.4px 9px;border-bottom:1px solid rgba(148,163,184,0.25);vertical-align:middle;}.tf-perf-table tr:last-child td{border-bottom:none;}.tf-perf-name{width:135px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fg);}.tf-perf-bar-cell{width:auto;padding-left:0;padding-right:0;}.tf-perf-bar-wrap{display:flex;align-items:center;gap:7.2px;width:100%;}.tf-perf-bar-wrap .tf-perf-bar-track{flex:1;min-width:0;position:relative;}.tf-perf-count{width:64.8px;text-align:right;font-variant-numeric:tabular-nums;color:var(--fg-soft);font-size:9.9px;font-weight:600;white-space:nowrap;flex:0 0 auto;}.tf-perf-loss.tf-perf-loss-red{color:var(--danger,#f97373);}.tf-perf-overall-row .tf-perf-count{width:72px;}.tf-perf-pct{width:48.6px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--fg-soft);}.tf-perf-neg{color:var(--danger,#f97373)!important;font-weight:700;}.tf-perf-bar-track{width:100%;height:9px;border-radius:899.1px;background:rgba(148,163,184,0.20);overflow:hidden;box-shadow:inset 0 0 0 1px rgba(148,163,184,0.20);}.tf-perf-bar-fill{height:100%;width:0%;border-radius:899.1px;background:var(--accent);transition:width 260ms ease;}.mini-spinner{display:inline-block;width:9px;height:9px;border:1.8px solid rgba(148,163,184,0.45);border-top-color:var(--accent);border-radius:50%;animation:tfSpin 0.9s linear infinite;vertical-align:middle;margin-left:5.4px;}.mini-spinner.tight{margin-left:0;}body.tf-wait-price #section-monthly,body.tf-wait-price #section-history{display:none!important;}#tf-wait-price-note{display:none;align-items:center;gap:7.2px;margin-top:7.2px;font-size:10.8px;font-weight:600;color:#c0392b;}body.tf-wait-price #tf-wait-price-note{display:inline-flex;}td.tf-subend-td{vertical-align:middle;}.tf-isignal-subend{display:flex;width:100%;align-items:center;justify-content:flex-start;min-height:14.4px;}.tf-isignal-subend.tf-isusers-sub-loading{justify-content:center;}@keyframes tfSpin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}.history-form{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin-bottom:10.8px;}.tp{color:var(--success);}.sl{color:var(--danger);}@media(max-width:900px){.history-form{grid-template-columns:repeat(2,minmax(0,1fr));}}@media(max-width:600px){body{padding:7.2px;}.card{padding:10.8px;}.card-header{flex-direction:column;align-items:flex-start;}.history-form{grid-template-columns:repeat(1,minmax(0,1fr));}}#equity-curve-section{margin-top:16.2px;}.equity-curve-wrapper{position:relative;width:100%;min-height:405px;}#equity-curve-canvas{width:100%;height:405px;display:block;border-radius:10.8px;background:radial-gradient(circle at top left,rgba(56,189,248,0.08),rgba(15,23,42,1));}.equity-tooltip{position:absolute;pointer-events:none;background:rgba(15,23,42,0.96);border-radius:9px;border:1px solid rgba(148,163,184,0.7);padding:5.4px 7.2px;font-size:9.9px;color:var(--fg);box-shadow:0 16.2px 36px rgba(15,23,42,0.9),0 0 0 1px rgba(15,23,42,0.9);max-width:234px;z-index:20;white-space:nowrap;}.equity-tooltip .label{color:var(--fg-soft);margin-right:3.6px;}.equity-tooltip .value{font-family:var(--font-mono);}.equity-tooltip .tp{color:var(--success);}.equity-tooltip .sl{color:var(--danger);}.equity-tooltip .positive{color:var(--success);}.equity-tooltip .negative{color:var(--danger);}.equity-tooltip .tf-analyst-lines{margin-top:1.8px;margin-bottom:1.8px;white-space:normal;}.equity-tooltip .tf-analyst-line{font-family:var(--font-mono);line-height:1.25;}#equity-empty-note{font-size:10.8px;color:var(--fg-soft);}.equity-drawdown-summary{margin-top:10.8px;padding:7.2px 9px;border-radius:10.8px;background:rgba(15,23,42,0.95);border:1px solid rgba(148,163,184,0.4);font-size:9.9px;line-height:1.4;}.equity-drawdown-summary-title{font-weight:600;margin-bottom:3.6px;font-size:9.9px;}.equity-drawdown-summary-list{margin:3.6px 0 0;padding-left:12.6px;}@media(max-width:700px){#equity-curve-canvas{height:198px;}}.equity-filter-row{margin-top:9px;margin-bottom:9px;display:flex;flex-direction:column;gap:3.6px;}.tf-time-range-row{display:flex;align-items:center;gap:5.4px;flex-wrap:wrap;}.tf-time-range-label{font-size:10.8px;font-weight:500;color:var(--fg-soft);margin-right:1.8px;}.tf-time-range-buttons{display:flex;flex-wrap:wrap;gap:3.6px;}.tf-time-range-btn{font-size:9.9px;padding:2.7px 6.3px;border-radius:9px;border:1px solid var(--border-subtle);background:rgba(15,23,42,0.12);color:var(--fg);cursor:pointer;line-height:1.2;user-select:none;}.tf-time-range-btn.active{background:rgba(15,23,42,0.95);border-color:rgba(15,23,42,0.95);color:#fff;}.tf-time-range-btn:disabled{opacity:0.35;cursor:not-allowed;}.tf-equity-chartmode-row{display:flex;align-items:center;gap:5.4px;flex-wrap:wrap;margin:7.2px 0 9px;}.equity-date-group{display:flex;flex-wrap:wrap;align-items:center;gap:5.4px;font-size:10.8px;}.equity-date-group label{font-weight:500;color:var(--fg-soft);}.equity-date-group input[type="date"]{background:rgba(15,23,42,0.9);border:1px solid var(--border-subtle);border-radius:5.4px;padding:3.6px 5.4px;font-size:10.8px;color:var(--fg);}.equity-date-separator{opacity:0.8;}.equity-analyst-group{display:flex;flex-wrap:wrap;align-items:center;gap:5.4px;font-size:10.8px;}.equity-analyst-group>label{font-weight:500;color:var(--fg-soft);}.equity-analyst-option{display:inline-flex;align-items:center;gap:3.6px;padding:1.8px 5.4px;border-radius:8999.1px;background:rgba(15,23,42,0.9);border:1px solid rgba(148,163,184,0.5);cursor:pointer;}.equity-analyst-option input[type="checkbox"]{margin:0;}.equity-analyst-option span{white-space:nowrap;}#summary-table td{vertical-align:middle;}#summary-table th,#summary-table td{text-align:center!important;vertical-align:middle!important;}#summary-table .text-right{text-align:center!important;}#summary-table select.form-input,#summary-table input.form-input{text-align:center;margin:0 auto;display:block;}.tf-ticker-dropdown{position:relative;display:inline-block;font-size:10.8px;}.tf-ticker-dropdown button{background-color:var(--bg-soft);color:var(--fg);border:1px solid var(--border-subtle);border-radius:3.6px;padding:3.6px 7.2px;cursor:pointer;font-size:10.8px;display:flex;align-items:center;gap:3.6px;}.tf-ticker-dropdown button .caret{border-top:3.6px solid var(--fg);border-right:3.6px solid transparent;border-left:3.6px solid transparent;margin-top:1.8px;}.tf-ticker-dropdown .dropdown-content{display:none;position:absolute;background-color:var(--bg-elevated);color:var(--fg);border:1px solid var(--border-subtle);border-radius:3.6px;min-width:198px;max-height:270px;overflow-y:auto;overflow-x:hidden;z-index:1000;padding:5.4px;}.tf-ticker-dropdown .dropdown-content ul{list-style:none;margin:0;padding-left:10.8px;}.tf-ticker-dropdown .dropdown-content li{margin:0;padding:1.8px 0;position:relative;}.tf-ticker-dropdown .dropdown-content label{cursor:pointer;display:flex;align-items:center;gap:3.6px;font-size:10.8px;user-select:none;}.tf-ticker-dropdown .toggle-arrow{display:inline-block;width:10.8px;text-align:center;cursor:pointer;user-select:none;font-size:9px;transform:rotate(0deg);transition:transform 0.2s ease;}.tf-ticker-dropdown .expanded>.toggle-arrow{transform:rotate(90deg);}.tf-ticker-dropdown .children{margin-left:12.6px;}.tf-history-column-filter-row{margin-bottom:9px;justify-content:flex-start;align-items:center;gap:9px;flex-wrap:wrap;}.tf-history-column-filter .dropdown-content{top:calc(100%+3.6px);left:0;min-width:207px;max-height:324px;padding:7.2px;}.tf-history-column-filter-list{list-style:none;margin:0;padding:0!important;}.tf-history-column-filter-list li{margin:0;padding:2.7px 1.8px!important;}.tf-history-column-filter-list label{display:flex;align-items:center;gap:6.3px;cursor:pointer;white-space:nowrap;}.tf-history-column-filter-list .tf-history-column-filter-all{padding-bottom:5.4px!important;margin-bottom:3.6px;border-bottom:1px solid var(--border-subtle);font-weight:700;}.tf-history-column-filter-footer{display:flex;justify-content:flex-end;padding-top:6.3px;margin-top:4.5px;border-top:1px solid var(--border-subtle);}.tf-history-column-filter-reset{border:0;background:transparent;color:var(--accent,#22c55e);cursor:pointer;font-size:9.9px;padding:1.8px 3.6px;}#history-table[data-history-col].tf-history-col-hidden,#history-table[data-history-col][hidden]{display:none!important;}#history-detail-data-status{display:inline-flex;align-items:center;min-height:19.8px;padding:1.8px 6.3px;border-radius:899.1px;border:1px solid var(--border-subtle);}#history-detail-data-status.tf-history-detail-ready{color:#22c55e;border-color:rgba(34,197,94,0.45);background:rgba(34,197,94,0.08);}.analyst-filter-list{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7.2px;}.analyst-filter-item{position:relative;font-size:10.8px;}.analyst-filter-item label{cursor:pointer;display:flex;align-items:center;gap:3.6px;}.analyst-filter-arrow{cursor:pointer;user-select:none;font-size:9px;margin-left:3.6px;}.analyst-filter-item .sub-menu{position:absolute;top:100%;left:0;background:var(--bg-elevated);border:1px solid var(--border-subtle);border-radius:3.6px;padding:3.6px 5.4px;list-style:none;margin:3.6px 0 0 0;z-index:1000;}.analyst-filter-item .sub-menu li{margin:0;padding:1.8px 0;}.analyst-filter-item .sub-menu label{display:flex;align-items:center;gap:3.6px;font-size:10.8px;}.analyst-filter-item .sub-menu .tf-pair-no-value{color:#ef4444;}.analyst-filter-item .tf-analyst-no-value{color:#ef4444;}.tf-pair-no-history-value{color:#ef4444;}.table-scroll.monthly-table-scroll{overflow-x:auto!important;overflow-y:hidden!important;max-height:none!important;position:relative;}#section-monthly .table-wrapper{overflow:visible!important;}#section-monthly .table-scroll.monthly-table-scroll{border-radius:9px;}#monthly-table{border-collapse:separate;border-spacing:0;}#monthly-table .monthly-sticky-col-1,#monthly-table .monthly-sticky-col-2,#monthly-table .monthly-sticky-col-3{position:sticky!important;}#monthly-table th:nth-child(1),#monthly-table td:nth-child(1){width:81px!important;min-width:81px!important;max-width:81px!important;}#monthly-table th:nth-child(2),#monthly-table td:nth-child(2){width:144px!important;min-width:144px!important;max-width:144px!important;}#monthly-table th:nth-child(3),#monthly-table td:nth-child(3){width:99px!important;min-width:99px!important;max-width:99px!important;}#monthly-table .monthly-sticky-col-1{left:0!important;z-index:6;background:var(--bg-card);}#monthly-table .monthly-sticky-col-2{left:81px!important;z-index:6;background:var(--bg-card);}#monthly-table .monthly-sticky-col-3{left:225px!important;z-index:6;background:var(--bg-card);}#monthly-table thead th{z-index:7;background:var(--bg-card);}#monthly-table thead .monthly-sticky-col-1,#monthly-table thead .monthly-sticky-col-2,#monthly-table thead .monthly-sticky-col-3{z-index:8;background:var(--bg-card);}#monthly-table{width:max-content;}#monthly-table th[data-month-key],#monthly-table td[data-month-key]{width:108px!important;min-width:108px!important;max-width:108px!important;}#section-monthly .table-wrapper{overflow:visible!important;}#section-monthly .table-scroll.monthly-table-scroll{overflow-x:auto!important;overflow-y:hidden!important;position:relative!important;max-height:none!important;-webkit-overflow-scrolling:touch;}#section-monthly #monthly-table{border-collapse:separate!important;border-spacing:0!important;table-layout:auto!important;width:max-content!important;}#section-monthly{--mcol-action:81px;--mcol-analyst:144px;--mcol-pair:99px;}#section-monthly #monthly-table th:nth-child(1),#section-monthly #monthly-table td:nth-child(1){width:var(--mcol-action)!important;min-width:var(--mcol-action)!important;max-width:var(--mcol-action)!important;}#section-monthly #monthly-table th:nth-child(2),#section-monthly #monthly-table td:nth-child(2){width:var(--mcol-analyst)!important;min-width:var(--mcol-analyst)!important;max-width:var(--mcol-analyst)!important;}#section-monthly #monthly-table th:nth-child(3),#section-monthly #monthly-table td:nth-child(3){width:var(--mcol-pair)!important;min-width:var(--mcol-pair)!important;max-width:var(--mcol-pair)!important;}#section-monthly #monthly-table thead th{position:sticky!important;top:0!important;z-index:20!important;background:var(--bg-card)!important;background-clip:padding-box;}#section-monthly #monthly-table .monthly-sticky-col-1,#section-monthly #monthly-table .monthly-sticky-col-2,#section-monthly #monthly-table .monthly-sticky-col-3{position:sticky!important;background:var(--bg-card)!important;background-clip:padding-box;box-shadow:1px 0 0 rgba(31,41,55,0.9);}#section-monthly #monthly-table .monthly-sticky-col-1{left:0!important;z-index:30!important;}#section-monthly #monthly-table .monthly-sticky-col-2{left:var(--mcol-action)!important;z-index:30!important;}#section-monthly #monthly-table .monthly-sticky-col-3{left:calc(var(--mcol-action)+var(--mcol-analyst))!important;z-index:30!important;}#section-monthly #monthly-table thead .monthly-sticky-col-1,#section-monthly #monthly-table thead .monthly-sticky-col-2,#section-monthly #monthly-table thead .monthly-sticky-col-3{z-index:40!important;}#section-monthly #monthly-table.monthly-fit{width:100%!important;min-width:100%!important;max-width:100%!important;table-layout:fixed!important;}#section-monthly #monthly-table.monthly-fit th[data-month-key],#section-monthly #monthly-table.monthly-fit td[data-month-key]{width:auto!important;min-width:0!important;max-width:none!important;}html.tf-preboot body{visibility:hidden;}body.tf-scan-loading #tf-dashboard-main{opacity:0;pointer-events:none;user-select:none;}#tf-dashboard-scan-overlay{position:fixed;inset:0;z-index:999999;display:none;align-items:center;justify-content:center;padding:14.4px;background:rgba(2,6,23,0.78);backdrop-filter:blur(9px);}body.tf-scan-loading #tf-dashboard-scan-overlay{display:flex;}#tf-dashboard-scan-card{width:min(828px,calc(100vw - 25.2px));max-height:calc(100vh - 25.2px);border-radius:14.4px;border:1px solid rgba(148,163,184,0.28);background:rgba(15,23,42,0.96);box-shadow:0 25.2px 72px rgba(0,0,0,0.45);overflow:hidden;display:flex;flex-direction:column;}.tf-scan-head{display:flex;align-items:center;justify-content:space-between;gap:10.8px;padding:12.6px 14.4px 10.8px;border-bottom:1px solid rgba(148,163,184,0.18);}.tf-scan-title{font-size:12.6px;font-weight:700;letter-spacing:0.02em;}.tf-scan-sub{margin-top:1.8px;font-size:10.8px;color:rgba(148,163,184,0.85);}.tf-scan-btn{appearance:none;border:1px solid rgba(148,163,184,0.35);background:rgba(2,6,23,0.35);color:var(--fg);padding:7.2px 10.8px;border-radius:9px;font-size:10.8px;cursor:pointer;transition:transform 0.06s ease,border-color 0.12s ease,background 0.12s ease;white-space:nowrap;}.tf-scan-btn:hover{border-color:rgba(56,189,248,0.55);background:rgba(56,189,248,0.12);}.tf-scan-btn:active{transform:scale(0.98);}.tf-scan-bar{height:9px;margin:0 14.4px 10.8px;border-radius:899.1px;background:rgba(148,163,184,0.14);overflow:hidden;}#tf-dashboard-scan-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,rgba(56,189,248,0.7),rgba(14,165,233,0.95));border-radius:899.1px;transition:width 0.2s ease;}.tf-scan-lists{padding:0 14.4px 14.4px;display:grid;grid-template-columns:1fr;gap:9px;overflow:auto;}.tf-scan-section-title{font-size:10.8px;font-weight:700;letter-spacing:0.02em;color:rgba(226,232,240,0.9);margin-bottom:5.4px;}.tf-scan-list{border:1px solid rgba(148,163,184,0.18);border-radius:10.8px;overflow:hidden;background:rgba(2,6,23,0.28);}.tf-scan-item{display:flex;justify-content:space-between;gap:10.8px;padding:7.2px 9px;font-size:10.8px;border-bottom:1px solid rgba(148,163,184,0.12);}.tf-scan-item:last-child{border-bottom:none;}.tf-scan-item .name{color:rgba(226,232,240,0.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:75%;}.tf-scan-item .state{color:rgba(148,163,184,0.95);white-space:nowrap;}#tf-dashboard-scan-overall{max-height:144px;overflow:auto;}#tf-dashboard-scan-detail{max-height:324px;overflow:auto;}@media(min-width:860px){.tf-scan-lists{grid-template-columns:1fr;}#tf-dashboard-scan-detail{max-height:378px;}}#tf-dashboard-scan-skip.disabled,#tf-dashboard-scan-skip:disabled{opacity:0.5!important;cursor:not-allowed!important;pointer-events:auto!important;}.sltype-select{font-size:9.9px;max-width:126px;width:126px;}#history-table th,#history-table td{text-align:center!important;vertical-align:middle!important;}#history-table tbody tr.tf-start-balance-row td{text-align:left!important;font-weight:700;color:#fbbf24;background:rgba(251,191,36,0.08);border-bottom:1px solid rgba(148,163,184,0.18);}#history-table th.tf-history-cb-head,#history-table td.tf-history-cb-cell{width:39.6px;text-align:center!important;vertical-align:middle!important;padding-left:5.4px;padding-right:5.4px;}#history-table td.tf-history-cb-cell input,#history-table th.tf-history-cb-head input{cursor:pointer;}#history-table tbody tr.tf-row-disabled{opacity:0.45;}#history-table tbody tr.tf-row-disabled td{background:rgba(148,163,184,0.10);}#history-table tbody tr.tf-withdraw-row td{font-weight:700;color:#ef4444;background:rgba(239,68,68,0.08);border-bottom:1px solid rgba(148,163,184,0.18);}.tf-copyright-footer{margin-top:14.4px;display:flex;flex-direction:column;align-items:center;gap:1.8px;padding:5.4px 0;font-size:9.9px;color:rgba(255,255,255,0.72);letter-spacing:0.15px;}.tf-copyright-footer a{color:rgba(255,255,255,0.88);text-decoration:none;border-bottom:1px dotted rgba(255,255,255,0.35);}.tf-copyright-footer a:hover{border-bottom-style:solid;opacity:0.95;}@media print{.tf-copyright-footer{margin-top:10mm;color:#111827;}.tf-copyright-footer a{color:#111827;border-bottom:none;}}#drawdown-table{border-collapse:separate;border-spacing:0;}#drawdown-table thead th{position:sticky;top:0;z-index:50;background:var(--bg-card)!important;background-clip:padding-box;border-bottom:1px solid rgba(148,163,184,0.25);}#drawdown-table th,#drawdown-table td{text-align:center!important;vertical-align:middle!important;}#drawdown-table td{line-height:1.3;}#drawdown-table tr.dd-child-row td{line-height:1.3;}#drawdown-table td.dd-details-control{cursor:pointer;user-select:none;font-size:12.6px;line-height:1;}#drawdown-table tr.dd-open td.dd-details-control{font-size:12.6px;}#drawdown-table tr.dd-child-row td{padding:0!important;background:rgba(2,6,23,0.35);}.drawdown-detail-wrap{padding:5.4px 0;margin:0;}.drawdown-detail-table{width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:10.8px;margin:0;}#drawdown-table tr.dd-child-row td .drawdown-detail-table{table-layout:fixed;}#drawdown-table tr.dd-child-row td .drawdown-detail-table td,#drawdown-table tr.dd-child-row td .drawdown-detail-table th{padding:5.4px 7.2px!important;border-bottom:1px solid rgba(30,64,175,0.4);text-align:center!important;vertical-align:middle!important;line-height:1.3;background:transparent;}#drawdown-table tr.dd-child-row td .drawdown-detail-table tr:last-child td{border-bottom:none;}.tf-switch{display:inline-flex;align-items:center;gap:5.4px;font-size:10.8px;user-select:none;}.tf-switch input{width:12.6px;height:12.6px;vertical-align:middle;}.tf-switch-label{opacity:.9;}.tf-switch{display:inline-flex;align-items:center;gap:5.4px;font-size:10.8px;user-select:none;}.tf-switch input[type="checkbox"]{width:14.4px;height:14.4px;cursor:pointer;}.tf-withdraw-inline{display:flex;align-items:center;gap:9px;}.tf-withdraw-label-row{display:flex;align-items:center;justify-content:space-between;gap:9px;}.tf-withdraw-average{font-size:9.9px;opacity:0.8;white-space:nowrap;}.tf-withdraw-input-equity::placeholder{opacity:0.55;}.tf-withdraw-inline .form-input{flex:1;min-width:144px;}.tf-withdraw-banner{font-weight:600;}.tf-withdraw-max-warning{margin-top:3.6px;font-size:9.9px;color:#ff6b6b;line-height:1.2;}.tf-top-nav-wrap{width:100%;max-width:100%;margin:7.2px 0 10.8px 0;padding:0;position:relative;z-index:999999;overflow:visible;}.tf-top-nav{position:relative;z-index:999999;overflow:visible;display:flex;align-items:center;width:100%;padding:5.4px 7.2px;border-radius:12.6px;background:linear-gradient(180deg,rgba(15,23,42,0.96),rgba(2,6,23,0.94));border:1px solid rgba(148,163,184,0.26);backdrop-filter:blur(10.8px);-webkit-backdrop-filter:blur(10.8px);box-shadow:0 12.6px 36px rgba(0,0,0,0.42);}.tf-top-nav ul{list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:3.6px;flex-wrap:wrap;width:100%;}.tf-top-nav li{position:relative;}.tf-top-nav a{display:inline-flex;align-items:center;gap:6.3px;padding:5.4px 7.2px;border-radius:9px;text-decoration:none;color:var(--fg-soft);font-size:10.8px;line-height:1;user-select:none;transition:background .15s ease,color .15s ease,transform .15s ease;white-space:nowrap;}.tf-top-nav a:hover{background:rgba(56,189,248,0.12);color:var(--fg);transform:translateY(-1px);}.tf-top-nav li.active>a{background:rgba(56,189,248,0.16);color:var(--fg);box-shadow:inset 0 0 0 1px rgba(56,189,248,0.18);}.tf-nav-divider{width:1px;height:18px;background:rgba(148,163,184,0.18);margin:0 3.6px;border-radius:899.1px;flex:0 0 1px;}.tf-nav-icon{display:inline-flex;align-items:center;gap:7.2px;min-width:0;}.tf-nav-icon img{width:14.4px;height:14.4px;object-fit:contain;display:none;filter:drop-shadow(0 1.8px 5.4px rgba(0,0,0,0.25));}.tf-top-nav a .tfnav-img-noactive{display:block;}.tf-top-nav li.active>a .tfnav-img-noactive{display:none;}.tf-top-nav li.active>a .tfnav-img-active{display:block;}.tf-top-nav a:hover .tfnav-img-noactive{display:none;}.tf-top-nav a:hover .tfnav-img-hov{display:block;}.tf-top-nav li.active>a:hover .tfnav-img-active{display:none;}.tf-top-nav li.active>a:hover .tfnav-img-hov{display:block;}.tf-top-nav .tf-caret{font-size:9.9px;opacity:0.8;margin-left:3.6px;}.tf-top-nav .tf-dropdown>.tf-submenu{position:absolute;top:calc(100%+1.8px);left:0;min-width:189px;padding:5.4px;border-radius:10.8px;background:linear-gradient(180deg,rgba(30,41,59,0.94),rgba(15,23,42,0.92));border:1px solid rgba(148,163,184,0.22);backdrop-filter:blur(10.8px);-webkit-backdrop-filter:blur(10.8px);box-shadow:0 16.2px 45px rgba(0,0,0,0.45);display:none;z-index:1000000;}.tf-top-nav .tf-dropdown>.tf-submenu::before{content:"";position:absolute;left:0;right:0;top:-9px;height:9px;}.tf-top-nav .tf-dropdown:hover>.tf-submenu,.tf-top-nav .tf-dropdown.open>.tf-submenu{display:block;}.tf-top-nav .tf-submenu li{width:100%;}.tf-top-nav .tf-submenu a{width:100%;padding:8.1px 9px;border-radius:10.8px;justify-content:flex-start;font-size:10.8px;color:var(--fg-soft);background:transparent;transform:none;}.tf-top-nav .tf-submenu a:hover{background:rgba(56,189,248,0.10);color:var(--fg);transform:none;}.tf-top-nav .tf-submenu .tf-nav-icon img{width:14.4px;height:14.4px;}@media(max-width:640px){.tf-top-nav-wrap{padding:0 9px;}.tf-top-nav a{padding:5.4px 7.2px;font-size:10.8px;}.tf-top-nav .tf-dropdown>.tf-submenu{left:0;right:auto;min-width:180px;}}.tf-isusers-stop-link{color:#e53935!important;font-weight:600;text-decoration:underline;}.tf-users-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10.8px;padding:5.4px 0 9px 0;}.tf-users-detail-head-title{font-weight:600;opacity:0.9;}.tf-users-detail-head-actions a{text-decoration:underline;}.tf-users-set-spinner{width:14.4px!important;height:14.4px!important;box-sizing:border-box;display:none;align-items:center;justify-content:center;margin-right:5.4px;border:1.8px solid rgba(148,163,184,0.65);border-top-color:transparent;border-radius:50%;animation:tfspin 0.9s linear infinite;}
+
+/* REV109 - Score History Analis */
+.tf-score-history-card{margin-top:19.8px;margin-bottom:25.2px}.tf-score-card-header{align-items:flex-start}.tf-score-sortbar{display:flex;align-items:center;padding:9px 12.6px;border-top:1px solid rgba(148,163,184,.18);border-bottom:1px solid rgba(148,163,184,.18)}.tf-score-sort{display:flex;align-items:center;gap:8.1px;font-size:9px;font-weight:700;color:#94a3b8}.tf-score-sort select{width:220.5px;min-height:28.8px;border:1px solid rgba(148,163,184,.28);border-radius:6.3px;background:#0f172a;color:#e5e7eb;padding:3.6px 7.2px;font-size:9.9px;outline:none}.tf-score-sort select:focus{border-color:#00b451;box-shadow:0 0 0 1.8px rgba(0,180,81,.14)}.tf-score-summary-wrap{overflow-x:auto}.tf-score-summary-table,.tf-score-detail-table{width:100%;border-collapse:collapse;table-layout:fixed}.tf-score-summary-table th,.tf-score-summary-table td,.tf-score-detail-table th,.tf-score-detail-table td{padding:6.3px 7.2px;border:1px solid rgba(148,163,184,.18);vertical-align:middle;text-align:center}.tf-score-summary-table th,.tf-score-detail-table th{background:rgba(15,23,42,.92);color:#cbd5e1;font-size:9px;line-height:1.25;white-space:normal}.tf-score-summary-table th:nth-child(1){width:52%}.tf-score-summary-table th:nth-child(2){width:30%}.tf-score-summary-table th:nth-child(3){width:18%}.tf-score-summary-table td{font-size:9.9px}.tf-score-summary-table .tf-score-analyst{text-align:center;font-weight:700}.tf-score-summary-row:hover{background:rgba(0,180,81,.045)}.tf-score-average-cell{font-weight:800;color:#f8fafc}.tf-score-max{font-size:8.1px;color:#94a3b8;font-weight:600}.tf-score-detail-link{display:inline-flex;align-items:center;justify-content:center;min-width:49.5px;padding:3.6px 6.3px;border:1px solid rgba(0,180,81,.45);border-radius:6.3px;color:#4ade80;text-decoration:none;font-weight:800;font-size:9px}.tf-score-detail-link:hover{background:rgba(0,180,81,.12)}.tf-score-expanded-row>td{padding:0!important;background:rgba(2,6,23,.45)}.tf-score-detail-wrap{overflow-x:auto;padding:7.2px}.tf-score-detail-table{min-width:846px}.tf-score-detail-table th:nth-child(1){width:9%}.tf-score-detail-table th:nth-child(2){width:10%}.tf-score-detail-table th:nth-child(n+3){width:11.57%}.tf-score-detail-table td{font-size:8.1px;line-height:1.2;white-space:normal;overflow-wrap:anywhere}.tf-score-detail-table td:first-child{text-align:center}.tf-score-value{display:block;color:#e2e8f0;margin-bottom:1.8px;font-size:8.1px}.tf-score-pill{display:inline-flex;min-width:27.9px;justify-content:center;padding:1px 3.6px;border-radius:899.1px;font-size:7.2px;font-weight:900;background:rgba(148,163,184,.14);color:#cbd5e1}.tf-score-pill.score-4{background:rgba(34,197,94,.18);color:#86efac}.tf-score-pill.score-3{background:rgba(132,204,22,.16);color:#bef264}.tf-score-pill.score-2{background:rgba(234,179,8,.17);color:#fde047}.tf-score-pill.score-1{background:rgba(249,115,22,.17);color:#fdba74}.tf-score-pill.score-0{background:rgba(239,68,68,.17);color:#fca5a5}.tf-score-pill.is-empty{opacity:.7}.tf-score-empty{text-align:center!important;padding:16.2px!important;color:#94a3b8}.tf-score-history-card .card-badge{white-space:nowrap}.tf-score-history-card .section-note{font-size:9px}@media(max-width:620px){.tf-score-sortbar{padding:8.1px}.tf-score-sort{width:100%;align-items:flex-start;flex-direction:column;gap:4.5px}.tf-score-sort select{width:100%}.tf-score-summary-table th,.tf-score-summary-table td{padding:5.4px 4.5px}}
+
+
+/* REV168 — Equity Curve Compare */
+.tf-equity-compare-row{align-items:center;gap:9px;margin:-1.8px 0 9px 0!important;}
+.tf-equity-compare-inline{display:flex;align-items:center;gap:7.2px;margin-left:7.2px;flex-wrap:wrap;}
+.tf-equity-compare-btn{border:1px solid rgba(148,163,184,.42);background:rgba(15,23,42,.78);color:#e5e7eb;border-radius:899.1px;padding:6.3px 11.7px;font-size:10.8px;font-weight:700;cursor:pointer;transition:background .18s ease,border-color .18s ease,box-shadow .18s ease,color .18s ease;}
+.tf-equity-compare-btn:hover{border-color:rgba(56,189,248,.75);}
+.tf-equity-compare-btn.active{background:rgba(22,163,74,.92);border-color:#22c55e;color:#fff;box-shadow:0 0 0 2.7px rgba(34,197,94,.15);}
+.tf-equity-compare-months{width:130.5px!important;padding:5.4px 9px!important;}
+.tf-equity-chart-disabled{opacity:.42!important;cursor:not-allowed!important;filter:grayscale(.55);}
+.tf-equity-compare-legend{margin-left:auto;display:flex;gap:12.6px;align-items:center;flex-wrap:wrap;font-size:9.9px;color:#cbd5e1;}
+.tf-equity-compare-legend span{display:inline-flex;align-items:center;gap:5.4px;}
+.tf-equity-compare-legend i{display:inline-block;width:21.6px;height:2.7px;border-radius:899.1px;}
+.tf-equity-summary-mode-title{font-size:10.8px;font-weight:800;letter-spacing:.04em;margin-bottom:5.4px;text-transform:uppercase;}
+.tf-equity-summary-primary-title{color:#38bdf8;}
+.tf-equity-summary-secondary{margin-top:10.8px;border-color:rgba(167,139,250,.55)!important;}
+.tf-equity-summary-secondary-title{color:#a78bfa;}
+@media (max-width:760px){.tf-equity-compare-inline{margin-left:0;width:100%;}.tf-equity-compare-legend{margin-left:0;width:100%;}}
+
+/* REV169 — Compare uses dual Y scales and fully distinct solid-line palettes */
+.tf-equity-summary-secondary{border-color:rgba(167,139,250,.68)!important;box-shadow:inset 0 0 0 1px rgba(167,139,250,.06);}
+.tf-equity-compare-legend i{box-shadow:0 0 0 1px rgba(255,255,255,.08);}
+
+/* REV171 — Compare preserves actual values with gentler compression and smooth ordered-trade progression. */
+.tf-equity-actual-scale-note{display:inline-flex;align-items:center;padding:2.7px 7.2px;border:1px solid rgba(148,163,184,.28);border-radius:899.1px;color:#94a3b8;font-size:9px;white-space:nowrap;}
+
+/* REV172 — Same-unit Compare uses full plot width; right-axis margin only for mixed units. */
+
+/* REV180 — Dense risk summary: compact cards, input-capital scenario, and short scroll distance. */
+.tf-summary-section{margin-top:5.4px;padding:6.3px;border:1px solid rgba(148,163,184,.28);border-radius:8.1px;background:rgba(15,23,42,.22)}
+.tf-summary-section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:5.4px;flex-wrap:wrap;margin-bottom:3.6px}
+.tf-summary-section-title{font-weight:850;font-size:9.9px;line-height:1.25}
+.tf-summary-section-subtitle{margin-top:1px;font-size:7.2px;opacity:.68;line-height:1.25;max-width:828px}
+.tf-summary-row-label{margin:3.6px 0 1.8px;font-size:7.2px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:#94a3b8}
+.tf-summary-row-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(115.2px,171px));gap:3.6px;justify-content:start;align-items:stretch}
+.tf-summary-metric{min-width:0;padding:3.6px 4.5px;border:1px solid rgba(148,163,184,.2);border-radius:6.3px;background:rgba(2,6,23,.18)}
+.tf-summary-metric-label{font-size:7.2px;opacity:.72;margin-bottom:1.8px;line-height:1.15}
+.tf-summary-metric-main{display:flex;align-items:flex-start;justify-content:space-between;gap:3.6px;min-width:0}
+.tf-summary-metric-value{min-width:0;font-size:9px;font-weight:750;line-height:1.25;overflow-wrap:anywhere}
+.tf-summary-metric-note{font-size:6.3px;opacity:.56;margin-top:1px;line-height:1.2;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:1;overflow:hidden}
+.tf-summary-date-lines{display:grid;gap:1px}
+.tf-summary-date-line{display:grid;grid-template-columns:31.5px minmax(0,1fr);gap:3.6px;align-items:start}
+.tf-summary-date-line span{font-family:var(--font-main);font-size:6.3px;font-weight:700;opacity:.65;text-transform:uppercase}
+.tf-summary-date-line strong{font-size:8.1px;line-height:1.2;overflow-wrap:anywhere}
+.tf-summary-inline-pct{font-size:7.2px;opacity:.92}
+.tf-summary-empty{font-size:8.1px;opacity:.72;padding:2.7px 1px}
+.tf-summary-detail-btn{flex:0 0 auto;border:1px solid rgba(56,189,248,.42);border-radius:899.1px;background:rgba(56,189,248,.08);color:#7dd3fc;padding:1px 5.4px;font-size:6.3px;font-weight:800;cursor:pointer;line-height:1.25}
+.tf-summary-detail-btn:hover,.tf-summary-detail-btn[aria-expanded="true"]{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.72);color:#e0f2fe}
+.tf-summary-detail-panel{margin-top:4.5px;border:1px solid rgba(148,163,184,.3);border-radius:7.2px;background:rgba(2,6,23,.25);overflow:hidden}
+.tf-summary-detail-panel[hidden]{display:none!important}
+.tf-summary-detail-head{display:flex;align-items:center;justify-content:space-between;gap:5.4px;padding:3.6px 5.4px;border-bottom:1px solid rgba(148,163,184,.2);font-size:7.2px}
+.tf-summary-detail-head span{color:#94a3b8}
+.tf-summary-detail-scroll{max-height:148.5px;overflow:auto}
+.tf-summary-detail-table{width:100%;min-width:612px;border-collapse:collapse;table-layout:auto;font-size:7.2px}
+.tf-summary-detail-table th,.tf-summary-detail-table td{padding:2.7px 4.5px;white-space:nowrap;vertical-align:middle}
+.tf-summary-detail-table th{font-size:6.3px}
+.tf-summary-detail-table tfoot td{font-weight:800;border-top:1px solid rgba(148,163,184,.28)}
+.tf-equity-summary-combined{margin-top:0;border-color:rgba(56,189,248,.38)!important}
+.tf-summary-compare-head{display:flex;gap:4.5px;align-items:center;flex-wrap:wrap;margin-bottom:2.7px}
+.tf-summary-series-chip{display:inline-flex;align-items:center;padding:1.8px 5.4px;border-radius:899.1px;font-size:7.2px;font-weight:850;border:1px solid transparent}
+.tf-summary-series-chip.primary{color:#7dd3fc;background:rgba(56,189,248,.09);border-color:rgba(56,189,248,.34)}
+.tf-summary-series-chip.secondary{color:#c4b5fd;background:rgba(167,139,250,.09);border-color:rgba(167,139,250,.34)}
+.tf-summary-compare-grid{grid-template-columns:repeat(auto-fit,minmax(126px,171px))}
+.tf-summary-compare-metric{padding:3.6px 4.5px}
+.tf-summary-compare-line{display:grid;grid-template-columns:14.4px minmax(0,1fr) auto;gap:3.6px;align-items:center;padding-top:1.8px;margin-top:1.8px;border-top:1px solid rgba(148,163,184,.12)}
+.tf-summary-compare-line.primary{color:#38bdf8}
+.tf-summary-compare-line.secondary{color:#a78bfa}
+.tf-summary-series-mini{display:inline-flex;align-items:center;justify-content:center;width:13.5px;height:13.5px;border-radius:899.1px;font-size:6.3px;font-weight:900}
+.tf-summary-series-mini.primary,.tf-summary-compare-line.primary .tf-summary-series-mini{color:#0c4a6e;background:#7dd3fc}
+.tf-summary-series-mini.secondary,.tf-summary-compare-line.secondary .tf-summary-series-mini{color:#4c1d95;background:#c4b5fd}
+.tf-summary-compare-line .tf-summary-metric-value{font-size:8.1px;color:inherit}
+.tf-summary-compare-line .tf-summary-detail-btn{padding:1px 4.5px;font-size:5.4px}
+@media(min-width:761px){
+.tf-summary-row-grid[data-summary-row="streak-overview"]{grid-template-columns:211.5px 139.5px 153px}
+.tf-summary-row-grid[data-summary-row="streak-percent"]{grid-template-columns:189px 189px}
+.tf-summary-row-grid[data-summary-row="streak-input-capital"],.tf-summary-row-grid[data-summary-row="streak-history-capital"]{grid-template-columns:repeat(3,162px)}
+.tf-summary-row-grid[data-summary-row="maximum-overview"]{grid-template-columns:211.5px 153px 153px 162px}
+.tf-summary-row-grid[data-summary-row="maximum-percent"]{grid-template-columns:189px 189px}
+.tf-summary-row-grid[data-summary-row="maximum-capital"]{grid-template-columns:repeat(auto-fit,minmax(144px,166.5px))}
+.tf-summary-row-grid[data-summary-row="balance-overall"]{grid-template-columns:repeat(3,171px)}
+.tf-summary-compare-grid[data-summary-row="streak-overview"]{grid-template-columns:211.5px 153px 162px}
+.tf-summary-compare-grid[data-summary-row="maximum-overview"]{grid-template-columns:211.5px repeat(3,162px)}
+}
+@media(max-width:760px){.tf-summary-row-grid,.tf-summary-compare-grid{grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch}.tf-summary-section{padding:5.4px}.tf-summary-metric{padding:3.6px}.tf-summary-detail-scroll{max-height:171px}}
+@media(max-width:460px){.tf-summary-row-grid,.tf-summary-compare-grid{grid-template-columns:1fr}.tf-summary-date-line{grid-template-columns:30.6px minmax(0,1fr)}}
+
+/* REV181 risk summary redesign */
+#equity-drawdown-detail{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:7.2px;align-items:start}
+#equity-drawdown-detail .tf-summary-section{margin-top:0;padding:7.2px 8.1px;border-radius:9.9px;background:linear-gradient(180deg,rgba(13,22,43,.42),rgba(6,14,30,.26));box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+#equity-drawdown-detail .tf-summary-section[data-summary-section="balance"]{grid-column:1 / -1}
+#equity-drawdown-detail .tf-summary-section-title{font-size:10.8px}
+#equity-drawdown-detail .tf-summary-section-subtitle{font-size:7.2px;max-width:none}
+#equity-drawdown-detail .tf-summary-row-label{font-size:8.1px;margin:6.3px 0 2.7px;opacity:.9;letter-spacing:.02em}
+#equity-drawdown-detail .tf-summary-row-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4.5px;justify-content:stretch;align-items:stretch}
+#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="streak-percent"],
+#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-percent"],
+#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-capital"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-overview"]{grid-template-columns:repeat(2,minmax(0,1fr))}
+#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="balance-overall"]{grid-template-columns:repeat(3,minmax(0,1fr))}
+#equity-drawdown-detail .tf-summary-metric{padding:4.5px 5.4px;min-width:0;max-width:none}
+#equity-drawdown-detail .tf-summary-metric-label{font-size:7.2px;margin-bottom:1.8px}
+#equity-drawdown-detail .tf-summary-metric-value{font-size:9px;line-height:1.22}
+#equity-drawdown-detail .tf-summary-metric-note{font-size:6.3px;white-space:normal;-webkit-line-clamp:2}
+#equity-drawdown-detail .tf-summary-detail-btn{padding:1px 4.5px;font-size:6.3px}
+#equity-drawdown-detail .tf-summary-detail-panel{grid-column:1/-1;margin-top:3.6px}
+#equity-drawdown-detail .tf-summary-date-line{grid-template-columns:36px minmax(0,1fr);gap:5.4px}
+@media(max-width:1100px){#equity-drawdown-detail{grid-template-columns:1fr}#equity-drawdown-detail .tf-summary-section[data-summary-section="balance"]{grid-column:auto}#equity-drawdown-detail .tf-summary-row-grid,#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-overview"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="streak-percent"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-percent"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-capital"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="balance-overall"]{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){#equity-drawdown-detail .tf-summary-row-grid,#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-overview"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="streak-percent"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-percent"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="maximum-capital"],#equity-drawdown-detail .tf-summary-row-grid[data-summary-row="balance-overall"]{grid-template-columns:1fr}}
+
+/* REV190 — risk detail clarity + hoisted overall balance */
+#equity-drawdown-summary>.tf-summary-balance-hoisted{margin:0 0 6.3px 0;padding:6.3px 7.2px;border-radius:8.1px;background:rgba(8,18,36,.48);border-color:rgba(56,189,248,.28)}
+#equity-drawdown-summary>.tf-summary-balance-hoisted .tf-summary-row-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:3.6px}
+#equity-drawdown-summary>.tf-summary-balance-hoisted .tf-summary-row-grid[data-summary-row="balance-risk-pct"]{grid-template-columns:repeat(2,minmax(162px,1fr))}
+.tf-summary-detail-method{display:flex;align-items:center;gap:5.4px;flex-wrap:wrap;padding:3.6px 5.4px;border-bottom:1px solid rgba(148,163,184,.14);font-size:6.3px;color:#94a3b8;background:rgba(15,23,42,.26)}
+.tf-summary-detail-method-badge{display:inline-flex;padding:1px 4.5px;border:1px solid rgba(56,189,248,.28);border-radius:899.1px;color:#bae6fd;background:rgba(56,189,248,.08);font-weight:800;white-space:nowrap}
+.tf-summary-detail-table th:nth-child(7),.tf-summary-detail-table td:nth-child(7){min-width:64.8px}
+.tf-summary-row-grid[data-summary-row="balance-risk-pct"]{grid-template-columns:repeat(2,minmax(162px,198px))}
+@media(max-width:640px){#equity-drawdown-summary>.tf-summary-balance-hoisted .tf-summary-row-grid[data-summary-row="balance-risk-pct"],.tf-summary-row-grid[data-summary-row="balance-risk-pct"]{grid-template-columns:1fr}}
+/* REV286 — Table 1 Swap/Commission controls + Table 3 cost columns */
+.tf-mm-controls-row{gap:5.4px;align-items:flex-end;flex-wrap:wrap;}
+.tf-mm-controls-row>.tf-mm-main-input{flex:0 0 135px;min-width:135px;width:135px;}
+.tf-mm-controls-row>.tf-mm-cost-input{flex:0 0 81px;min-width:81px;width:81px;}
+.tf-mm-controls-row>.tf-mm-action-btn{flex:0 0 108px;width:108px;min-width:108px;padding-left:8.1px;padding-right:8.1px;font-size:9.9px;}
+.tf-cost-toggle-group{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4.5px;flex:0 0 19.8px;min-width:19.8px;padding-bottom:3.6px;}
+.tf-cost-toggle-group .form-label{font-size:8.1px;letter-spacing:.04em;}
+.tf-cost-switch{display:inline-flex!important;align-items:center!important;}
+.tf-cost-switch input[type="checkbox"]{-webkit-appearance:none;appearance:none;width:23.4px!important;height:12.6px!important;margin:0;cursor:pointer;border-radius:899.1px;border:1px solid rgba(148,163,184,.55);background:rgba(71,85,105,.75);position:relative;transition:background .15s ease,border-color .15s ease,box-shadow .15s ease;}
+.tf-cost-switch input[type="checkbox"]::after{content:"";position:absolute;width:9px;height:9px;left:1px;top:1px;border-radius:50%;background:#e5e7eb;transition:transform .15s ease;box-shadow:0 1px 2.7px rgba(0,0,0,.45);}
+.tf-cost-switch input[type="checkbox"]:checked{background:#22c55e;border-color:#22c55e;box-shadow:0 0 0 1.8px rgba(34,197,94,.12);}
+.tf-cost-switch input[type="checkbox"]:checked::after{transform:translateX(10.8px);background:#fff;}
+#history-table{min-width:1566px;}
+#history-table [data-history-col="swapDollar"],#history-table [data-history-col="commDollar"]{font-variant-numeric:tabular-nums;}
+@media(max-width:1050px){.tf-mm-controls-row>.tf-mm-main-input{flex-basis:126px;width:126px;min-width:126px}.tf-mm-controls-row>.tf-mm-action-btn{flex-basis:104.4px;width:104.4px;min-width:104.4px}.tf-mm-controls-row>.tf-mm-cost-input{flex-basis:77.4px;width:77.4px;min-width:77.4px}}
+/* REV287 — compact conditional cost columns + synced section tickers */
+#history-table{min-width:1152px;}
+#history-table th.tf-cost-net-head{min-width:91.8px!important;max-width:106.2px;white-space:normal!important;line-height:1.15!important;padding-left:5.4px;padding-right:5.4px;}
+#history-table th.tf-cost-value-head{min-width:63px!important;max-width:73.8px;padding-left:5.4px;padding-right:5.4px;}
+#history-table [data-history-col="pnlDollarNet"],#history-table [data-history-col="pnlPercentNet"]{min-width:91.8px;}
+#history-table [data-history-col="swapDollar"],#history-table [data-history-col="commDollar"]{min-width:63px;}
+.tf-cost-sync-tickers{display:inline-flex;align-items:center;gap:7.2px;margin-left:3.6px;padding-left:8.1px;border-left:1px solid rgba(148,163,184,.28);}
+.tf-cost-ticker{display:inline-flex;align-items:center;gap:3.6px;font-size:9px;color:var(--fg-soft);cursor:pointer;user-select:none;white-space:nowrap;}
+.tf-cost-ticker input[type="checkbox"]{width:12.6px!important;height:12.6px!important;margin:0;cursor:pointer;accent-color:#22c55e;}
+.tf-cost-ticker:has(input:checked){color:#bbf7d0;}
+.tf-withdraw-toggle-switch{margin-right:0;}
+.tf-mm-controls-row>.tf-mm-cost-input{flex:0 0 93.6px;min-width:93.6px;width:93.6px;}
+@media(max-width:1050px){.tf-mm-controls-row>.tf-mm-cost-input{flex-basis:86.4px;width:86.4px;min-width:86.4px}.tf-cost-sync-tickers{margin-left:0;padding-left:5.4px;gap:5.4px}}
+
+/* REV288 — Table 1 second-row Swap/Comm/Withdraw alignment */
+.tf-mm-primary-row{margin-bottom:6.3px;}
+.tf-mm-secondary-row{display:flex;align-items:flex-end;gap:10.8px;flex-wrap:wrap;margin-top:0;margin-bottom:7.2px;}
+.tf-mm-inline-pair{display:flex;align-items:flex-end;gap:6.3px;min-width:0;}
+.tf-mm-row-switch{flex:0 0 auto;margin-bottom:9px;}
+.tf-mm-secondary-row .tf-mm-cost-input{width:115.2px;min-width:115.2px;}
+.tf-mm-secondary-row .tf-mm-cost-input .form-input{width:100%;}
+.tf-mm-withdraw-pair{gap:6.3px;align-items:flex-end;flex-wrap:nowrap;}
+.tf-mm-withdraw-input-group{width:252px;min-width:252px;}
+.tf-mm-withdraw-input-group .form-input{width:100%;}
+.tf-mm-withdraw-period-group{width:153px;min-width:153px;}
+.tf-mm-withdraw-period-group select{width:153px;padding:5.4px 9px;}
+.tf-mm-withdraw-btn{width:162px;min-width:162px;flex:0 0 162px;}
+#tf-mm-cost-withdraw-row .form-label{white-space:nowrap;}
+#tf-mm-cost-withdraw-row .tf-withdraw-label-row{display:flex;align-items:center;justify-content:space-between;gap:9px;}
+@media(max-width:1050px){
+  .tf-mm-secondary-row{gap:8.1px;}
+  .tf-mm-secondary-row .tf-mm-cost-input{width:100.8px;min-width:100.8px;}
+  .tf-mm-withdraw-input-group{width:225px;min-width:225px;}
+  .tf-mm-withdraw-period-group,.tf-mm-withdraw-period-group select{width:135px;min-width:135px;}
+  .tf-mm-withdraw-btn{width:148.5px;min-width:148.5px;flex-basis:148.5px;}
+}
+@media(max-width:760px){
+  .tf-mm-secondary-row{align-items:flex-end;}
+  .tf-mm-withdraw-pair{flex-wrap:wrap;}
+}
+
+/* ============================================================================
+   REV358 — PC TABLE VISUAL REFINEMENT (PRESENTATION ONLY)
+   Scope: Table 1, Table 2, Table 3, Table 4. Drawdown & Consecutive Stats is
+   intentionally NOT overridden here so it falls back to the original pre-REV356
+   design. No data/calculation/scan/Remote/Device Lock logic changed.
+   ============================================================================ */
+
+/* Shared table surface for Table 1/2/3 only. */
+#summary-table,
+#monthly-table,
+#history-table{
+  border-collapse:separate!important;
+  border-spacing:0!important;
+  background:#07101f;
+}
+#summary-table th,#summary-table td,
+#monthly-table th,#monthly-table td,
+#history-table th,#history-table td{
+  padding:6.3px 7.2px!important;
+  border-bottom:1px solid rgba(30,64,175,.40)!important;
+  border-right:1px solid rgba(51,65,85,.34);
+  text-align:center!important;
+  vertical-align:middle!important;
+  line-height:1.3;
+}
+
+/* Strong, fully solid headers across Table 1/2/3/4. */
+#summary-table thead th,
+#monthly-table thead th,
+#history-table thead th,
+.tf-score-summary-table thead th,
+.tf-score-detail-table thead th{
+  background:#132238!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  border-bottom:1.8px solid #2d6f9f!important;
+  border-right:1px solid #26374e!important;
+  font-weight:800!important;
+  letter-spacing:.055em;
+  text-transform:uppercase;
+  box-shadow:0 1.8px 0 rgba(0,0,0,.28)!important;
+  background-clip:padding-box!important;
+  opacity:1!important;
+}
+#summary-table thead th,
+#monthly-table thead th,
+#history-table thead th{font-size:9px;}
+.tf-score-summary-table thead th,
+.tf-score-detail-table thead th{font-size:9px!important;}
+
+#summary-table tbody tr:nth-child(odd),
+#monthly-table tbody tr:nth-child(odd),
+#history-table tbody tr:nth-child(odd){background:rgba(15,23,42,.98);}
+#summary-table tbody tr:nth-child(even),
+#monthly-table tbody tr:nth-child(even),
+#history-table tbody tr:nth-child(even){background:rgba(15,23,42,.92);}
+
+/* Compact scrollbars for the three revised tables only. */
+#section-summary .table-scroll,
+#section-monthly .table-scroll,
+#section-history>.table-wrapper>.table-scroll{
+  scrollbar-width:thin;
+  scrollbar-color:#334155 #07101f;
+}
+#section-summary .table-scroll::-webkit-scrollbar,
+#section-monthly .table-scroll::-webkit-scrollbar,
+#section-history>.table-wrapper>.table-scroll::-webkit-scrollbar{height:8.1px;width:8.1px;}
+#section-summary .table-scroll::-webkit-scrollbar-track,
+#section-monthly .table-scroll::-webkit-scrollbar-track,
+#section-history>.table-wrapper>.table-scroll::-webkit-scrollbar-track{background:#07101f;border-radius:899.1px;}
+#section-summary .table-scroll::-webkit-scrollbar-thumb,
+#section-monthly .table-scroll::-webkit-scrollbar-thumb,
+#section-history>.table-wrapper>.table-scroll::-webkit-scrollbar-thumb{background:#334155;border-radius:899.1px;border:1.8px solid #07101f;}
+
+/* TABLE 1 — pinned analyst identity rail. */
+#summary-table{
+  min-width:882px!important;
+  table-layout:auto!important;
+}
+#section-summary .table-scroll.monthly-table-scroll{
+  overflow-x:auto!important;
+  overflow-y:auto;
+  position:relative;
+}
+#summary-table thead th{position:sticky;top:0;z-index:30;}
+#summary-table th:first-child,
+#summary-table td:first-child,
+#summary-table .monthly-sticky-col-2{
+  position:sticky!important;
+  left:0!important;
+  width:162px!important;
+  min-width:162px!important;
+  max-width:162px!important;
+  z-index:24;
+  background:#0f172a!important;
+  background-image:none!important;
+  background-clip:padding-box!important;
+  box-shadow:1.8px 0 0 rgba(56,189,248,.22),7.2px 0 12.6px rgba(2,6,23,.22);
+  font-weight:800!important;
+}
+#summary-table thead th:first-child{
+  z-index:42!important;
+  background:#132238!important;
+  background-image:none!important;
+}
+#summary-table tbody tr:nth-child(even)>td:first-child{background:#0d1628!important;}
+#summary-table tbody tr:hover>td:first-child{background:#14213a!important;}
+
+/* Table 1 Risk % / Trade values: left aligned as requested. */
+#summary-table tbody td:nth-child(9),
+#summary-table tbody td:nth-child(9) input,
+#summary-table tbody td:nth-child(9) .form-input{
+  text-align:left!important;
+}
+
+/* Slightly stronger analyst-name text, without changing table data. */
+#summary-table tbody td:first-child,
+#section-monthly #monthly-table tbody .monthly-sticky-col-2,
+#history-table tbody td[data-history-col="analyst"],
+.tf-score-summary-table tbody .tf-score-analyst{
+  color:#dbeafe!important;
+  font-weight:800!important;
+}
+
+/* TABLE 2 — pinned ACTION / NAMA ANALIS / PAIR. */
+#section-monthly{--rev358-mcol-action:81px;--rev358-mcol-analyst:153px;--rev358-mcol-pair:94.5px;}
+#section-monthly .table-wrapper{overflow:visible!important;}
+#section-monthly .table-scroll.monthly-table-scroll{
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  max-height:none!important;
+  position:relative!important;
+  border-radius:9px;
+}
+#section-monthly #monthly-table{
+  width:max-content!important;
+  min-width:100%!important;
+  table-layout:auto!important;
+}
+#section-monthly #monthly-table th[data-month-key],
+#section-monthly #monthly-table td[data-month-key]{min-width:108px!important;}
+#section-monthly #monthly-table thead th{position:sticky!important;top:0!important;z-index:30!important;}
+#section-monthly #monthly-table .monthly-sticky-col-1,
+#section-monthly #monthly-table .monthly-sticky-col-2,
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  position:sticky!important;
+  background:#0f172a!important;
+  background-image:none!important;
+  background-clip:padding-box!important;
+  z-index:35!important;
+  margin:0!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-1{
+  left:0!important;
+  width:var(--rev358-mcol-action)!important;
+  min-width:var(--rev358-mcol-action)!important;
+  max-width:var(--rev358-mcol-action)!important;
+  box-shadow:none!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-2{
+  left:calc(var(--rev358-mcol-action) - 1px)!important;
+  width:var(--rev358-mcol-analyst)!important;
+  min-width:var(--rev358-mcol-analyst)!important;
+  max-width:var(--rev358-mcol-analyst)!important;
+  border-left:1px solid #26374e!important;
+  border-right:0!important;
+  box-shadow:none!important;
+  font-weight:800!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  left:calc(var(--rev358-mcol-action) + var(--rev358-mcol-analyst) - 1.8px)!important;
+  width:var(--rev358-mcol-pair)!important;
+  min-width:var(--rev358-mcol-pair)!important;
+  max-width:var(--rev358-mcol-pair)!important;
+  border-left:1px solid #26374e!important;
+  box-shadow:1.8px 0 0 rgba(56,189,248,.22),7.2px 0 12.6px rgba(2,6,23,.18)!important;
+}
+/* Force the first three Table 2 headers to be fully opaque / solid. */
+#section-monthly #monthly-table thead .monthly-sticky-col-1,
+#section-monthly #monthly-table thead .monthly-sticky-col-2,
+#section-monthly #monthly-table thead .monthly-sticky-col-3{
+  z-index:45!important;
+  background:#132238!important;
+  background-image:none!important;
+  opacity:1!important;
+}
+#section-monthly #monthly-table tbody tr:nth-child(even)>.monthly-sticky-col-1,
+#section-monthly #monthly-table tbody tr:nth-child(even)>.monthly-sticky-col-2,
+#section-monthly #monthly-table tbody tr:nth-child(even)>.monthly-sticky-col-3{background:#0d1628!important;}
+#section-monthly #monthly-table tbody tr:hover>.monthly-sticky-col-1,
+#section-monthly #monthly-table tbody tr:hover>.monthly-sticky-col-2,
+#section-monthly #monthly-table tbody tr:hover>.monthly-sticky-col-3{background:#14213a!important;}
+#section-monthly #monthly-table tr.monthly-total-row td{
+  font-weight:800;
+  background:#0a1830!important;
+  border-top:1px solid rgba(56,189,248,.30)!important;
+}
+#section-monthly #monthly-table tr.monthly-total-row .monthly-sticky-col-1{
+  left:0!important;
+  z-index:39!important;
+  background:#0a1830!important;
+  box-shadow:none!important;
+}
+
+/* TABLE 3 — checkbox/ticker + analyst stay pinned. */
+#section-history>.table-wrapper>.table-scroll{
+  overflow-x:auto!important;
+  overflow-y:auto!important;
+  position:relative!important;
+  scrollbar-gutter:stable;
+}
+#history-table{min-width:1188px!important;table-layout:auto!important;}
+#history-table thead th{position:sticky!important;top:0!important;z-index:36!important;}
+#history-table th.tf-history-cb-head,
+#history-table td.tf-history-cb-cell{
+  position:sticky!important;
+  left:0!important;
+  width:39.6px!important;
+  min-width:39.6px!important;
+  max-width:39.6px!important;
+  z-index:41!important;
+  background:#0f172a!important;
+  background-image:none!important;
+  background-clip:padding-box!important;
+}
+#history-table th[data-history-col="analyst"],
+#history-table td[data-history-col="analyst"]{
+  position:sticky!important;
+  left:39.6px!important;
+  width:157.5px!important;
+  min-width:157.5px!important;
+  max-width:157.5px!important;
+  z-index:40!important;
+  background:#0f172a!important;
+  background-image:none!important;
+  background-clip:padding-box!important;
+  box-shadow:1.8px 0 0 rgba(56,189,248,.22),7.2px 0 12.6px rgba(2,6,23,.22);
+  font-weight:800!important;
+}
+#history-table thead th.tf-history-cb-head,
+#history-table thead th[data-history-col="analyst"]{
+  z-index:55!important;
+  background:#132238!important;
+  background-image:none!important;
+  opacity:1!important;
+}
+#history-table tbody tr:nth-child(even)>td.tf-history-cb-cell,
+#history-table tbody tr:nth-child(even)>td[data-history-col="analyst"]{background:#0d1628!important;}
+#history-table tbody tr:hover>td.tf-history-cb-cell,
+#history-table tbody tr:hover>td[data-history-col="analyst"]{background:#14213a!important;}
+#history-table tbody tr.tf-row-disabled>td.tf-history-cb-cell,
+#history-table tbody tr.tf-row-disabled>td[data-history-col="analyst"]{background:#172033!important;}
+#history-table tbody tr.tf-withdraw-row>td.tf-history-cb-cell,
+#history-table tbody tr.tf-withdraw-row>td[data-history-col="analyst"]{background:#23151d!important;color:#ef4444!important;}
+
+/* TABLE 4 — only make headers solid/stronger and analyst name slightly firmer. */
+.tf-score-summary-table thead th,
+.tf-score-detail-table thead th{
+  background:#132238!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+  opacity:1!important;
+}
+
+/* Print: disable sticky positioning for clean PDF/print layout. */
+@media print{
+  #summary-table th:first-child,#summary-table td:first-child,#summary-table .monthly-sticky-col-2,
+  #monthly-table .monthly-sticky-col-1,#monthly-table .monthly-sticky-col-2,#monthly-table .monthly-sticky-col-3,
+  #history-table th.tf-history-cb-head,#history-table td.tf-history-cb-cell,#history-table th[data-history-col="analyst"],#history-table td[data-history-col="analyst"]{
+    position:static!important;
+    box-shadow:none!important;
+  }
+}
+
+
+/* ============================================================================
+   REV360 — TABLE 1 RISK STEPPER + TABLE 2 ZERO-GAP STICKY RAIL
+   Scope only: per-row Risk % / Trade input and Table 2 ACTION/NAMA ANALIS/PAIR.
+   ============================================================================ */
+
+/* Table 1: keep requested left alignment while restoring native up/down arrows. */
+#summary-table tbody td:nth-child(9) input.tf-summary-risk-input{
+  text-align:left!important;
+  width:52.2px!important;
+  min-width:52.2px!important;
+  max-width:52.2px!important;
+  padding-left:5.4px!important;
+  padding-right:1.8px!important;
+  color-scheme:dark;
+}
+
+/* Table 2: exact widths shared with tf_applyMonthlyTableLayout(). */
+#section-monthly{
+  --rev360-mcol-action:var(--mcol-action,81px);
+  --rev360-mcol-analyst:var(--mcol-analyst,144px);
+  --rev360-mcol-pair:var(--mcol-pair,99px);
+}
+#section-monthly #monthly-table .monthly-sticky-col-1,
+#section-monthly #monthly-table .monthly-sticky-col-2,
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  box-sizing:border-box!important;
+  margin:0!important;
+  overflow:hidden!important;
+  white-space:nowrap!important;
+  text-overflow:ellipsis!important;
+  background-clip:padding-box!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-1{
+  left:0!important;
+  width:var(--rev360-mcol-action)!important;
+  min-width:var(--rev360-mcol-action)!important;
+  max-width:var(--rev360-mcol-action)!important;
+  border-right:1px solid #26374e!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-2{
+  left:calc(var(--rev360-mcol-action) - 1px)!important;
+  width:var(--rev360-mcol-analyst)!important;
+  min-width:var(--rev360-mcol-analyst)!important;
+  max-width:var(--rev360-mcol-analyst)!important;
+  border-left:0!important;
+  border-right:1px solid #26374e!important;
+  box-shadow:none!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  left:calc(var(--rev360-mcol-action) + var(--rev360-mcol-analyst) - 1.8px)!important;
+  width:var(--rev360-mcol-pair)!important;
+  min-width:var(--rev360-mcol-pair)!important;
+  max-width:var(--rev360-mcol-pair)!important;
+  border-left:0!important;
+  border-right:1px solid #26374e!important;
+  box-shadow:1.8px 0 0 rgba(56,189,248,.22),7.2px 0 12.6px rgba(2,6,23,.18)!important;
+}
+/* Prevent any scrolling month cell from bleeding through the sticky seams. */
+#section-monthly #monthly-table thead .monthly-sticky-col-1,
+#section-monthly #monthly-table thead .monthly-sticky-col-2,
+#section-monthly #monthly-table thead .monthly-sticky-col-3{
+  z-index:80!important;
+  background:#132238!important;
+  opacity:1!important;
+}
+#section-monthly #monthly-table tbody .monthly-sticky-col-1,
+#section-monthly #monthly-table tbody .monthly-sticky-col-2,
+#section-monthly #monthly-table tbody .monthly-sticky-col-3{
+  z-index:70!important;
+}
+
+/* ============================================================================
+   REV361 — TABLE 2 COMPACT REFRESH ICON + TABLE 3 COMPACT FONT/WIDTH
+   Scope only: Table 2 ACTION rail and Table 3 visual density.
+   ============================================================================ */
+
+/* Table 2: compact ACTION rail; icon only, no wide text button. */
+#section-monthly{
+  --rev361-mcol-action:41.4px;
+  --rev360-mcol-action:var(--mcol-action,41.4px);
+}
+#section-monthly #monthly-table .monthly-sticky-col-1{
+  width:var(--rev361-mcol-action)!important;
+  min-width:var(--rev361-mcol-action)!important;
+  max-width:var(--rev361-mcol-action)!important;
+  padding-left:3.6px!important;
+  padding-right:3.6px!important;
+  text-align:center!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-2{
+  left:calc(var(--rev361-mcol-action) - 1px)!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  left:calc(var(--rev361-mcol-action) + var(--rev360-mcol-analyst) - 1.8px)!important;
+}
+#section-monthly .tf-monthly-refresh-icon{
+  width:23.4px!important;
+  height:23.4px!important;
+  min-width:23.4px!important;
+  padding:0!important;
+  border-radius:899.1px!important;
+  font-size:15.3px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  box-shadow:none!important;
+}
+#section-monthly .tf-monthly-refresh-icon.tf-refreshing{
+  animation:tfRev361RefreshSpin .85s linear infinite;
+}
+@keyframes tfRev361RefreshSpin{to{transform:rotate(360deg)}}
+
+/* Table 3: slightly smaller typography and tighter columns to reduce long horizontal scroll. */
+#section-history #history-table{
+  min-width:1080px!important;
+  font-size:9.9px!important;
+}
+#section-history #history-table th,
+#section-history #history-table td{
+  padding:4.5px 5.4px!important;
+  line-height:1.22!important;
+}
+#section-history #history-table thead th{
+  font-size:8.1px!important;
+  letter-spacing:.045em!important;
+}
+#history-table th.tf-history-cb-head,
+#history-table td.tf-history-cb-cell{
+  width:36px!important;
+  min-width:36px!important;
+  max-width:36px!important;
+}
+#history-table th[data-history-col="analyst"],
+#history-table td[data-history-col="analyst"]{
+  left:36px!important;
+  width:139.5px!important;
+  min-width:139.5px!important;
+  max-width:139.5px!important;
+}
+#history-table [data-history-col="created"],
+#history-table [data-history-col="closed"]{min-width:124.2px!important;}
+#history-table [data-history-col="balance"]{min-width:91.8px!important;}
+#history-table [data-history-col="entry"]{min-width:70.2px!important;}
+#history-table [data-history-col="takeProfit"],
+#history-table [data-history-col="stopLoss"]{min-width:77.4px!important;}
+#history-table [data-history-col="type"]{min-width:52.2px!important;}
+#history-table [data-history-col="pair"]{min-width:63px!important;}
+#history-table [data-history-col="lot"]{min-width:61.2px!important;}
+#history-table [data-history-col="pnlPips"]{min-width:70.2px!important;}
+#history-table [data-history-col="pnlDollar"]{min-width:77.4px!important;}
+#history-table [data-history-col="pnlPercent"]{min-width:63px!important;}
+#history-table [data-history-col="pnlDollarNet"],
+#history-table [data-history-col="pnlPercentNet"]{min-width:79.2px!important;}
+#history-table [data-history-col="swapDollar"],
+#history-table [data-history-col="commDollar"]{min-width:55.8px!important;}
+#history-table [data-history-col="balancePnl"]{min-width:100.8px!important;}
+
+/* ============================================================================
+   REV362 — TABLE 2 COLUMN DIVIDERS + COMPACT PAIR + RIGHTMOST DEFAULT + CLEAN ICON
+   Scope only: Table 2 visual rail and initial horizontal position.
+   ============================================================================ */
+#section-monthly{
+  --rev362-mcol-action:37.8px;
+  --rev362-mcol-analyst:144px;
+  --rev362-mcol-pair:75.6px;
+  --rev361-mcol-action:var(--rev362-mcol-action);
+  --rev360-mcol-action:var(--rev362-mcol-action);
+  --rev360-mcol-analyst:var(--rev362-mcol-analyst);
+  --rev360-mcol-pair:var(--rev362-mcol-pair);
+}
+
+/* Three fixed identity columns: clearly separated, never visually merged. */
+#section-monthly #monthly-table .monthly-sticky-col-1{
+  width:var(--rev362-mcol-action)!important;
+  min-width:var(--rev362-mcol-action)!important;
+  max-width:var(--rev362-mcol-action)!important;
+  left:0!important;
+  border-left:1px solid #31445f!important;
+  border-right:1px solid #31445f!important;
+  box-shadow:none!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-2{
+  width:var(--rev362-mcol-analyst)!important;
+  min-width:var(--rev362-mcol-analyst)!important;
+  max-width:var(--rev362-mcol-analyst)!important;
+  left:calc(var(--rev362-mcol-action) - 1px)!important;
+  border-left:0!important;
+  border-right:1px solid #31445f!important;
+  box-shadow:none!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  width:var(--rev362-mcol-pair)!important;
+  min-width:var(--rev362-mcol-pair)!important;
+  max-width:var(--rev362-mcol-pair)!important;
+  left:calc(var(--rev362-mcol-action) + var(--rev362-mcol-analyst) - 1.8px)!important;
+  padding-left:4.5px!important;
+  padding-right:4.5px!important;
+  border-left:0!important;
+  border-right:1.8px solid rgba(56,189,248,.48)!important;
+  box-shadow:4.5px 0 9px rgba(2,6,23,.22)!important;
+}
+#section-monthly #monthly-table thead .monthly-sticky-col-1,
+#section-monthly #monthly-table thead .monthly-sticky-col-2,
+#section-monthly #monthly-table thead .monthly-sticky-col-3{
+  background:#132238!important;
+  background-image:none!important;
+  color:#f8fafc!important;
+}
+
+/* Simple line refresh icon: no oversized cyan bubble. */
+#section-monthly .tf-monthly-refresh-icon{
+  width:21.6px!important;
+  height:21.6px!important;
+  min-width:21.6px!important;
+  padding:0!important;
+  border-radius:5.4px!important;
+  border:1px solid rgba(125,211,252,.24)!important;
+  background:rgba(15,23,42,.55)!important;
+  background-image:none!important;
+  color:#7dd3fc!important;
+  box-shadow:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+}
+#section-monthly .tf-monthly-refresh-icon:hover{
+  border-color:rgba(125,211,252,.50)!important;
+  background:rgba(56,189,248,.10)!important;
+  color:#bae6fd!important;
+}
+#section-monthly .tf-monthly-refresh-icon svg,
+#section-monthly .tf-monthly-refresh-head-icon svg{
+  width:12.6px!important;
+  height:12.6px!important;
+  display:block!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.8!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+}
+#section-monthly .tf-monthly-refresh-head-icon{
+  color:#bae6fd!important;
+}
+#section-monthly .tf-monthly-refresh-icon.tf-refreshing svg{
+  animation:tfRev361RefreshSpin .85s linear infinite;
+}
+
+/* ============================================================================
+   REV364 — TABLE 2 HARD VERTICAL DIVIDERS + DASHBOARD PAINT STABILITY
+   Scope: visual separators only; widths/sticky behavior from REV362 retained.
+   ============================================================================ */
+/* Sticky borders can visually disappear while horizontally scrolling a collapsed
+   table, so reinforce each identity-column boundary with an inset paint line. */
+#section-monthly #monthly-table th.monthly-sticky-col-1,
+#section-monthly #monthly-table td.monthly-sticky-col-1{
+  border-left:1px solid #42556f!important;
+  border-right:1px solid #42556f!important;
+  box-shadow:inset -1px 0 0 #42556f!important;
+}
+#section-monthly #monthly-table th.monthly-sticky-col-2,
+#section-monthly #monthly-table td.monthly-sticky-col-2{
+  border-right:1px solid #42556f!important;
+  box-shadow:inset -1px 0 0 #42556f!important;
+}
+#section-monthly #monthly-table th.monthly-sticky-col-3,
+#section-monthly #monthly-table td.monthly-sticky-col-3{
+  border-right:1.8px solid rgba(56,189,248,.62)!important;
+  box-shadow:inset -1px 0 0 rgba(125,211,252,.38),4.5px 0 9px rgba(2,6,23,.22)!important;
+}
+
+
+/* ============================================================================
+   REV365 — SMOOTHER PAGE SCROLL + TABLE 2 LIGHTWEIGHT PAINT
+   - Keep Table 2 sticky identity rail and vertical separators.
+   - Remove expensive row-hover radial repaint on Table 2.
+   - Remove repeated shadow on every sticky Pair cell; divider remains.
+   - Disable backdrop blur on near-opaque dashboard cards to reduce GPU repaint
+     during vertical page scrolling without materially changing the appearance.
+   ============================================================================ */
+
+/* The card surface is already ~96% opaque, so backdrop blur adds a large
+   scroll/compositing cost while barely changing the visible result. */
+#tf-dashboard-main .card{
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Table 2: preserve zebra rows but make hover paint a no-op. This avoids a
+   radial-gradient repaint every time another row passes under the mouse while
+   the user scrolls the page. */
+#section-monthly #monthly-table tbody tr:nth-child(odd),
+#section-monthly #monthly-table tbody tr:nth-child(odd):hover{
+  background:rgba(15,23,42,.98)!important;
+}
+#section-monthly #monthly-table tbody tr:nth-child(even),
+#section-monthly #monthly-table tbody tr:nth-child(even):hover{
+  background:rgba(15,23,42,.92)!important;
+}
+#section-monthly #monthly-table tbody tr,
+#section-monthly #monthly-table tbody td{
+  transition:none!important;
+}
+
+/* Keep the requested vertical rail dividers, but avoid a box-shadow layer on
+   every Pair cell. */
+#section-monthly #monthly-table .monthly-sticky-col-1{
+  border-right:1px solid #31445f!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-2{
+  border-right:1px solid #31445f!important;
+}
+#section-monthly #monthly-table .monthly-sticky-col-3{
+  border-right:1.8px solid rgba(56,189,248,.55)!important;
+  box-shadow:none!important;
+}
+
+/* Make the Table 2 surface fully solid so scrolling does not need to blend a
+   large gradient layer behind the sticky cells. */
+#section-monthly .table-wrapper,
+#section-monthly .table-scroll.monthly-table-scroll{
+  background:#0f172a!important;
+}
+
+/* Avoid repaint-heavy hover gradients on the large History table as the page
+   moves beneath a stationary mouse pointer. Appearance remains the same zebra
+   surface and all checkbox/click behavior remains available. */
+#section-history #history-table tbody tr:nth-child(odd),
+#section-history #history-table tbody tr:nth-child(odd):hover{
+  background:rgba(15,23,42,.98)!important;
+}
+#section-history #history-table tbody tr:nth-child(even),
+#section-history #history-table tbody tr:nth-child(even):hover{
+  background:rgba(15,23,42,.92)!important;
+}
+#section-history #history-table tbody tr,
+#section-history #history-table tbody td{
+  transition:none!important;
+}
+
+/* ============================================================================
+   REV366 — TABLE 2 CENTERED REFRESH + COMPLETE HOVER-FREE MODE
+   Scope only: Table 2 interaction paint / alignment. No data logic changes.
+   ============================================================================ */
+/* Center the compact refresh icon precisely inside the first sticky column. */
+#section-monthly #monthly-table th.monthly-sticky-col-1,
+#section-monthly #monthly-table td.monthly-sticky-col-1{
+  text-align:center!important;
+  vertical-align:middle!important;
+  padding-left:0!important;
+  padding-right:0!important;
+}
+#section-monthly #monthly-table thead th.monthly-sticky-col-1.tf-monthly-refresh-head-icon{
+  text-align:center!important;
+}
+#section-monthly #monthly-table thead th.monthly-sticky-col-1.tf-monthly-refresh-head-icon > svg{
+  display:block!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+#section-monthly #monthly-table td.monthly-sticky-col-1 > .tf-monthly-refresh-icon{
+  display:flex!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+
+/* Table 2 must not visually react to hover at all. Keep each zebra row exactly
+   the same before/during hover, including the three sticky identity cells. */
+#section-monthly #monthly-table tbody tr:nth-child(odd),
+#section-monthly #monthly-table tbody tr:nth-child(odd):hover{
+  background:rgba(15,23,42,.98)!important;
+  background-image:none!important;
+  filter:none!important;
+  box-shadow:none!important;
+}
+#section-monthly #monthly-table tbody tr:nth-child(even),
+#section-monthly #monthly-table tbody tr:nth-child(even):hover{
+  background:rgba(15,23,42,.92)!important;
+  background-image:none!important;
+  filter:none!important;
+  box-shadow:none!important;
+}
+#section-monthly #monthly-table tbody tr:nth-child(odd) > td,
+#section-monthly #monthly-table tbody tr:nth-child(odd):hover > td{
+  background-color:rgba(15,23,42,.98)!important;
+  background-image:none!important;
+}
+#section-monthly #monthly-table tbody tr:nth-child(even) > td,
+#section-monthly #monthly-table tbody tr:nth-child(even):hover > td{
+  background-color:rgba(15,23,42,.92)!important;
+  background-image:none!important;
+}
+/* Preserve solid sticky backgrounds and dividers while making hover a no-op. */
+#section-monthly #monthly-table tbody tr:nth-child(odd) > .monthly-sticky-col-1,
+#section-monthly #monthly-table tbody tr:nth-child(odd) > .monthly-sticky-col-2,
+#section-monthly #monthly-table tbody tr:nth-child(odd) > .monthly-sticky-col-3,
+#section-monthly #monthly-table tbody tr:nth-child(odd):hover > .monthly-sticky-col-1,
+#section-monthly #monthly-table tbody tr:nth-child(odd):hover > .monthly-sticky-col-2,
+#section-monthly #monthly-table tbody tr:nth-child(odd):hover > .monthly-sticky-col-3{
+  background:#0f172a!important;
+  background-image:none!important;
+}
+#section-monthly #monthly-table tbody tr:nth-child(even) > .monthly-sticky-col-1,
+#section-monthly #monthly-table tbody tr:nth-child(even) > .monthly-sticky-col-2,
+#section-monthly #monthly-table tbody tr:nth-child(even) > .monthly-sticky-col-3,
+#section-monthly #monthly-table tbody tr:nth-child(even):hover > .monthly-sticky-col-1,
+#section-monthly #monthly-table tbody tr:nth-child(even):hover > .monthly-sticky-col-2,
+#section-monthly #monthly-table tbody tr:nth-child(even):hover > .monthly-sticky-col-3{
+  background:#0d1628!important;
+  background-image:none!important;
+}
+/* Even the refresh button itself has no hover visual animation/repaint. */
+#section-monthly .tf-monthly-refresh-icon,
+#section-monthly .tf-monthly-refresh-icon:hover,
+#section-monthly .tf-monthly-refresh-icon:focus-visible{
+  border-color:rgba(125,211,252,.24)!important;
+  background:rgba(15,23,42,.55)!important;
+  background-image:none!important;
+  color:#7dd3fc!important;
+  box-shadow:none!important;
+  transform:none!important;
+  transition:none!important;
+}
+
+/* REV393 — latest-month Drawdown / Consecutive Loss warning states */
+.tf-latest-risk-healthy{
+  color:#22c55e !important;
+  font-weight:800 !important;
+}
+.tf-latest-risk-warning{
+  color:#facc15 !important;
+  font-weight:800 !important;
+}
+.tf-latest-risk-critical{
+  color:#ef4444 !important;
+  font-weight:800 !important;
+}
+.tf-latest-risk-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:9px;
+  height:9px;
+  min-width:9px;
+  border-radius:50%;
+  vertical-align:middle;
+  position:relative;
+  top:-0.5px;
+  font-family:Arial,sans-serif;
+  font-size:6.3px;
+  line-height:1;
+  font-weight:900;
+  box-sizing:border-box;
+  user-select:none;
+  flex:0 0 9px;
+}
+.tf-latest-risk-icon-left{
+  margin-left:0;
+  margin-right:3.6px;
+}
+.tf-latest-risk-icon-right{
+  margin-left:3.6px;
+  margin-right:0;
+}
+.tf-latest-risk-icon-healthy{
+  background:#22c55e;
+  border:1px solid #4ade80;
+  color:#fff;
+  font-size:6.3px;
+  box-shadow:0 0 0 1px rgba(34,197,94,.16);
+}
+.tf-latest-risk-icon-warning{
+  background:#facc15;
+  border:1px solid #fde047;
+  color:#111827;
+  box-shadow:0 0 0 1px rgba(250,204,21,.16);
+}
+.tf-latest-risk-icon-critical{
+  background:#ef4444;
+  border:1px solid #f87171;
+  color:#fff;
+  font-size:6.3px;
+  box-shadow:0 0 0 1px rgba(239,68,68,.18);
+}
+.tf-perf-name-text.tf-latest-risk-warning,
+.tf-perf-name-text.tf-latest-risk-critical,
+.tf-holding-analyst.tf-latest-risk-warning,
+.tf-holding-analyst.tf-latest-risk-critical,
+#history-table td.tf-latest-risk-warning,
+#history-table td.tf-latest-risk-critical,
+#drawdown-table td.tf-latest-risk-warning,
+#drawdown-table td.tf-latest-risk-critical,
+.tf-score-analyst.tf-latest-risk-warning,
+.tf-score-analyst.tf-latest-risk-critical,
+.tf-users-analyst-link.tf-latest-risk-warning,
+.tf-users-analyst-link.tf-latest-risk-critical{
+  opacity:1 !important;
+}
+
+
+/* REV394 — data rows only; headers remain centered. */
+.tf-risk-name-left{ text-align:left !important; }
+
+/* REV396 desktop Table 3 row text follows PNL%; analyst cell follows risk state. */
+#history-table tbody tr:has(td[data-history-col="pnlPercent"].tp) > td:not([data-history-col="analyst"]),
+#history-table tbody tr:has(td[data-history-col="pnlPercent"].tp) > td:not([data-history-col="analyst"]) *{color:var(--success)!important;}
+#history-table tbody tr:has(td[data-history-col="pnlPercent"].sl) > td:not([data-history-col="analyst"]),
+#history-table tbody tr:has(td[data-history-col="pnlPercent"].sl) > td:not([data-history-col="analyst"]) *{color:var(--danger)!important;}
+#summary-table tbody td.tf-latest-risk-healthy,#monthly-table tbody td.tf-latest-risk-healthy,.tf-perf-name-text.tf-latest-risk-healthy,.tf-holding-analyst.tf-latest-risk-healthy,#history-table tbody td[data-history-col="analyst"].tf-latest-risk-healthy,#drawdown-table tbody td.tf-latest-risk-healthy,.tf-score-analyst.tf-latest-risk-healthy{color:#22c55e!important;}
+#summary-table tbody td.tf-latest-risk-warning,#monthly-table tbody td.tf-latest-risk-warning,.tf-perf-name-text.tf-latest-risk-warning,.tf-holding-analyst.tf-latest-risk-warning,#history-table tbody td[data-history-col="analyst"].tf-latest-risk-warning,#drawdown-table tbody td.tf-latest-risk-warning,.tf-score-analyst.tf-latest-risk-warning{color:#facc15!important;}
+#summary-table tbody td.tf-latest-risk-critical,#monthly-table tbody td.tf-latest-risk-critical,.tf-perf-name-text.tf-latest-risk-critical,.tf-holding-analyst.tf-latest-risk-critical,#history-table tbody td[data-history-col="analyst"].tf-latest-risk-critical,#drawdown-table tbody td.tf-latest-risk-critical,.tf-score-analyst.tf-latest-risk-critical{color:#ef4444!important;}
+
+/* REV397 — nested analyst name color inheritance */
+.tf-latest-risk-healthy :not(.tf-latest-risk-icon){color:#22c55e!important;}
+.tf-latest-risk-warning :not(.tf-latest-risk-icon){color:#facc15!important;}
+.tf-latest-risk-critical :not(.tf-latest-risk-icon){color:#ef4444!important;}
+
+/* REV400 — dedicated analyst-name target */
+.tf-analyst-name-color-target{color:inherit!important;-webkit-text-fill-color:currentColor!important;font:inherit;}
+.tf-latest-risk-healthy > .tf-analyst-name-color-target,.tf-latest-risk-healthy .tf-analyst-name-color-target{color:#22c55e!important;-webkit-text-fill-color:#22c55e!important;}
+.tf-latest-risk-warning > .tf-analyst-name-color-target,.tf-latest-risk-warning .tf-analyst-name-color-target{color:#facc15!important;-webkit-text-fill-color:#facc15!important;}
+.tf-latest-risk-critical > .tf-analyst-name-color-target,.tf-latest-risk-critical .tf-analyst-name-color-target{color:#ef4444!important;-webkit-text-fill-color:#ef4444!important;}
+
+
+/* REV403 — Table 3/Table 4 column sizing polish. */
+#history-table td[data-history-col="analyst"]{
+  width:max-content !important;
+  min-width:171px !important;
+  max-width:none !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  padding-left:9px !important;
+  padding-right:9px !important;
+}
+.tf-score-summary-table th:nth-child(1),
+.tf-score-summary-table td:nth-child(1){width:44% !important;}
+.tf-score-summary-table th:nth-child(2),
+.tf-score-summary-table td:nth-child(2){width:38% !important;}
+.tf-score-summary-table th:nth-child(3),
+.tf-score-summary-table td:nth-child(3){width:18% !important;}
+
+/* REV406: left aligned analyst body cells; headers retain their alignment. */
+#summary-table tbody td.monthly-sticky-col-2,
+#summary-table tbody td:first-child,
+#monthly-table tbody td.monthly-sticky-col-2,
+#history-table tbody td[data-history-col="analyst"],
+#drawdown-table tbody tr:not(.dd-child-row)>td:nth-child(2){text-align:left!important;justify-content:flex-start!important;padding-left:9px!important;}
+#tf-lot-sizing-title{font-size:13.5px;margin:12.6px 0 7.2px;}
+
+/* REV407: Pulse Reactor card with Halo-style cyan/blue/violet title. */
+body.tf-risk-explainer-open{overflow:hidden!important;}
+#tf-risk-explainer{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;background:rgba(4,10,17,.96);padding:16.2px;overflow:auto;}
+#tf-risk-explainer .tf-risk-explainer-card{width:100%;max-width:396px;max-height:calc(100dvh - 32.4px);overflow:auto;padding:25.2px;border:1px solid rgba(56,189,248,.18);border-radius:16.2px;background:radial-gradient(ellipse at 20% 25%,rgba(22,77,111,.18),transparent 75%),#090f18;color:#dbeafe;box-sizing:border-box;box-shadow:0 18px 72px rgba(0,0,0,.24);}
+#tf-risk-explainer .tf-risk-explainer-eyebrow{color:#38d1ff;font:9px ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:2.16px;margin-bottom:21.6px;}
+#tf-risk-explainer h2{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:32.4px!important;font-weight:800!important;line-height:1!important;letter-spacing:-1px;margin:0 0 19.8px!important;background:linear-gradient(100deg,#00e5ef 0%,#38a9ff 42%,#9665ff 85%);background-clip:text;-webkit-background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent;}
+#tf-risk-explainer p{font:9.9px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;color:#94a3b8;margin:0 0 19.8px;}
+#tf-risk-explainer .tf-risk-explainer-row{display:flex;align-items:flex-start;gap:10.8px;margin:14.4px 0;}
+#tf-risk-explainer .tf-risk-explainer-row>div{flex:1;min-width:0;}
+#tf-risk-explainer .tf-risk-explainer-row strong{display:block;font-size:10.8px;line-height:1.4;margin:0 0 4.5px;}
+#tf-risk-explainer .tf-risk-explainer-row span:not(.tf-risk-explainer-icon){display:block;font-size:9.9px;line-height:1.6;color:#a9bdd0;}
+#tf-risk-explainer .tf-risk-explainer-icon{display:flex;align-items:center;justify-content:center;width:21.6px;height:21.6px;flex:0 0 21.6px;border:1px solid currentColor;border-radius:50%;font:700 12.6px/1 system-ui;margin-top:1px;}
+#tf-risk-explainer .tf-risk-green{color:#22c55e;}
+#tf-risk-explainer .tf-risk-yellow{color:#facc15;}
+#tf-risk-explainer .tf-risk-red{color:#ef4444;}
+#tf-risk-explainer button{width:100%;min-height:39.6px;margin-top:12.6px;border:1px solid rgba(56,189,248,.5);border-radius:6.3px;background:rgba(56,189,248,.08);color:#55d6ff;font-size:10.8px;font-weight:600;letter-spacing:.6px;cursor:pointer;}
+#tf-risk-explainer button:hover,#tf-risk-explainer button:focus-visible{background:rgba(56,189,248,.17);outline:1.8px solid rgba(56,189,248,.2);outline-offset:2.7px;}
+#tf-risk-explainer .tf-risk-explainer-footer{display:flex;justify-content:space-between;gap:10.8px;margin-top:19.8px;padding-top:12.6px;border-top:1px solid #1b2533;color:#64748b;font:7.2px/1.4 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:1px;}
+@media(max-width:380px){#tf-risk-explainer .tf-risk-explainer-card{padding:19.8px;}#tf-risk-explainer h2{font-size:28.8px!important;}}
+/* REV412: responsive balance overview, matching dark dashboard palette. */
+.tf-balance-cards412{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10.8px;margin:12.6px 0 16.2px}
+.tf-balance-card412{background:#101827;border:1px solid #283447;border-radius:10.8px;padding:12.6px 14.4px;min-width:0}
+.tf-balance-label412{font-size:10.8px;font-weight:600;color:#a4adbc;margin-bottom:7.2px}
+.tf-balance-value412{font-size:clamp(16.2px,2.2vw,23.4px);font-weight:700;color:#e6e9f2;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.tf-balance-card412.neg{background:rgba(127,29,29,.24);border-color:rgba(239,68,68,.42)}
+.tf-balance-card412.neg :is(.tf-balance-label412,.tf-balance-value412){color:#f87171}
+.tf-balance-card412.pos .tf-balance-value412{color:#22c55e}
+@media(max-width:560px){.tf-balance-cards412{grid-template-columns:repeat(2,minmax(0,1fr));gap:7.2px}.tf-balance-card412{padding:10.8px}}
+.tf-isignal-subend.tf-subscription-healthy412{color:#22c55e!important}
+.tf-isignal-subend.tf-subscription-warning412{color:#facc15!important}
+.tf-isignal-subend.tf-subscription-critical412{color:#ef4444!important}
+.tf-subscription-icon412{display:inline-flex;align-items:center;justify-content:center;width:13.5px;font-weight:800;margin-right:2.7px}
+.tf-users-detail-wrap .tf-col-analyst,.tf-users-analyst-link{text-align:left!important}
+#tf-isignal-explainer412{position:fixed;inset:0;z-index:2147483646;background:rgba(2,6,23,.86);backdrop-filter:blur(7.2px);display:flex;align-items:center;justify-content:center;padding:16.2px;box-sizing:border-box;color:#e2e8f0}
+.tf-isignal-explainer-card412{width:468px;max-width:100%;max-height:90vh;overflow:auto;background:#0b1322;border:1px solid #29364d;border-radius:16.2px;padding:23.4px;box-shadow:0 21.6px 63px #0008;box-sizing:border-box}
+.tf-isignal-eyebrow412{font-size:9px;letter-spacing:1.8px;color:#64748b;font-family:monospace}
+.tf-isignal-explainer-card412 h2{font-size:34.2px;line-height:1.05;margin:12.6px 0 16.2px;font-weight:800;background:linear-gradient(110deg,#67e8f9,#60a5fa,#a78bfa);background-clip:text;-webkit-background-clip:text;color:transparent}
+.tf-isignal-explainer-card412 p{font-size:10.8px;line-height:1.65;color:#a7b2c5;margin:7.2px 0}
+.tf-isignal-explainer-row412{display:flex;gap:12.6px;border-top:1px solid #1e293b;padding:10.8px 0}
+.tf-isignal-explainer-row412>span{width:21.6px;flex:0 0 21.6px;font-weight:800;font-size:19.8px;text-align:center}
+.tf-isignal-explainer-row412 strong{font-size:11.7px}
+.tf-legend-green412{color:#22c55e}.tf-legend-yellow412{color:#facc15}.tf-legend-red412{color:#ef4444}
+.tf-isignal-note412{font-size:10.8px;line-height:1.6;border:1px solid #924a39;background:#421c213d;color:#fecaca;border-radius:9px;padding:10.8px;margin:12.6px 0}
+#tf-isignal-understand412{width:100%;padding:10.8px;border:1px solid #6b85ac;border-radius:9px;background:#1d3555;color:#eef6ff;font-weight:700;cursor:pointer}
+
+/* REV415: adjustment grouping and synchronized analyst filters. */
+.tf-user-adjustment415{min-width:0;margin:16.2px 0;padding:10.8px 12.6px 7.2px;border:1px solid rgba(148,163,184,.32);border-radius:9px;box-sizing:border-box;}
+.tf-user-adjustment415>legend{padding:0 7.2px;font-size:11.7px;font-weight:600;color:inherit;}
+.tf-analyst-filter415{display:flex;align-items:center;flex-wrap:wrap;gap:7.2px;margin:10.8px 0 7.2px;min-width:0;}
+.tf-analyst-filter415>div{display:flex;flex-wrap:wrap;gap:7.2px;min-width:0;}
+.tf-balance-pips415{font-size:10.8px;line-height:1.4;margin-top:4.5px;opacity:.9;color:inherit;}
+.tf-balance-pips415.neg{color:#ff5d6c;}.tf-balance-pips415.pos{color:#3ddc97;}
+@media(max-width:600px){.tf-user-adjustment415{padding:9px;margin:12.6px 0;}}
+
+/* REV417: title, balance cards, metric controls, analyst filter, existing range. */
+.tf-perf-head{display:block;min-width:0;}
+.tf-perf-head>.tf-balance-cards412{width:100%;box-sizing:border-box;margin:10.8px 0 12.6px;}
+.tf-perf-head>.tf-analyst-filter415{width:100%;margin:10.8px 0 5.4px;}
+
+/* REV452 duration colour */
+.tf-balance-card412.pos .tf-pnl-duration446{color:#22c55e!important}.tf-balance-card412.neg .tf-pnl-duration446{color:#f87171!important}
+
+/* TF compact dimensions REV452 */
+html{font-size:14.4px}
