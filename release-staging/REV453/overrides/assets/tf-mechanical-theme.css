@@ -1,0 +1,66 @@
+/* REV383 — Original plugin theme + selective table glow + compact neon custom cursor. */
+@media screen {
+  html, body, body * { cursor:url("tf-cursor-arrow.png") 2 2,default!important; }
+  a,button,[role="button"],summary,select,option,label[for],
+  input[type="button"],input[type="submit"],input[type="reset"],input[type="checkbox"],input[type="radio"],
+  .btn,.tf-nav-link,.tf-time-range-btn,.tf-cost-ticker,[onclick],[data-action],[data-tf-url] {
+    cursor:url("tf-cursor-hand.png") 8 2,pointer!important;
+  }
+  button:disabled,input:disabled,select:disabled,[aria-disabled="true"] { cursor:url("tf-cursor-arrow.png") 2 2,default!important; }
+
+  .table-wrapper,.tf-holding-card {
+    --tf-glow-x:50%;--tf-glow-y:50%;--tf-glow-alpha:0;position:relative;isolation:isolate;
+    transition:box-shadow .22s ease,border-color .22s ease,transform .22s ease;
+  }
+  .table-wrapper::before,.tf-holding-card::before {
+    content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;z-index:12;
+    opacity:var(--tf-glow-alpha);
+    background:radial-gradient(162px circle at var(--tf-glow-x) var(--tf-glow-y),rgba(56,189,248,.98) 0%,rgba(56,189,248,.50) 24%,rgba(14,165,233,.16) 48%,transparent 72%);
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+    transition:opacity .18s ease;
+  }
+  .table-wrapper::after,.tf-holding-card::after {
+    content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:11;
+    opacity:calc(var(--tf-glow-alpha) * .72);
+    background:radial-gradient(234px circle at var(--tf-glow-x) var(--tf-glow-y),rgba(56,189,248,.09),transparent 68%);
+    transition:opacity .18s ease;
+  }
+  .table-wrapper.tf-glow-near,.tf-holding-card.tf-glow-near {
+    --tf-glow-alpha:1;border-color:rgba(56,189,248,.58)!important;
+    box-shadow:0 14.4px 34.2px rgba(2,6,23,.32),0 0 0 1px rgba(56,189,248,.08),0 0 21.6px rgba(14,165,233,.16)!important;
+  }
+
+  /* History/Table 3 intentionally has zero glow/RAF work for performance. */
+  #section-history > .table-wrapper,#section-history > .table-wrapper::before,#section-history > .table-wrapper::after {
+    --tf-glow-alpha:0!important;transition:none!important;
+  }
+  #section-history > .table-wrapper.tf-glow-near { border-color:inherit!important;box-shadow:none!important; }
+
+  .tf-holding-section { margin:12.6px 0 10.8px;padding:12.6px;border:1px solid var(--border-subtle,rgba(148,163,184,.25));border-radius:9px;background:transparent; }
+  .tf-holding-head { display:flex;justify-content:space-between;gap:14.4px;align-items:flex-end;margin-bottom:7.2px; }
+  .tf-holding-kicker { font:700 9px/1.2 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;letter-spacing:.18em;color:var(--accent,#38bdf8);margin-bottom:3.6px; }
+  .tf-holding-head h3 { margin:0;font-size:12.6px; }
+  .tf-holding-formula { font:600 9.9px/1.3 ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;padding:5.4px 7.2px;border:1px solid var(--border-subtle,rgba(148,163,184,.25));border-radius:6.3px; }
+  .tf-holding-note { margin-bottom:9px;font-size:9.9px;line-height:1.55;color:var(--fg-soft,#9ca3af); }
+  .tf-holding-grid { display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10.8px; }
+  .tf-holding-card { min-width:0;overflow:visible!important;border:1px solid var(--border-subtle,rgba(148,163,184,.25));border-radius:9px; }
+  .tf-holding-table { width:100%;min-width:0!important;table-layout:fixed;font-size:9.9px; }
+  .tf-holding-table th,.tf-holding-table td { padding:8.1px 9px; }
+  .tf-holding-table th:first-child,.tf-holding-table td:first-child { width:48%;overflow-wrap:anywhere;word-break:normal; }
+  .tf-holding-table th:nth-child(2),.tf-holding-table th:nth-child(3) { width:26%;text-align:center!important; }
+  .tf-holding-value { text-align:right;white-space:nowrap; }
+  .tf-holding-analyst { font-weight:700; }
+  .tf-holding-empty-row td { text-align:center;color:var(--fg-soft,#9ca3af); }
+  @media(max-width:860px){.tf-holding-grid{grid-template-columns:1fr}.tf-holding-head{align-items:flex-start;flex-direction:column;gap:6.3px}.tf-holding-formula{width:100%}}
+}
+
+/* REV384 Holding alignment final override */
+.tf-holding-table{width:100%!important;min-width:0!important;table-layout:fixed!important;border-collapse:collapse!important}
+.tf-holding-table th,.tf-holding-table td{box-sizing:border-box!important;vertical-align:middle!important;line-height:1.35!important}
+.tf-holding-table th:first-child,.tf-holding-table td:first-child{width:48%!important;text-align:left!important;overflow-wrap:anywhere;word-break:normal}
+.tf-holding-table th:nth-child(2),.tf-holding-table td:nth-child(2),.tf-holding-table th:nth-child(3),.tf-holding-table td:nth-child(3){width:26%!important;text-align:center!important}
+.tf-holding-table th:nth-child(2),.tf-holding-table th:nth-child(3){white-space:normal!important}
+.tf-holding-analyst{font-weight:700;line-height:1.35}
+.tf-holding-value{text-align:center!important;white-space:nowrap;font-variant-numeric:tabular-nums;font-feature-settings:"tnum" 1;letter-spacing:0}
+
+/* TF compact dimensions REV453 */
