@@ -1,0 +1,43 @@
+name: Publish REV456 progress and readable filters
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV456/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf456/src
+          gh release download v1.17.68 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV455_MULTI_LINK.zip --output /tmp/tf456/base.zip
+          echo '2bc17fbc6c7717de99005ff21d47305c3fe619db6ba54b57149a5a8a86e2af52  /tmp/tf456/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf456/base.zip -d /tmp/tf456/src
+          python3 release-staging/REV456/patch456.py /tmp/tf456/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf456/src node release-staging/REV456/test-progress455.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf456/src node release-staging/REV456/test-pair456.cjs
+          TF_REV419_ROOT=/tmp/tf456/src node release-staging/REV456/test-rev456.js
+          TF_REV419_ROOT=/tmp/tf456/src node release-staging/REV456/test-lifecycle456.cjs
+          find /tmp/tf456/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf456/src && zip -qr /tmp/TF_Extension_PC_MAC_REV456_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.69 /tmp/TF_Extension_PC_MAC_REV456_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.69 — REV456' --notes-file release-staging/REV456/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.69" > /tmp/tf456/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf456/previous.json
+          python3 release-staging/REV456/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf456/latest-request.json
