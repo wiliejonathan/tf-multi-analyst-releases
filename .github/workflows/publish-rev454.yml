@@ -1,0 +1,40 @@
+name: Publish REV454 progress and readable filters
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV454/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf454/src
+          gh release download v1.17.66 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV453_MULTI_LINK.zip --output /tmp/tf454/base.zip
+          echo '707eccc7a0047dc7480acad20ce875479e492d8587ebc8851fec9090e029279e  /tmp/tf454/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf454/base.zip -d /tmp/tf454/src
+          python3 release-staging/REV454/patch454.py /tmp/tf454/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf454/src node release-staging/REV454/test-progress454.cjs
+          find /tmp/tf454/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf454/src && zip -qr /tmp/TF_Extension_PC_MAC_REV454_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.67 /tmp/TF_Extension_PC_MAC_REV454_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.67 — REV454' --notes-file release-staging/REV454/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.67" > /tmp/tf454/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf454/previous.json
+          python3 release-staging/REV454/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf454/latest-request.json
