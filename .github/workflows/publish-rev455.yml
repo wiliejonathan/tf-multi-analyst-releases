@@ -1,0 +1,42 @@
+name: Publish REV455 progress and readable filters
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV455/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf455/src
+          gh release download v1.17.67 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV454_MULTI_LINK.zip --output /tmp/tf455/base.zip
+          echo '264bc9b2147f9096b76cd9c5e7b017894834f623c8fed096ba233f048a0b1508  /tmp/tf455/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf455/base.zip -d /tmp/tf455/src
+          python3 release-staging/REV455/patch455.py /tmp/tf455/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf455/src node release-staging/REV455/test-progress455.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf455/src node release-staging/REV455/test-pair455.cjs
+          TF_REV419_ROOT=/tmp/tf455/src node release-staging/REV455/test-rev455.js
+          find /tmp/tf455/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf455/src && zip -qr /tmp/TF_Extension_PC_MAC_REV455_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.68 /tmp/TF_Extension_PC_MAC_REV455_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.68 — REV455' --notes-file release-staging/REV455/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.68" > /tmp/tf455/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf455/previous.json
+          python3 release-staging/REV455/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf455/latest-request.json
