@@ -1,0 +1,45 @@
+name: Publish REV457 scalable scan recovery
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV457/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf457/src
+          gh release download v1.17.69 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV456_MULTI_LINK.zip --output /tmp/tf457/base.zip
+          echo '923a7e010ccfefcdeae9dcdc7ec888f49bca818f5c0b7a498ba7a8736d138c4e  /tmp/tf457/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf457/base.zip -d /tmp/tf457/src
+          python3 release-staging/REV457/patch457.py /tmp/tf457/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf457/src node release-staging/REV457/test-progress455.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf457/src node release-staging/REV457/test-pair456.cjs
+          TF_REV419_ROOT=/tmp/tf457/src node release-staging/REV457/test-rev457.js
+          TF_REV419_ROOT=/tmp/tf457/src node release-staging/REV457/test-lifecycle456.cjs
+          TF_REV419_ROOT=/tmp/tf457/src node release-staging/REV457/test-scale457.cjs
+          TF_REV419_ROOT=/tmp/tf457/src node release-staging/REV457/test-recovery457.cjs
+          find /tmp/tf457/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf457/src && zip -qr /tmp/TF_Extension_PC_MAC_REV457_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.70 /tmp/TF_Extension_PC_MAC_REV457_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.70 — REV457' --notes-file release-staging/REV457/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.70" > /tmp/tf457/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf457/previous.json
+          python3 release-staging/REV457/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf457/latest-request.json
