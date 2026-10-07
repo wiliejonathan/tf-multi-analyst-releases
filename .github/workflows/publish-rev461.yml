@@ -1,0 +1,49 @@
+name: Publish REV461 scalable scan recovery
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV461/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf461/src
+          gh release download v1.17.73 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV460_MULTI_LINK.zip --output /tmp/tf461/base.zip
+          echo 'ff04fee71f178c7f5cf24b8ac3bf1c36b9e384f8c4c9f3f474d0f2ece67767b1  /tmp/tf461/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf461/base.zip -d /tmp/tf461/src
+          python3 release-staging/REV461/patch461.py /tmp/tf461/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-progress455.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-pair456.cjs
+          TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-rev457.js
+          TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-lifecycle456.cjs
+          TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-scale457.cjs
+          TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-recovery457.cjs
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-export459.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-losing460.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf461/src node release-staging/REV461/test-columns461.cjs
+          find /tmp/tf461/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf461/src && zip -qr /tmp/TF_Extension_PC_MAC_REV461_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.74 /tmp/TF_Extension_PC_MAC_REV461_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.74 — REV461' --notes-file release-staging/REV461/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.74" > /tmp/tf461/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf461/previous.json
+          python3 release-staging/REV461/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf461/latest-request.json
