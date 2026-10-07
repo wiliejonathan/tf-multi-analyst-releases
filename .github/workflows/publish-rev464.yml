@@ -1,0 +1,52 @@
+name: Publish REV464 scalable scan recovery
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV464/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf464/src
+          gh release download v1.17.76 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV463_MULTI_LINK.zip --output /tmp/tf464/base.zip
+          echo 'cbd8dc9335f440ac7a0cc0dbc138e1f8877e726ca64ac0b677d78837253915c7  /tmp/tf464/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf464/base.zip -d /tmp/tf464/src
+          python3 release-staging/REV464/patch464.py /tmp/tf464/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-progress455.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-pair456.cjs
+          TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-rev457.js
+          TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-lifecycle456.cjs
+          TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-scale457.cjs
+          TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-recovery457.cjs
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-export459.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-losing460.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-columns461.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-rows462.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-summary463.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf464/src node release-staging/REV464/test-losing464.cjs
+          find /tmp/tf464/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf464/src && zip -qr /tmp/TF_Extension_PC_MAC_REV464_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.17.77 /tmp/TF_Extension_PC_MAC_REV464_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.77 — REV464' --notes-file release-staging/REV464/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.77" > /tmp/tf464/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf464/previous.json
+          python3 release-staging/REV464/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf464/latest-request.json
