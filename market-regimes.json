@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-10-06T08:56:22.638226+00:00",
+  "updatedAt": "2026-10-07T08:36:00.197415+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -553,9 +553,9 @@
       "2026-10": {
         "status": "Trending/Rally",
         "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -825,11 +825,11 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "status": "Ranging",
+        "efficiencyRatio": 0.151393,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -1100,10 +1100,10 @@
       },
       "2026-10": {
         "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "efficiencyRatio": 0.660317,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -1374,10 +1374,10 @@
       },
       "2026-10": {
         "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "efficiencyRatio": 0.686608,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -1649,9 +1649,9 @@
       "2026-10": {
         "status": "Trending/Rally",
         "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -1921,11 +1921,11 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "status": "Ranging",
+        "efficiencyRatio": 0.089042,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -2193,6 +2193,14 @@
         "start": "2026-09-01",
         "end": "2026-09-30",
         "provisional": false
+      },
+      "2026-10": {
+        "status": "Ranging",
+        "efficiencyRatio": 0.085295,
+        "dailyBars": 3,
+        "start": "2026-10-01",
+        "end": "2026-10-05",
+        "provisional": true
       }
     },
     "GBPUSD": {
@@ -2461,11 +2469,11 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.280989,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -2736,10 +2744,10 @@
       },
       "2026-10": {
         "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "efficiencyRatio": 0.777853,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -3009,11 +3017,11 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "status": "Ranging",
+        "efficiencyRatio": 0.10866,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -3285,9 +3293,9 @@
       "2026-10": {
         "status": "Trending/Rally",
         "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -3559,9 +3567,9 @@
       "2026-10": {
         "status": "Trending/Rally",
         "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -3831,11 +3839,11 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Trending/Rally",
-        "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "status": "Ranging",
+        "efficiencyRatio": 0.093452,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -4107,9 +4115,9 @@
       "2026-10": {
         "status": "Trending/Rally",
         "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     },
@@ -4381,22 +4389,18 @@
       "2026-10": {
         "status": "Trending/Rally",
         "efficiencyRatio": 1.0,
-        "dailyBars": 2,
+        "dailyBars": 3,
         "start": "2026-10-01",
-        "end": "2026-10-04",
+        "end": "2026-10-05",
         "provisional": true
       }
     }
   },
   "errors": [
     {
-      "pair": "USDJPY",
-      "error": "Unexpected symbol"
-    },
-    {
       "pair": "XAUUSD",
       "year": 2026,
-      "error": "HTTP Error 404: Not Found"
+      "error": "<urlopen error [Errno 104] Connection reset by peer>"
     }
   ],
   "sources": {
@@ -4425,7 +4429,7 @@
       "url": "https://finance.yahoo.com/quote/NZDJPY%3DX/history/"
     },
     "USDJPY": {
-      "name": "Yahoo Finance",
+      "name": "Yahoo Finance daily FX closes",
       "url": "https://finance.yahoo.com/quote/USDJPY%3DX/history/"
     },
     "GBPUSD": {
