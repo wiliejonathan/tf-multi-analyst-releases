@@ -5,3 +5,5 @@ REV474 / v1.17.87
 - Apply shared changes to Android, iOS/browser and website.
 
 Validation: 5,000-row scroll at 4x CPU throttle preserves data; 100 hover events become one update; unchanged chart widths avoid redraws. Browser navigation, risk calculations, mobile controls and exports regression tested.
+
+Default PnL warning >75%, critical >100%. Existing custom values remain saved. Percentage inputs placed immediately beside labels.
