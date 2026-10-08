@@ -6,11 +6,11 @@
   "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.17.87",
   "published_at": "2026-10-08T13:31:39Z",
   "asset": {
-    "id": 621933252,
+    "id": 621968150,
     "name": "TF_Extension_PC_MAC_REV474_MULTI_LINK.zip",
     "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.17.87/TF_Extension_PC_MAC_REV474_MULTI_LINK.zip",
-    "size": 954628,
-    "digest": "sha256:0889483e1d4df37bfd29a3098c2b52da51f9c72b29be8922b25525db5b71324c",
-    "updated_at": "2026-10-08T13:34:59Z"
+    "size": 954800,
+    "digest": "sha256:2f64a575f814a92c629999a3933e0f0457b925a95689e80723d77dd98655899c",
+    "updated_at": "2026-10-08T13:49:11Z"
   }
 }
