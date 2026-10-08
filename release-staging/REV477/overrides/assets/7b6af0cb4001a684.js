@@ -265,7 +265,7 @@ const FILES = {
   "multi-scanner/dashboard.js": "85a6249ed880dcbc3831ac29a82a19ae8303d8e96101a2745904a159f0972b90",
   "multi-scanner/engine.js": "36e7845851b114b1cd376853c0e921fba0a7d7aef4e1d1ad0d6658fac09b2382",
   "multi-scanner/export.js": "e9cc5b730c5b67c288d25e4f62cc02e287e8ee6d3deacf9ab481282792f2e7c6",
-  "multi-scanner/market-regimes.json": "1c416486b64fd5362df6b91bb6fbfca4e8555e138eea5e4c22f4b3b0e3648e00",
+  "multi-scanner/market-regimes.json": "397cfe50aa513d724e3f110f56d2b5df4bf4ddfbd7281e08b4347f21621cb314",
   "multi-scanner/progress.js": "7ab8a17fc11ff7eade63788a9585688328419cca682de73426f30bb45afeb1a7",
   "multi-scanner/sidebar.html": "7038f613f9bb853099fc742b7344a5abc58a0b5ac925b77f3818083ac328122e",
   "multi-scanner/sidebar.js": "5be2c9664416af42158593b9cc24405f601a38a2b33fc1af39195a1da6c3d717",

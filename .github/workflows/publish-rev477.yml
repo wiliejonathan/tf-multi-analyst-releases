@@ -70,7 +70,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p /tmp/tf477-mobile/source /tmp/tf477-mobile/src /tmp/outputs
-          gh api repos/wiliejonathan/tf-analyzer-analyst-ios/zipball/9c747387fb0c92c4235fe5729092eb4df4b47cb8 > /tmp/tf477-mobile/source.zip
+          gh api repos/wiliejonathan/tf-analyzer-analyst-ios/zipball/d15ddbec481696226b2bdd857d64aa3d14935d2e > /tmp/tf477-mobile/source.zip
           unzip -q /tmp/tf477-mobile/source.zip -d /tmp/tf477-mobile/source
           cp -a /tmp/tf477-mobile/source/*/. /tmp/tf477-mobile/src/
           cd /tmp/tf477-mobile/src
