@@ -50,7 +50,12 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release create v1.17.86 /tmp/TF_Extension_PC_MAC_REV473_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.86 — REV473' --notes-file release-staging/REV473/RELEASE_NOTES.md --latest
+          if gh release view v1.17.86 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.17.86 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.86 — REV473' --notes-file release-staging/REV473/RELEASE_NOTES.md --latest
+            gh release upload v1.17.86 /tmp/TF_Extension_PC_MAC_REV473_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.17.86 /tmp/TF_Extension_PC_MAC_REV473_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.17.86 — REV473' --notes-file release-staging/REV473/RELEASE_NOTES.md --latest
+          fi
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.17.86" > /tmp/tf473/release.json
           gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf473/previous.json
           python3 release-staging/REV473/update-latest.py
