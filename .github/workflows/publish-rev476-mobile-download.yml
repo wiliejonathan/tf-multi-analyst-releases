@@ -1,0 +1,41 @@
+name: Publish REV476 iOS Browser download
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV476-mobile-download/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Fetch and verify mobile source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/mobile476-source /tmp/mobile476
+          gh api repos/wiliejonathan/tf-analyzer-analyst-ios/zipball/153b7efd183d766a97a417888efe99eb1b304984 > /tmp/mobile476-source.zip
+          unzip -q /tmp/mobile476-source.zip -d /tmp/mobile476-source
+          cp -a /tmp/mobile476-source/*/. /tmp/mobile476/
+          cd /tmp/mobile476
+          mkdir -p ../../outputs
+          node --check assets/dashboard-mobile.js
+          node --test tests/activation404.cjs tests/import407.cjs tests/performance406.cjs tests/equity412.cjs tests/animation414.cjs tests/risk433.cjs
+          TF_RISK_SOURCE=assets/dashboard-mobile.js node tests/test-risk476.cjs
+          TF_RISK_SOURCE=assets/dashboard-mobile.js node tests/test-switches476.cjs
+          npm install --no-save playwright
+          TF_BROWSER_CHANNEL=chrome node tests/report476.cjs
+      - name: Publish download
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: wiliejonathan/tf-multi-analyst-releases
+        run: |
+          set -euo pipefail
+          cd /tmp/mobile476
+          zip -qr /tmp/TF_Analyzer_Analyst_iOS_BROWSER_REV476.zip . -x '.github/*' 'release-staging/*' 'node_modules/*' 'package-lock.json' 'package.json'
+          unzip -tq /tmp/TF_Analyzer_Analyst_iOS_BROWSER_REV476.zip
+          gh release upload v1.17.89 /tmp/TF_Analyzer_Analyst_iOS_BROWSER_REV476.zip --clobber
