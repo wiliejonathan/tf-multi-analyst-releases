@@ -74,9 +74,10 @@
       const marker=document.createComment('Report shared control');node.before(marker);moved.push({node,marker});panel.querySelector(target).append(node);
     }}else{for(const {node,marker} of moved){marker.replaceWith(node);}moved.length=0;}
   }
+  let riskTemplate=null;
   function explain(){
     dialog=document.createElement('dialog');dialog.id='tf-report-explainer';dialog.className='tf-report-dialog';
-    const card=document.querySelector('#tf-risk-explainer .tf-risk-explainer-card')?.cloneNode(true)||document.createElement('div');
+    const card=(riskTemplate||document.querySelector('#tf-risk-explainer .tf-risk-explainer-card'))?.cloneNode(true)||document.createElement('div');
     card.className='tf-risk-explainer-card';card.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
     const title=card.querySelector('h2');if(title)title.textContent='Analis Report';
     const intro=document.createElement('p');intro.textContent='Bulan terbaru belum genap satu bulan. Cons. Loss dan Drawdown Baru memakai 3 bulan sebelumnya + bulan berjalan = 4 bulan. PnL memakai 6 bulan sebelumnya + bulan terbaru = 7 bulan; rata-rata pembanding = total PnL 6 bulan dibagi 6, sedangkan bulan terbaru menampilkan total PnL bersih bulan berjalan. Drawdown ditampilkan negatif.';card.prepend(intro);
@@ -113,6 +114,7 @@
     moveControls(value);if(value){render();if(!show.explained){show.explained=true;explain();}}else dialog?.close();if(push)history.pushState(null,'',value?hash:location.pathname+location.search);
   }
   function init(){
+    riskTemplate ||= document.querySelector('#tf-risk-explainer .tf-risk-explainer-card')?.cloneNode(true);
     const nav=document.querySelector('.tf-top-nav > ul');if(!nav||document.getElementById('tf-report-nav'))return;
     home=nav.querySelector('a[data-tf-url="dashboard.html"]');if(!home)return;
     const li=document.createElement('li');report=document.createElement('a');report.id='tf-report-nav';report.className='tf-nav-link';
