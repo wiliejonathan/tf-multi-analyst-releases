@@ -1,0 +1,10 @@
+const assert=require('assert/strict'),core=require(require('path').resolve(process.env.TF_REV419_ROOT||'outputs/TF_Extension_PC_MAC_REV491_MULTI_LINK','multi-scanner/core.js'));
+assert.equal(core.pairRejection('Forex',['CHFJPY','XAUUSD']),null);
+assert(core.pairRejection('Forex',['XAUUSD','CHFJPY']));
+assert.equal(core.pairRejection('Forex',['CHFJPY']),null);
+assert.equal(core.pairRejection('Commodity',['XAUUSD','CHFJPY']),null);
+assert(core.pairRejection('Commodity',['CHFJPY','XAUUSD']));
+assert(core.pairRejection('Commodity',['CHFJPY']));
+assert.equal(core.pairRejection('ALL',['XAUUSD']),null);
+assert.equal(core.pairRejection('ALL',[]),null);
+console.log('PASS first-ranked XAUUSD policy, absent XAUUSD and ALL bypass');
