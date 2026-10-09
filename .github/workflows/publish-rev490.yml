@@ -1,0 +1,53 @@
+name: Publish REV490 Main Pair category rules
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV490/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf490/src
+          gh release download v1.17.85 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV472_MULTI_LINK.zip --output /tmp/tf490/base.zip
+          echo 'ab12568ee3392201e567b9a8aa14653afadfeef5fcc881e0a60f25c9b4d0c32f  /tmp/tf490/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf490/base.zip -d /tmp/tf490/src
+          python3 release-staging/REV490/patch490.py /tmp/tf490/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          TF_REV419_ROOT=/tmp/tf490/src node release-staging/REV490/test-recovery457.cjs
+          TF_REV419_ROOT=/tmp/tf490/src node release-staging/REV490/test-submit-worker490.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf490/src node release-staging/REV490/test-submit490.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf490/src node release-staging/REV490/test-pairs490.cjs
+          TF_REV419_ROOT=/tmp/tf490/src node release-staging/REV490/test-flow490.cjs
+          TF_REV419_ROOT=/tmp/tf490/src node release-staging/REV490/test-rank490.cjs
+          mkdir -p outputs
+          find /tmp/tf490/src -name '*.js' -print0 | xargs -0 -n1 node --check
+          (cd /tmp/tf490/src && zip -qr /tmp/TF_Extension_PC_MAC_REV490_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.03 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.03 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.03 — REV490' --notes-file release-staging/REV490/RELEASE_NOTES.md --latest
+            gh release upload v1.18.03 /tmp/TF_Extension_PC_MAC_REV490_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.03 /tmp/TF_Extension_PC_MAC_REV490_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.03 — REV490' --notes-file release-staging/REV490/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.03" > /tmp/tf490/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf490/previous.json
+          python3 release-staging/REV490/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf490/latest-request.json
+
+
