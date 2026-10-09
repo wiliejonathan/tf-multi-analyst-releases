@@ -26,7 +26,7 @@
   "icon32.png": "f3c1fc47153cfb2204a4ea61b62f121f4bc18d5645eb583abec88c17b5afd826",
   "icon48.png": "7ec81e4df7ba329984a2747e6b47dba954088617f6c644c1907dc1de160f2925",
   "iSignalUsers.html": "ecc472b0f1529c87f022324b375ea469d5c12a3a255eefbf0d3d6ce44160c5fc",
-  "manifest.json": "ac0451a3485cb45edec7c83bb5d33216b091291f2307fdf04343aac956ecbbca",
+  "manifest.json": "2bbe9e7ee7b42e957e8bd16fe9d67b621811640ddf9d554275bbb444420d9c9a",
   "PANDUAN_RELEASE_GITHUB_DEVELOPER.txt": "71f2feb3c7a854afbe1094cd2aedcd52d994cf080b698f12bec5ba04409e1eb4",
   "popup.html": "4f2c28ad647d45f1b5ecfc835c1b04df6753f0814d17bc8a15543e9c0090d311",
   "PROTECTED_BUILD_README.txt": "13fe61685c3a5d05338bee971ec98f7c23a8b582a82ff09b5d93834d49df7804",
@@ -260,7 +260,7 @@
   "assets/6f5f92e21ebd9721.css": "d74e73d0792a89b121ba949732aa84bb6de3572373064af8db8437ccb4a13fe0",
   "assets/7125b615d060d669.css": "a9026a6fe2759c106a63875af6d091b107f0cad371569d79dae9a0ff1dd4aab1",
   "assets/716cc2271671214b.js": "9260b9b9ac944b1bf8026e7d0f7c6a9d30bbcea38403b8d9f32cf7bc432f0c40",
-  "assets/7b6af0cb4001a684.js": "c3f09be3d28ad36921f562d7f709128fd4aced2c2ba802dcdd643ad0a1b51c2f",
+  "assets/7b6af0cb4001a684.js": "ce6e037379570762d9ae6d3a1d7d825f7937248ded4a6e7389521273f632e99a",
   "assets/7e95b596e5bf8dff.css": "204ec8614917ac5f07627952b48ba7ae10bc4592d308da6b6bef7c4a652c3210",
   "assets/894f18e8a37bd7c6.js": "75208539fb1833a403067677b60f2e5c557c4ece7d05cd6bbdfbe8c6564e69c8",
   "assets/901c62026afc22f4.js": "50172aebe1b48c2e37bf450ce1150911217ac67aab1e6eb14fed1e03aa500aa7",
@@ -303,12 +303,12 @@
   "multi-scanner/collector.js": "1af66bfe0f2a59e305cbc3a6a8e44e5e47358241bd0b9f46c86f4e53d2f44d70",
   "multi-scanner/core.js": "7a101ddb59e0c31903bdca64b3c09cc90e4569b5026398256cd9002c5683100c",
   "multi-scanner/dashboard.html": "8ae825d1f1f8df6072de3e37625fe4662cdac0cc3afa3e4363894438dd196546",
-  "multi-scanner/dashboard.js": "b0981ae88efb8b54c952943a5c6348fbf7fb065c1393245aeda55c94dc148062",
+  "multi-scanner/dashboard.js": "cd2bcf8ceee9985a02b93730080f18e409b2907e7faa7a7e0f6384bfc41a8716",
   "multi-scanner/engine.js": "8b874c01786c02c30dfb1223048674e051d319109119d29ddca3d8187de2b1e8",
   "multi-scanner/export.js": "bfa99c5a872a2117c2b6acc0c2460318d749b9a949c1988423fb5cbdba4eda31",
   "multi-scanner/market-regimes.json": "397cfe50aa513d724e3f110f56d2b5df4bf4ddfbd7281e08b4347f21621cb314",
   "multi-scanner/progress.js": "7ab8a17fc11ff7eade63788a9585688328419cca682de73426f30bb45afeb1a7",
   "multi-scanner/sidebar.html": "7038f613f9bb853099fc742b7344a5abc58a0b5ac925b77f3818083ac328122e",
   "multi-scanner/sidebar.js": "9e21b0cee0141f7e35d7e83e7b211896a0011509410ef8f14e897f8c01e43b1f",
-  "multi-scanner/styles.css": "213b9cc119ff0c5b2849b584e258f305ec7a67f2d8cfb17ea67cb2cf42342d85"
+  "multi-scanner/styles.css": "f4bd40e64cfa8bea532360b5ff4ed256f889164670035bf0d90c201aa126ae2b"
 }
