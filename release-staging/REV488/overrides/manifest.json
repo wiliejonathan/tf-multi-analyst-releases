@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TF Multi-Analyst Scanner",
-  "version": "1.18.01",
+  "version": "1.18.1",
   "description": "REV488: Analis Report and configurable analyst risk percentages.",
   "minimum_chrome_version": "116",
   "permissions": [
@@ -87,5 +87,5 @@
     "default_path": "popup.html"
   },
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqJ7+8rQMKQLh6MP9c2K4xUBszCpYNbKYYAjqVPLl0hHHz3X1uS9NarldrfPMsAK5qAAnC+RrostZwMBJ8m3DQQuyMl14BaAsZeX9xHf+pbtSErcjQKAVJOgCkB3X8KpMNpX8vq3AnfRL7PHy8RfCKiE4kRh+xdBTDoRrFXTVThjdt4lgIZs9dvjCBrSHsza2U3vZVAOZyKWWYCxeVBu2Q6uJLI97bqu1c2afc1O2V4A/FDBh5sd34ahSrBrD4DaXt2J6+gy2U4UuAr4WZkn/rm16gT0eXHUMUKJfH4VwFtTD4526UdyIjZuXHT0b3FORHKbGhvIQ1ke9MvaInK52WQIDAQAB",
-  "version_name": "REV488"
+  "version_name": "1.18.01"
 }

@@ -258,7 +258,7 @@ const FILES = {
   "icon16.png": "0b4850a138e4ee559a7f8c206717dcb9bd27adfa9b9029b100e88b184bdedb1d",
   "icon32.png": "f3c1fc47153cfb2204a4ea61b62f121f4bc18d5645eb583abec88c17b5afd826",
   "icon48.png": "7ec81e4df7ba329984a2747e6b47dba954088617f6c644c1907dc1de160f2925",
-  "manifest.json": "8f80c43197748c00ce34a20b2daeeba077d05dce4fad251205679f07e78849a5",
+  "manifest.json": "4ad65a81ac8ad0f71b4c7c65f3b773c51ba03df182703c9f39d7b674f4004fdc",
   "multi-scanner/collector.js": "5d81886492e5916b90eb3dbdeac1cb0b6c0639bc00a230eb532548625e3e4818",
   "multi-scanner/core.js": "9fbbfb4fd6eb9ea94d46e94e2d92319c82ba835d84ffdf8769bf26e392ef8259",
   "multi-scanner/dashboard.html": "8ae825d1f1f8df6072de3e37625fe4662cdac0cc3afa3e4363894438dd196546",
