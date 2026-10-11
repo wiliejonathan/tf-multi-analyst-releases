@@ -1,0 +1,15 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict');
+const root=process.env.TF_REV419_ROOT||'outputs/TF_Extension_PC_MAC_REV496_MULTI_LINK';const source=fs.readFileSync(root+'/assets/4b4d6b8dc315a95c.js','utf8');
+const rules=source.slice(source.indexOf('function tf_monthlyPnlRisk('),source.indexOf('function tf_refreshLatestRiskState('));
+const stop=source.slice(source.indexOf('let tf_monthRiskBlocked='),source.indexOf('const tf_historyRowManualOverrideSet'));
+const ctx={localStorage:{getItem:()=>null},tf_historyRowEnabledMap:new Map(),tf_historyRowId:r=>r.id,tf_createdKeyOf:r=>r.createdSortKey,tf_closedKeyOf:r=>r.sortKey,tf_parseHistoryTableDateMs:Date.parse,tf_monthKeyFromSortKey:t=>new Date(t).toISOString().slice(0,7),tf_latestRiskNormAnalyst:s=>s.toLowerCase(),tf_latestRiskNormPair:s=>s.toUpperCase(),tf_latestRiskRowTs:r=>r.sortKey,tf_latestRiskMonthKey:t=>new Date(t).toISOString().slice(0,7),tf_analystRiskSettings:()=>({warningOn:true,criticalOn:true,warning:75,critical:120})};vm.createContext(ctx);vm.runInContext(rules+'\n'+stop+'\nglobalThis.calculate=tf_computeMonthlyRiskStop;',ctx);
+let id=0;const make=(a,date,pips,closed=date)=>({id:String(++id),analyst:a,pair:'XAUUSD',pips,createdSortKey:Date.parse(date),sortKey:Date.parse(closed)});
+const history=[];for(const a of ['A','B'])for(let m=1;m<=8;m++)history.push(make(a,`2026-${String(m).padStart(2,'0')}-02`,m===3?-50:100));
+const month=[make('A','2026-07-01',-75),make('A','2026-07-02',-1),make('A','2026-07-03',500),make('B','2026-07-04',10),make('A','2026-08-01',100)];
+const all=history.filter(r=>r.createdSortKey<Date.parse('2026-07-01')).concat(month);
+const run=(percent=75,enabled=true)=>ctx.calculate(month,all,{enabled,percent});
+assert.deepEqual([...run()],[month[2].id]);assert.equal(run(80).size,0);assert.equal(run(75,false).size,0);assert.equal(ctx.calculate(month,month,{enabled:true,percent:75}).size,0);
+ctx.tf_historyRowEnabledMap.set(month[1].id,false);assert.equal(run().size,0);ctx.tf_historyRowEnabledMap.clear();
+assert.equal(run().has(month[4].id),false);assert.equal(run().has(month[3].id),false);
+const reordered=month.slice().reverse();assert.deepEqual([...ctx.calculate(reordered,all,{enabled:true,percent:75})],[month[2].id]);
+console.log('PASS exact threshold, crossing-trade inclusion, next-month reset, analyst isolation, positive-month-only average, 80%, OFF, missing history, manual untick, Created At order');
