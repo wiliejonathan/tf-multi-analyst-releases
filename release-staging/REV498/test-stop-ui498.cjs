@@ -1,0 +1,24 @@
+const fs=require('fs'),{chromium}=require('playwright'),assert=require('assert/strict');
+const root=process.env.TF_REV419_ROOT||'outputs/TF_Extension_PC_MAC_REV498_MULTI_LINK';
+(async()=>{const b=await chromium.launch({headless:true,channel:process.env.CI?undefined:'chrome'}),p=await b.newPage();await p.route('https://test.local/**',r=>r.fulfill({body:'<!doctype html><html data-tf-server-authorized="1"><body></body></html>',contentType:'text/html'}));await p.goto('https://test.local/dashboard.html');
+await p.addScriptTag({path:root+'/assets/4b4d6b8dc315a95c.js'});
+await p.addScriptTag({path:root+'/assets/tf-analyst-risk-adjustment.js'});
+await p.evaluate(()=>{document.getElementById('tf-risk-explainer')?.remove();document.body.classList.remove('tf-risk-explainer-open');tf_setupMonthlyRiskStop();document.querySelector('.tf-risk-fold').open=true;});
+assert.equal(await p.locator('#tf-month-risk-toggle').isChecked(),false);assert.equal(await p.locator('#tf-month-risk-percent').inputValue(),'75');assert(await p.locator('#tf-month-risk-percent').isDisabled());
+assert(await p.locator('#tf-month-risk-stop').evaluate(el=>el.nextElementSibling?.classList.contains('tf-risk-adjust-help')));
+await p.evaluate(()=>{equityMetric='pips';tf_isMyfxbookPriceLoading=()=>false;getDollarPerPipForAnalyst=()=>1;getEffectiveSlForAnalyst=()=>({pips:100});historySignals=[];let i=0;const add=(date,pips)=>historySignals.push({analyst:'A',pair:'XAUUSD',pips,createdSortKey:Date.parse(date),sortKey:Date.parse(date),createdDate:date,displayDate:date,id:++i});for(let m=1;m<=6;m++)add('2026-'+String(m).padStart(2,'0')+'-02',100);add('2026-07-01',-80);add('2026-07-02',100);add('2026-08-01',100);});
+await p.evaluate(()=>{const e=document.getElementById('tf-month-risk-toggle');e.checked=!e.checked;e.dispatchEvent(new Event('change',{bubbles:true}));});await p.waitForTimeout(100);
+const stopped=p.locator('#history-table tr[data-month-risk-stopped]');assert.equal(await stopped.count(),1);assert.equal(await stopped.locator('input[type=checkbox]').isChecked(),false);assert(await stopped.locator('input').isDisabled());
+const on=await p.evaluate(()=>({n:lastHistoryRowsForExport.length,ids:tf_lastEquityCalcRows.filter(r=>!r.isWithdraw).length,blocked:tf_monthRiskBlocked.size}));assert.equal(on.n,8);assert.equal(on.blocked,1);assert.equal(on.ids,8);
+await p.evaluate(()=>{const e=document.getElementById('tf-month-risk-toggle');e.checked=!e.checked;e.dispatchEvent(new Event('change',{bubbles:true}));});const off=await p.evaluate(()=>({n:lastHistoryRowsForExport.length,ids:tf_lastEquityCalcRows.filter(r=>!r.isWithdraw).length}));assert.equal(off.n,9);assert.equal(off.ids,9);assert.equal(await stopped.count(),0);
+await p.evaluate(()=>{const e=document.getElementById('tf-month-risk-toggle');e.checked=!e.checked;e.dispatchEvent(new Event('change',{bubbles:true}));});await p.locator('#tf-month-risk-percent').fill('90');await p.locator('#tf-month-risk-percent').dispatchEvent('change');assert.equal(await stopped.count(),0);
+assert.equal(await p.locator('[data-month-risk-toggle]').count(),4);
+await p.evaluate(()=>{const e=document.querySelector('.tf-cost-sync-tickers [data-month-risk-toggle]');e.checked=false;e.dispatchEvent(new Event('change',{bubbles:true}));});assert.equal(await p.locator('#tf-month-risk-toggle').isChecked(),false);
+await p.evaluate(()=>{const e=document.getElementById('tf-month-risk-toggle');e.checked=true;e.dispatchEvent(new Event('change',{bubbles:true}));});
+await p.locator('#tf-month-risk-percent').fill('75');await p.locator('#tf-month-risk-percent').dispatchEvent('change');
+const scale=await p.evaluate(()=>{const calls=[],labels=[];tf_lastEquityCalcRows=historySignals;tf_monthRiskBreaches=new Set(['a|2026-07']);const points=['2026-06-01','2026-07-01','2026-07-15','2026-08-01'].map(d=>({dayTs:Date.parse(d)}));const ctx={save(){},restore(){},fillRect(...a){calls.push(a)},fillText(...a){labels.push(a)}};tf_drawMonthlyRiskBands(ctx,points,i=>10+(i-1+.5)*40,10,100,{start:1,end:2,left:10,right:90,step:40});tf_drawMonthlyRiskBands(ctx,points,i=>10+(i-2+.5)*80,10,100,{start:2,end:2,left:10,right:90,step:80});return {calls,labels};});assert.deepEqual(scale.calls,[[10,10,80,100],[10,10,80,100]]);assert.equal(scale.labels[0][0],'1x');assert.equal(scale.labels[1][0],'1x');
+const bands=await p.evaluate(()=>{const calls=[];tf_lastEquityCalcRows=historySignals;const points=['2026-06-01','2026-07-01','2026-08-01'].map(date=>({sortKey:Date.parse(date)}));tf_drawMonthlyRiskBands({save(){},restore(){},fillRect(...args){calls.push(args)}},points,i=>i*50,10,100);return calls;});assert.deepEqual(bands,[[50,10,50,100]]);
+await p.screenshot({path:'outputs/month-risk498.png',fullPage:false});console.log('PASS real dashboard UI placement/defaults/toggle, stopped Table 3 checkbox, exports and equity membership, OFF restoration, custom percentage');await b.close();})().catch(e=>{console.error(e);process.exit(1)});
+
+
+
