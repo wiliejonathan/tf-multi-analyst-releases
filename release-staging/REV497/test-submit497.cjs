@@ -1,0 +1,10 @@
+const assert=require('assert/strict'),{chromium}=require('playwright'),fs=require('fs');
+(async()=>{const root=process.env.TF_REV419_ROOT||'outputs/TF_Extension_PC_MAC_REV454_MULTI_LINK';const b=await chromium.launch({headless:true,channel:process.env.CI?undefined:'chrome'});try{
+ const p=await b.newPage({viewport:{width:430,height:1000}});const errors=[];p.on('pageerror',e=>errors.push(e.message));
+ // Reproduce license bootstrap: body content mounted after initial stylesheet setup.
+ await p.setContent('<body class="tf-multi-mode"><button id="tf-multi-back">Back To Main Dashboard</button><div id="controls">'+['start','pause','dashboard','reset'].map(x=>`<button id="tf-multi-control-${x}"></button>`).join('')+'</div><div id="tf-multi-page"></div></body>');
+ await p.evaluate(()=>{window.listeners=[];window.saved={};chrome={windows:{getCurrent:async()=>({id:1})},runtime:{getURL:x=>x,sendMessage:async m=>{window.sent=(window.sent||[]).concat(m);return {ok:true}} },storage:{local:{get:async()=>({tfMultiScoreDefaultsV431:true}),set:async x=>Object.assign(saved,x)},onChanged:{addListener:f=>listeners.push(f)}}};fetch=async()=>({ok:false});});
+ for(const f of ['multi-scanner/core.js','multi-scanner/progress.js','assets/tf-multi-native-sidebar.js'])await p.addScriptTag({path:root+'/'+f});
+ await p.evaluate(()=>TFMultiSidebar.mount(document.querySelector('#tf-multi-page'),document.querySelector('#controls')));await p.waitForTimeout(100);
+ await p.locator('#tf-multi-control-start').click();await p.waitForTimeout(100);assert.equal(await p.evaluate(()=>sent.at(-1).type),'TF_MULTI_START');assert.equal(await p.evaluate(()=>saved.tfMultiFiltersV419.pair),'XAUUSD');assert.equal(await p.locator('#message').textContent(),'Dashboard Multi-Link dibuka. Menunggu proses scan dimulai…'); assert(await p.locator('#tf-multi-top-progress').isHidden());
+ assert.deepEqual(errors,[]);console.log('PASS sidebar Submit sends request, saves filters and shows opening feedback');}finally{await b.close();}})().catch(e=>{console.error(e);process.exitCode=1});
