@@ -1,0 +1,49 @@
+name: Publish REV510 separate filter outlines and compact dashboard
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV510/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf510/src
+          gh release download v1.17.85 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV472_MULTI_LINK.zip --output /tmp/tf510/base.zip
+          echo 'ab12568ee3392201e567b9a8aa14653afadfeef5fcc881e0a60f25c9b4d0c32f  /tmp/tf510/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf510/base.zip -d /tmp/tf510/src
+          python3 release-staging/REV510/patch510.py /tmp/tf510/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf510/src node release-staging/REV510/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf510/src node release-staging/REV510/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf510/src node release-staging/REV510/test-lot510.cjs
+          (cd /tmp/tf510/src && zip -qr /tmp/TF_Extension_PC_MAC_REV510_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.23 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.23 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.23 — REV510' --notes-file release-staging/REV510/RELEASE_NOTES.md --latest
+            gh release upload v1.18.23 /tmp/TF_Extension_PC_MAC_REV510_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.23 /tmp/TF_Extension_PC_MAC_REV510_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.23 — REV510' --notes-file release-staging/REV510/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.23" > /tmp/tf510/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf510/previous.json
+          python3 release-staging/REV510/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf510/latest-request.json
+
+
