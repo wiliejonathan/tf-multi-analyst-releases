@@ -1,16 +1,16 @@
 {
   "schema": 1,
   "available": true,
-  "revision": 517,
-  "tag_name": "v1.18.30",
-  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.18.30",
-  "published_at": "2026-10-20T09:13:20Z",
+  "revision": 518,
+  "tag_name": "v1.18.31",
+  "release_url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/tag/v1.18.31",
+  "published_at": "2026-10-20T11:25:52Z",
   "asset": {
-    "id": 658826637,
-    "name": "TF_Extension_PC_MAC_REV517_MULTI_LINK.zip",
-    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.18.30/TF_Extension_PC_MAC_REV517_MULTI_LINK.zip",
-    "size": 1006585,
-    "digest": "sha256:ff575def3f79bb688d90b06487ae082e7c7576adc0b02456c9590f90d6502323",
-    "updated_at": "2026-10-20T09:13:19Z"
+    "id": 659131266,
+    "name": "TF_Extension_PC_MAC_REV518_MULTI_LINK.zip",
+    "url": "https://github.com/wiliejonathan/tf-multi-analyst-releases/releases/download/v1.18.31/TF_Extension_PC_MAC_REV518_MULTI_LINK.zip",
+    "size": 1008307,
+    "digest": "sha256:5b8356bdb9aaf7f85812f45ddfba2758d1989281ade2e388874d3b486fc84f5c",
+    "updated_at": "2026-10-20T11:25:51Z"
   }
 }
