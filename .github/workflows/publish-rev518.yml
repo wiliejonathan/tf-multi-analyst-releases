@@ -1,0 +1,52 @@
+name: Publish REV518 weekday profit-loss day counts and yearly calendar headers
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV518/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf518/src
+          gh release download v1.18.30 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV517_MULTI_LINK.zip --output /tmp/tf518/base.zip
+          echo 'ff575def3f79bb688d90b06487ae082e7c7576adc0b02456c9590f90d6502323  /tmp/tf518/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf518/base.zip -d /tmp/tf518/src
+          python3 release-staging/REV518/patch518.py /tmp/tf518/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf518/src node release-staging/REV518/test-unload518.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf518/src node release-staging/REV518/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf518/src node release-staging/REV518/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf518/src node release-staging/REV518/test-lot518.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf518/src node release-staging/REV518/test-viewer518.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf518/src node release-staging/REV518/test-integration518.cjs
+          (cd /tmp/tf518/src && zip -qr /tmp/TF_Extension_PC_MAC_REV518_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.31 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.31 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.31 — REV518' --notes-file release-staging/REV518/RELEASE_NOTES.md --latest
+            gh release upload v1.18.31 /tmp/TF_Extension_PC_MAC_REV518_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.31 /tmp/TF_Extension_PC_MAC_REV518_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.31 — REV518' --notes-file release-staging/REV518/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.31" > /tmp/tf518/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf518/previous.json
+          python3 release-staging/REV518/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf518/latest-request.json
+
+
