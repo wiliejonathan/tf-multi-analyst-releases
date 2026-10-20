@@ -1,0 +1,51 @@
+name: Publish REV514 weighted monthly R and shared user adjustments
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV514/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf514/src
+          gh release download v1.18.26 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV513_MULTI_LINK.zip --output /tmp/tf514/base.zip
+          echo '5aba0a7f5ff78cbee267e6e9058bc75f7852c9d631ec040d5d4a7eebbd1d1aca  /tmp/tf514/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf514/base.zip -d /tmp/tf514/src
+          python3 release-staging/REV514/patch514.py /tmp/tf514/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf514/src node release-staging/REV514/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf514/src node release-staging/REV514/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf514/src node release-staging/REV514/test-lot514.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf514/src node release-staging/REV514/test-viewer514.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf514/src node release-staging/REV514/test-integration514.cjs
+          (cd /tmp/tf514/src && zip -qr /tmp/TF_Extension_PC_MAC_REV514_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.27 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.27 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.27 — REV514' --notes-file release-staging/REV514/RELEASE_NOTES.md --latest
+            gh release upload v1.18.27 /tmp/TF_Extension_PC_MAC_REV514_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.27 /tmp/TF_Extension_PC_MAC_REV514_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.27 — REV514' --notes-file release-staging/REV514/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.27" > /tmp/tf514/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf514/previous.json
+          python3 release-staging/REV514/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf514/latest-request.json
+
+
