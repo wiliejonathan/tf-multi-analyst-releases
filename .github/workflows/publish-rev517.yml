@@ -1,0 +1,52 @@
+name: Publish REV517 Closed At reports and ten-trade scrolling summaries
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV517/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf517/src
+          gh release download v1.18.29 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV516_MULTI_LINK.zip --output /tmp/tf517/base.zip
+          echo 'c67ee211b13599cc6a84f76ee8543ca029743f00e44bf8030f7fc3ed84ff2ccf  /tmp/tf517/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf517/base.zip -d /tmp/tf517/src
+          python3 release-staging/REV517/patch517.py /tmp/tf517/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf517/src node release-staging/REV517/test-unload517.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf517/src node release-staging/REV517/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf517/src node release-staging/REV517/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf517/src node release-staging/REV517/test-lot517.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf517/src node release-staging/REV517/test-viewer517.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf517/src node release-staging/REV517/test-integration517.cjs
+          (cd /tmp/tf517/src && zip -qr /tmp/TF_Extension_PC_MAC_REV517_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.30 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.30 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.30 — REV517' --notes-file release-staging/REV517/RELEASE_NOTES.md --latest
+            gh release upload v1.18.30 /tmp/TF_Extension_PC_MAC_REV517_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.30 /tmp/TF_Extension_PC_MAC_REV517_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.30 — REV517' --notes-file release-staging/REV517/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.30" > /tmp/tf517/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf517/previous.json
+          python3 release-staging/REV517/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf517/latest-request.json
+
+
