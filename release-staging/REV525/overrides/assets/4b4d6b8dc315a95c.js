@@ -14003,6 +14003,7 @@ fillMonthlyFromStorage(rawMonthlyStats || {});
 const validHistory = (rawHistory || []).filter((item) => {
 if (!item || !item.analyst)
 return false;
+if(tf_isCancelled525(item)) return true;
 if (typeof item.pips === 'number')
 return Number.isFinite(item.pips);
 if (typeof item.pips === 'string' && item.pips.trim() !== '')
@@ -14015,7 +14016,7 @@ return {
 ...item,
 analyst: item.analyst,
 pair: item.pair,
-pips: Number.isFinite(parsedPips) ? parsedPips : 0,
+pips: tf_isCancelled525(item) ? null : (Number.isFinite(parsedPips) ? parsedPips : 0),
 displayDate: normalizeWIBSuffix(item.displayDate),
 sortKey: item.sortKey,
 openedDate: normalizeWIBSuffix(item.openedDate),
