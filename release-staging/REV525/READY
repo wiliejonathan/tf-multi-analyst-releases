@@ -1,1 +1,1 @@
-REV525 cancelled history and local compiler; include cancellation predicate in isolated SL cache regression harness.
+REV525 final: preserve source identity in risk cache; isolate Cancelled from financial calculations.
