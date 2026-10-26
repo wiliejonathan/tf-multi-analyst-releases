@@ -1,0 +1,56 @@
+name: Publish REV521 Opened At history date column
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV521/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf521/src
+          gh release download v1.18.32 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV519_MULTI_LINK.zip --output /tmp/tf521/base.zip
+          echo '754851703c7f475edff5d0f60e2c65e9a2180d7986b1babf27c291b87517ca3e  /tmp/tf521/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf521/base.zip -d /tmp/tf521/src
+          python3 release-staging/REV521/patch521.py /tmp/tf521/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-unload521.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-lot521.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-viewer521.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-integration521.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-performance521.cjs
+          TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-core-performance521.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-paging521.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf521/src node release-staging/REV521/test-opened521.cjs
+          (cd /tmp/tf521/src && zip -qr /tmp/TF_Extension_PC_MAC_REV521_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.34 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.34 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.34 — REV521' --notes-file release-staging/REV521/RELEASE_NOTES.md --latest
+            gh release upload v1.18.34 /tmp/TF_Extension_PC_MAC_REV521_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.34 /tmp/TF_Extension_PC_MAC_REV521_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.34 — REV521' --notes-file release-staging/REV521/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.34" > /tmp/tf521/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf521/previous.json
+          python3 release-staging/REV521/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf521/latest-request.json
+
+
