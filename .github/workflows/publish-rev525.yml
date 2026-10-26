@@ -1,0 +1,60 @@
+name: Publish REV525 stabilize rapid filter interactions
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV525/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf525/src
+          gh release download v1.18.37 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV524_MULTI_LINK.zip --output /tmp/tf525/base.zip
+          echo 'ece7b122ce7650901c6b954cc0af492539d85bcbb0abafabe06727256039f730  /tmp/tf525/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf525/base.zip -d /tmp/tf525/src
+          python3 release-staging/REV525/patch525.py /tmp/tf525/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-unload525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-lot525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-viewer525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-integration525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-performance525.cjs
+          TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-core-performance525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-history525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-smooth525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-stability525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-opened525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-cancelled525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf525/src node release-staging/REV525/test-builder525.cjs
+          (cd /tmp/tf525/src && zip -qr /tmp/TF_Extension_PC_MAC_REV525_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.38 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.38 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.38 — REV525' --notes-file release-staging/REV525/RELEASE_NOTES.md --latest
+            gh release upload v1.18.38 /tmp/TF_Extension_PC_MAC_REV525_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.38 /tmp/TF_Extension_PC_MAC_REV525_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.38 — REV525' --notes-file release-staging/REV525/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.38" > /tmp/tf525/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf525/previous.json
+          python3 release-staging/REV525/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf525/latest-request.json
+
+
