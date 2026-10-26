@@ -1,0 +1,62 @@
+name: Publish REV527 indicator TP SL Cancelled visibility controls
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV527/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf527/src
+          gh release download v1.18.39 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV526_MULTI_LINK.zip --output /tmp/tf527/base.zip
+          echo '6e96db463be9ba0754fc947d2ab63cbdeb9044d586bb48999f74a408fe2cc1f1  /tmp/tf527/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf527/base.zip -d /tmp/tf527/src
+          python3 release-staging/REV527/patch527.py /tmp/tf527/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-unload525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-lot525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-viewer525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-integration525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-performance525.cjs
+          TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-core-performance525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-history525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-smooth525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-stability525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-opened525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-cancelled525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-builder525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-builder526.cjs
+          TF_REV419_ROOT=/tmp/tf527/src node release-staging/REV527/test-toggles527.cjs
+          (cd /tmp/tf527/src && zip -qr /tmp/TF_Extension_PC_MAC_REV527_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.40 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.40 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.40 — REV527' --notes-file release-staging/REV527/RELEASE_NOTES.md --latest
+            gh release upload v1.18.40 /tmp/TF_Extension_PC_MAC_REV527_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.40 /tmp/TF_Extension_PC_MAC_REV527_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.40 — REV527' --notes-file release-staging/REV527/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.40" > /tmp/tf527/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf527/previous.json
+          python3 release-staging/REV527/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf527/latest-request.json
+
+
