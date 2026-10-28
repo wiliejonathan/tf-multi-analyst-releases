@@ -1,0 +1,66 @@
+name: Publish REV531 complete shared navigation
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV531/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf531/src
+          gh release download v1.18.43 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV530_MULTI_LINK.zip --output /tmp/tf531/base.zip
+          echo '6971c31a679e55652ff426f3449658d351a91c25685535ba7ce977ad98ca6703  /tmp/tf531/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf531/base.zip -d /tmp/tf531/src
+          python3 release-staging/REV531/patch531.py /tmp/tf531/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-unload525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-lot525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-viewer525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-integration525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-performance525.cjs
+          TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-core-performance525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-history525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-smooth525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-stability525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-opened525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-cancelled525.cjs
+          mkdir -p work/report528 work/report530
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-navigation528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-builder528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-template528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-source528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-ui530.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf531/src node release-staging/REV531/test-shared-nav531.cjs
+          (cd /tmp/tf531/src && zip -qr /tmp/TF_Extension_PC_MAC_REV531_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.44 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.44 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.44 — REV531' --notes-file release-staging/REV531/RELEASE_NOTES.md --latest
+            gh release upload v1.18.44 /tmp/TF_Extension_PC_MAC_REV531_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.44 /tmp/TF_Extension_PC_MAC_REV531_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.44 — REV531' --notes-file release-staging/REV531/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.44" > /tmp/tf531/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf531/previous.json
+          python3 release-staging/REV531/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf531/latest-request.json
+
+
