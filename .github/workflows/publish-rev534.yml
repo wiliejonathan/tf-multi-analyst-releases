@@ -1,0 +1,47 @@
+name: Publish REV534 login, loss colors, report expansion and scan timer
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV534/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build exact verified package and run regression checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf534/src
+          gh release download v1.18.46 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV533_MULTI_LINK.zip --output /tmp/tf534/base.zip
+          echo '1343ef8d99697163c33128cac8c2fdd0b23c065a9fee1f4bc50e59103413d3e6  /tmp/tf534/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf534/base.zip -d /tmp/tf534/src
+          python3 release-staging/REV534/patch534.py /tmp/tf534/src
+          python3 - <<'PY'
+          import json,hashlib
+          from pathlib import Path
+          root=Path('/tmp/tf534/src')
+          expected=json.loads(Path('release-staging/REV534/FILE_HASHES.json').read_text())
+          actual={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file()}
+          assert actual==expected, 'Package differs from tested files'
+          PY
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          CI=1 TF_REV419_ROOT=/tmp/tf534/src node release-staging/REV534/test534.cjs
+          (cd /tmp/tf534/src && zip -qr /tmp/TF_Extension_PC_MAC_REV534_MULTI_LINK.zip .)
+      - name: Publish release and latest metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.18.47 /tmp/TF_Extension_PC_MAC_REV534_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.47 — REV534' --notes-file release-staging/REV534/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.47" > /tmp/tf534/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf534/previous.json
+          python3 release-staging/REV534/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf534/latest-request.json
