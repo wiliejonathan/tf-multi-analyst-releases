@@ -1,0 +1,70 @@
+name: Publish REV533 packed tutorial layout and small connection button
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV533/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and verify tested package
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/tf533/src
+          gh release download v1.18.45 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV532_MULTI_LINK.zip --output /tmp/tf533/base.zip
+          echo 'e93fc1848369c906c23abaf32b15fdafa88cc28358e2fc62d37c2f0a8098271f  /tmp/tf533/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf533/base.zip -d /tmp/tf533/src
+          python3 release-staging/REV533/patch533.py /tmp/tf533/src
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          mkdir -p outputs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-unload525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-negative509.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-all508.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-lot525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-viewer525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-integration525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-performance525.cjs
+          TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-core-performance525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-history525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-smooth525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-stability525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-opened525.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-cancelled525.cjs
+          mkdir -p work/report528 work/report530
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-navigation528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-builder528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-template528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-source528.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-ui530.cjs
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-shared-nav531.cjs
+          mkdir -p work/report532
+          TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-mobile-panel532.cjs
+          mkdir -p work/report533
+          CI=1 TF_REV419_ROOT=/tmp/tf533/src node release-staging/REV533/test-compact-tutorial533.cjs
+          (cd /tmp/tf533/src && zip -qr /tmp/TF_Extension_PC_MAC_REV533_MULTI_LINK.zip .)
+      - name: Publish release and update metadata
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view v1.18.46 --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit v1.18.46 --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.46 — REV533' --notes-file release-staging/REV533/RELEASE_NOTES.md --latest
+            gh release upload v1.18.46 /tmp/TF_Extension_PC_MAC_REV533_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            gh release create v1.18.46 /tmp/TF_Extension_PC_MAC_REV533_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.46 — REV533' --notes-file release-staging/REV533/RELEASE_NOTES.md --latest
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.46" > /tmp/tf533/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf533/previous.json
+          python3 release-staging/REV533/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf533/latest-request.json
+
+
