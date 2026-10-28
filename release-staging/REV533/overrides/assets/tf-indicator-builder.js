@@ -19,7 +19,7 @@ function exportFilename(analyst, suffix){
 }
 function packTutorial(grid){
  grid.classList.add('tf-packed-tutorial');
- if(!document.getElementById('tf-tutorial-pack-style')){const style=document.createElement('style');style.id='tf-tutorial-pack-style';style.textContent='.tf-indicator-builder .tf-compiler-setup button{padding:5px 11px;min-height:29px;font-size:12px;line-height:1.35;border-radius:6px}.tf-pine-steps.tf-packed-tutorial{display:block;position:relative}.tf-packed-tutorial>li{box-sizing:border-box;margin:0}.tf-packed-tutorial>li[data-wide="true"] img{width:100%;max-height:none;height:auto}';document.head.append(style);}
+ if(!document.getElementById('tf-tutorial-pack-style')){const style=document.createElement('style');style.id='tf-tutorial-pack-style';style.textContent='.tf-indicator-builder .tf-compiler-setup button{padding:5px 11px;min-height:29px;font-size:12px;line-height:1.35;border-radius:6px}.tf-pine-steps.tf-packed-tutorial{display:block;position:relative;min-width:0;overflow-x:clip}.tf-packed-tutorial>li{box-sizing:border-box;max-width:100%;margin:0}.tf-packed-tutorial>li[data-wide="true"] img{width:100%;max-height:none;height:auto}';document.head.append(style);}
  let frame=0;
  function arrange(){
   frame=0;const width=grid.clientWidth;if(!width)return;

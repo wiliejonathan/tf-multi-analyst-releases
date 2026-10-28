@@ -285,7 +285,7 @@ const FILES = {
   "assets/tf-activity-report.html": "da020f08288dcc4ec118c0bfec79d1a0412bce40ac8d11350a0501ec4c4fd55f",
   "assets/tf-activity-report.js": "32be4999fa310330369a59a5432edbc91a13495f4c0cc1678c0819d347967547",
   "assets/tf-activity-report-bridge.js": "277c35b9f18cf01360f4f7e8f99b93b2c04890ff281a491ec98f4a6d010476a8",
-  "assets/tf-indicator-builder.js": "205129a7f69952479fba3ee88ae56703da24986f78c32838ac4d2d777a9f1329",
+  "assets/tf-indicator-builder.js": "5b6c8893837e1f100099a526c643500832e85ed96cd8ca88ac9f2a7c25d85c9a",
   "assets/tf-indicator-source.js": "8f933023ea56d9782ecdb93c64d059dc436f23d01382d6671b9fdc104777f6bc",
   "assets/metatrader-guide/BACKTEST.tpl": "9bac671098f5df6de50367c3600beb6537661e225e89c30ea079f92a956f134e",
   "assets/tf-shared-navigation.js": "f887e044d3d8d69b4cc0e4dbc5b51b4e81d2a0ed62acfd350cff634c9fc91a30"
