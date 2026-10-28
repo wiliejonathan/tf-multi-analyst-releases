@@ -1,8 +1,8 @@
-name: Publish REV535 progress visibility, exclusive months, iSignal review and footer
+name: Publish REV536 progress visibility, exclusive months, iSignal review and footer
 on:
   push:
     branches: [main]
-    paths: ['release-staging/REV535/READY']
+    paths: ['release-staging/REV536/READY']
 permissions:
   contents: write
 jobs:
@@ -18,34 +18,30 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p /tmp/tf535/src
-          gh release download v1.18.47 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV534_MULTI_LINK.zip --output /tmp/tf535/base.zip
-          echo '74ae0562b750cd3b57d3d150aa09d1742484069726aa2fc2c3827dcd5738adee  /tmp/tf535/base.zip' | sha256sum -c -
-          unzip -q /tmp/tf535/base.zip -d /tmp/tf535/src
-          python3 release-staging/REV535/patch535.py /tmp/tf535/src
+          mkdir -p /tmp/tf536/src
+          gh release download v1.18.48 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV535_MULTI_LINK.zip --output /tmp/tf536/base.zip
+          echo 'd3c33c247b1bfa355689d526e01bff6aa23609d67e59d6ba3a2f46d4b027c2d2  /tmp/tf536/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf536/base.zip -d /tmp/tf536/src
+          python3 release-staging/REV536/patch536.py /tmp/tf536/src
           python3 - <<'PY'
           import json,hashlib
           from pathlib import Path
-          root=Path('/tmp/tf535/src')
-          expected=json.loads(Path('release-staging/REV535/FILE_HASHES.json').read_text())
+          root=Path('/tmp/tf536/src')
+          expected=json.loads(Path('release-staging/REV536/FILE_HASHES.json').read_text())
           actual={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file()}
           assert actual==expected, 'Package differs from tested files'
           PY
           npm install --no-save playwright
           npx playwright install --with-deps chromium
-          CI=1 TF_REV419_ROOT=/tmp/tf535/src node release-staging/REV535/test535.cjs
-          CI=1 TF_REV419_ROOT=/tmp/tf535/src node release-staging/REV535/test535-month-isignal.cjs
-          TF_REV419_ROOT=/tmp/tf535/src node release-staging/REV535/test535-discovery.cjs
-          CI=1 TF_REV419_ROOT=/tmp/tf535/src node release-staging/REV535/test535-footer.cjs
-          CI=1 TF_REV419_ROOT=/tmp/tf535/src node release-staging/REV535/test535-risk.cjs
-          (cd /tmp/tf535/src && zip -qr /tmp/TF_Extension_PC_MAC_REV535_MULTI_LINK.zip .)
+          CI=1 TF_REV419_ROOT=/tmp/tf536/src node release-staging/REV536/test536-risk.cjs
+          (cd /tmp/tf536/src && zip -qr /tmp/TF_Extension_PC_MAC_REV536_MULTI_LINK.zip .)
       - name: Publish release and latest metadata
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release create v1.18.48 /tmp/TF_Extension_PC_MAC_REV535_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.48 — REV535' --notes-file release-staging/REV535/RELEASE_NOTES.md --latest
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.48" > /tmp/tf535/release.json
-          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf535/previous.json
-          python3 release-staging/REV535/update-latest.py
-          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf535/latest-request.json
+          gh release create v1.18.49 /tmp/TF_Extension_PC_MAC_REV536_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.49 — REV536' --notes-file release-staging/REV536/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.49" > /tmp/tf536/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf536/previous.json
+          python3 release-staging/REV536/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf536/latest-request.json
