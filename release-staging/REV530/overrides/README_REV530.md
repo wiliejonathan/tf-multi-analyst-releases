@@ -1,0 +1,11 @@
+REV530 / v1.18.43
+
+- Add Download Mt4 Template next to Submit / Reset. Downloads the exact supplied BACKTEST.tpl. Add illustrated template-first MT4 setup before indicator installation; MT5 uses its own MQL5/Indicators flow.
+- Add illustrated MT4/MT5 and TradingView installation guides, including the supplied final result screenshots. Combine indicator folder steps 3–4–5 into one compact frame. Images load lazily, open full size on click and fit mobile/tablet/desktop widths.
+- Add Download Panduan Tutorial (PDF) above each guide. The MT4/MT5 PDF follows BACKTEST template installation first, then indicator installation. The TradingView PDF covers Pine Script installation only. Both three-page PDFs contain the same instructions and images as the page; all six pages were rendered and visually checked.
+- Remove redundant Buat Script / Unduh Script from both builders. Submit generates the script and downloads TXT or EX4/EX5; Copy Code copies the generated source. Add brief feedback for Submit, Reset, Copy Code and template download, with reduced-motion support.
+- Move Pine information panel to the top right. Default maximum trade input includes the entire selected history through the oldest trade, replacing the fixed 100/120 default. Objects are drawn for the visible chart within TradingView's 500-object limits; display counts and zoom/pan guidance explain dense areas. All loaded history contributes to statistics.
+- Revise dashed outcome lines to Opened At → Closed At in MT4, MT5 and Pine. Preserve soft Created At → Opened At pending areas, normal Opened At → Closed At risk/reward areas and grey Cancelled orders without executed outcome paths.
+- Compiler 2.29 embeds the revised MQL template. Existing local companion users must update; the current setup executable is bundled. Regenerate existing EX4/EX5 or Pine exports after updating to apply chart changes.
+- Verified exact template download bytes, all 17 guide images, compact grouped steps, source generation/copy/reset behavior, shared navigation, responsive widths, full-history Pine export settings, object budgets, native host validation, fee-toggle math and real MT4/MT5 compilation. Regression checks run before publication.
+- APK/iOS/browser code is unchanged; desktop indicator builders remain excluded from mobile builds.
