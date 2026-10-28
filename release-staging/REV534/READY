@@ -1,1 +1,1 @@
-REV534 v1.18.47: verified reproducible LF output across Windows and Linux; throttle progress updates to scan-state changes
+REV534: wait for asynchronous iframe sizing before asserting expanded methodology; verified local tests pass

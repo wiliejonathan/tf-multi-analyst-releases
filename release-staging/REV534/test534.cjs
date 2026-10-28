@@ -32,9 +32,14 @@ const root=process.env.TF_REV419_ROOT||'outputs/TF_Extension_PC_MAC_REV534_MULTI
  const frame=p.frameLocator('#report');await frame.locator('.method summary').waitFor();
  await p.waitForTimeout(400);await frame.locator('.method summary').click();
  await p.waitForFunction(()=>heights.length>0);
- const h=await p.evaluate(()=>heights.at(-1));
- const bounds=await frame.locator('.method').evaluate(e=>({bottom:e.getBoundingClientRect().bottom+scrollY,open:e.open}));
- assert(bounds.open);assert(h>=bounds.bottom-2,'methodology must fit in resized iframe');
+ let h,bounds;
+ for(let attempt=0;attempt<40;attempt++){
+  h=await p.evaluate(()=>heights.at(-1));
+  bounds=await frame.locator('.method').evaluate(e=>({bottom:e.getBoundingClientRect().bottom+scrollY,open:e.open}));
+  if(bounds.open&&h>=bounds.bottom-2)break;
+  await p.waitForTimeout(50);
+ }
+ assert(bounds.open);assert(h>=bounds.bottom-2,`methodology must fit in resized iframe: ${h} < ${bounds.bottom}`);
  const timer=await b.newPage();await timer.setContent('<div class="tf-github-update-block" data-tf-update-kind="profile"></div>');
  await timer.evaluate(()=>{window.now534=20000000;Date.now=()=>now534;window.progressListeners=[];window.chrome={storage:{local:{get:(_k,cb)=>cb({tfTotalAnalystProgressV439:{runId:'test',total:6,completed:2,status:'running',startedAt:now534-65000}})},onChanged:{addListener:fn=>progressListeners.push(fn)}},runtime:{onMessage:{addListener:()=>{}}}};});
  await timer.addScriptTag({path:root+'/assets/tf-multi-total-progress.js'});
