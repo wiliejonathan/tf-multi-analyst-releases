@@ -1,1 +1,1 @@
-REV534 v1.18.47: tested login preservation, loss colors, expanded methodology and batch elapsed timer
+REV534 v1.18.47: verified reproducible LF output across Windows and Linux; throttle progress updates to scan-state changes

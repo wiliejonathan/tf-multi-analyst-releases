@@ -25,11 +25,11 @@
    box.querySelector('.tf-total-progress-fill').style.width=percent+'%';
    box.querySelector('[role="progressbar"]').setAttribute('aria-valuenow',String(percent));
    const label={done:'Selesai',stopped:'Dihentikan',error:'Error',paused:'Dijeda',running:'Berjalan'}[state?.status]||'Menunggu';
-   box.querySelector('.tf-total-progress-note').textContent=completed+' / '+total+' analis · '+label;
+   box.querySelector('.tf-total-progress-note').textContent=completed+' / '+total+' analis Â· '+label;
   });tick();schedule();
  }
  chrome.storage.local.get(['tfTotalAnalystProgressV439','tfMultiJobV419'],data=>{state=data.tfMultiJobV419&&['running','paused'].includes(data.tfMultiJobV419.status)?fromMulti(data.tfMultiJobV419):data.tfTotalAnalystProgressV439||null;render();});
- chrome.storage.onChanged.addListener((changes,area)=>{if(area!=='local')return;if(changes.tfMultiJobV419)state=fromMulti(changes.tfMultiJobV419.newValue);if(changes.tfTotalAnalystProgressV439)state=changes.tfTotalAnalystProgressV439.newValue||null;render();});
+ chrome.storage.onChanged.addListener((changes,area)=>{if(area!=='local'||(!changes.tfMultiJobV419&&!changes.tfTotalAnalystProgressV439))return;if(changes.tfMultiJobV419)state=fromMulti(changes.tfMultiJobV419.newValue);if(changes.tfTotalAnalystProgressV439)state=changes.tfTotalAnalystProgressV439.newValue||null;render();});
  chrome.runtime.onMessage.addListener(message=>{if(message.type==='batchScanDone'&&state){state={...state,status:message.error?'error':message.stopped?'stopped':'done',endedAt:Date.now()};render();}});
  let scheduled=false;
  new MutationObserver(records=>{if(scheduled||!records.some(r=>[...r.addedNodes].some(n=>n.nodeType===1&&!n.closest?.('.tf-total-progress')&&(n.matches?.('.tf-github-update-block')||n.querySelector?.('.tf-github-update-block')))))return;scheduled=true;queueMicrotask(()=>{scheduled=false;render();});}).observe(document.body,{childList:true,subtree:true});
