@@ -1,0 +1,13 @@
+(()=>{
+const timers=new Map();let interval=null;
+const elapsed=(job,now=Date.now())=>Math.max(0,Number(job?.timerElapsedMs)||0)+(job?.status==='running'?Math.max(0,now-(Number(job.timerRunningSince)||Date.parse(job.createdAt)||now)):0);
+const format=ms=>{const s=Math.floor(ms/1000),h=Math.floor(s/3600),m=Math.floor(s%3600/60);return (h?String(h)+':':'')+String(m).padStart(2,'0')+':'+String(s%60).padStart(2,'0');};
+function refresh(){let active=false;for(const [el,job]of timers){if(!el.isConnected){timers.delete(el);continue;}el.textContent='Durasi '+format(elapsed(job));el.title='Durasi total proses scan; waktu Pause tidak dihitung.';if(job.status==='running'&&!el.hidden)active=true;}if(active&&!document.hidden&&!interval)interval=setInterval(refresh,1000);if((!active||document.hidden)&&interval){clearInterval(interval);interval=null;}}
+document.addEventListener('visibilitychange',refresh);addEventListener('pagehide',()=>{if(interval)clearInterval(interval);interval=null;timers.clear();});
+globalThis.TFMultiProgress={elapsed,format,
+
+  limit(root,name){const inputs=Array.from(root.querySelectorAll(`input[name="${name}"]`)),count=inputs.filter(e=>e.checked).length;inputs.forEach(e=>e.disabled=!e.checked&&count>=2);},
+  paint(job,root=document){const q=id=>root.getElementById(id),total=job?.inventoryCount??job?.inventory?.length??0,cursor=job?.cursor||0,inventory=!!job?.inventoryComplete,fraction=Math.max(0,Math.min(1,job?.progress?.fraction||0));const anchor=q('card-stage');if(anchor){let timer=q('multi-scan-timer');if(!timer){timer=document.createElement('span');timer.id='multi-scan-timer';timer.style.cssText='display:block;text-align:right;color:#93c5fd;font-variant-numeric:tabular-nums;font-size:inherit;margin-top:3px';anchor.after(timer);}timer.hidden=!job||!!job.isPreview||!['running','paused','error','stopped','complete'].includes(job.status);timer.style.display=timer.hidden?'none':'block';if(job)timers.set(timer,job);else timers.delete(timer);refresh();}if(q('card-progress')){q('card-progress').hidden=!job||job.isPreview||!['running','paused'].includes(job.status);}if(q('overall-label'))q('overall-label').textContent=!job?'Jumlah card belum dihitung.':job?.isPreview?'Pratinjau — jumlah analis belum dihitung.':inventory?`Diperiksa ${cursor} dari ${total} card hasil filter`:`Memuat semua card (${total} ditemukan)`;if(q('card-label'))q('card-label').textContent=job?.progress?.name?`Card ${job.progress.index} · ${job.progress.name}`:'Card analis';if(q('card-percent'))q('card-percent').textContent=Math.round(fraction*100)+'%';if(q('card-fill'))q('card-fill').style.width=fraction*100+'%';if(q('card-stage'))q('card-stage').textContent=job?.progress?.message||'Belum berjalan.';}
+};
+
+})();
