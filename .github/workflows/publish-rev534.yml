@@ -1,8 +1,8 @@
-name: Publish REV543 multi-link timer and indicator export fixes
+name: Publish REV544 JSON compatibility and Post Studio gradient fix
 on:
   push:
     branches: [main]
-    paths: ['release-staging/REV543/READY']
+    paths: ['release-staging/REV544/READY']
 permissions:
   contents: write
 jobs:
@@ -13,37 +13,44 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Build exact verified package and run regression checks
+      - name: Build packages from pinned release and verified overlay
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          mkdir -p /tmp/tf543/src
-          gh release download v1.18.49 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV536_MULTI_LINK.zip --output /tmp/tf543/base.zip
-          echo '397c9ed172f09435b22ede6643e51e7c91f0c9f397b8163a7b6d73fc46e37190  /tmp/tf543/base.zip' | sha256sum -c -
-          unzip -q /tmp/tf543/base.zip -d /tmp/tf543/src
-          cp -a release-staging/REV543/overlay/. /tmp/tf543/src/
+          mkdir -p /tmp/tf544/src
+          gh release download v1.18.56 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV543_MULTI_LINK.zip --output /tmp/tf544/base.zip
+          echo '56fcbeaaa5227aac5ed390dd5e5bfa1700a3999824ebd18974e1e2156f49f669  /tmp/tf544/base.zip' | sha256sum -c -
+          unzip -q /tmp/tf544/base.zip -d /tmp/tf544/src
+          cp -a release-staging/REV544/overlay/. /tmp/tf544/src/
+          python3 - <<'PY'
+          import json,base64
+          from pathlib import Path
+          for payload in json.loads(Path('release-staging/REV544/PAYLOADS.json').read_text()):
+              data=base64.b64decode(''.join(Path(part).read_text() for part in payload['parts']),validate=True)
+              target=Path(payload['destination']);target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data)
+          PY
           python3 - <<'PY'
           import json,hashlib
           from pathlib import Path
-          root=Path('/tmp/tf543/src')
-          expected=json.loads(Path('release-staging/REV543/FILE_HASHES.json').read_text())
-          actual={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file()}
-          assert actual==expected, 'Package differs from tested files'
+          for root,manifest in [(Path('/tmp/tf544/src'),'FILE_HASHES.json'),(Path('release-staging/REV544/post-studio/TF-Instagram-Post-Studio'),'STUDIO_HASHES.json')]:
+              expected=json.loads(Path('release-staging/REV544',manifest).read_text())
+              actual={p.relative_to(root).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in root.rglob('*') if p.is_file()}
+              assert actual==expected, 'Package differs from tested files'
           PY
           npm install --no-save playwright
           npx playwright install --with-deps chromium
-          CI=1 TF_REV419_ROOT=/tmp/tf543/src node release-staging/REV543/test537.cjs
-          CI=1 TF_REV419_ROOT=/tmp/tf543/src node release-staging/REV543/test538.cjs
-          TF_REV419_ROOT=/tmp/tf543/src node release-staging/REV543/test-codec.cjs
-          (cd /tmp/tf543/src && zip -qr /tmp/TF_Extension_PC_MAC_REV543_MULTI_LINK.zip .)
-      - name: Publish release and latest metadata
+          CI=1 TF_REV419_ROOT=/tmp/tf544/src TF_JSON_FIXTURE=release-staging/REV544/synthetic-export.json node release-staging/REV544/test-json.cjs
+          CI=1 TF_STUDIO_ROOT=release-staging/REV544/post-studio/TF-Instagram-Post-Studio node release-staging/REV544/test-dither.cjs
+          (cd /tmp/tf544/src && zip -qr /tmp/TF_Extension_PC_MAC_REV544_MULTI_LINK.zip .)
+          (cd release-staging/REV544/post-studio && zip -qr /tmp/TF-Instagram-Post-Studio-v1.0.24.zip TF-Instagram-Post-Studio)
+      - name: Publish release and update plugin metadata
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release create v1.18.56 /tmp/TF_Extension_PC_MAC_REV543_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'TF Multi-Analyst Scanner v1.18.56 — REV543' --notes-file release-staging/REV543/RELEASE_NOTES.md --latest
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.56" > /tmp/tf543/release.json
-          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf543/previous.json
-          python3 release-staging/REV543/update-latest.py
-          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf543/latest-request.json
+          gh release create v1.18.57 /tmp/TF_Extension_PC_MAC_REV544_MULTI_LINK.zip /tmp/TF-Instagram-Post-Studio-v1.0.24.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'REV544 â€” JSON Import Fix + Post Studio v1.0.24' --notes-file release-staging/REV544/RELEASE_NOTES.md --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.57" > /tmp/tf544/release.json
+          gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" > /tmp/tf544/previous.json
+          python3 release-staging/REV544/update-latest.py
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/tf544/latest-request.json

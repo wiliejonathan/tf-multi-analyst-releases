@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "TF Instagram Post Studio",
+  "version": "1.0.24",
+  "minimum_chrome_version": "116",
+  "description": "Buat carousel Instagram dari Excel multi-link atau link analis TradersFamily.",
+  "permissions": [
+    "storage",
+    "scripting",
+    "tabs",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://account.tradersfamily.id/*",
+    "https://static2.tradersfamily.id/*",
+    "https://static.tradersfamily.id/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "TF Instagram Post Studio",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "side_panel": {
+    "default_path": "studio.html"
+  }
+}
