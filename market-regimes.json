@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-10-30T08:34:22.913275+00:00",
+  "updatedAt": "2026-11-02T09:25:01.122540+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -552,11 +552,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.234491,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.167251,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "CHFJPY": {
@@ -826,11 +826,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.073631,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.189757,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "CADJPY": {
@@ -1100,11 +1100,11 @@
       },
       "2026-10": {
         "status": "Semi-Trend",
-        "efficiencyRatio": 0.297513,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.29408,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "GBPJPY": {
@@ -1374,11 +1374,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.184749,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.24197,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "EURJPY": {
@@ -1648,11 +1648,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.187877,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.13218,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "NZDJPY": {
@@ -1922,11 +1922,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.054377,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.059397,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "USDJPY": {
@@ -2469,12 +2469,12 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Ranging",
-        "efficiencyRatio": 0.198101,
-        "dailyBars": 20,
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.256201,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "EURUSD": {
@@ -2744,11 +2744,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.214348,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.143832,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "USDCHF": {
@@ -3018,11 +3018,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.057615,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.140879,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "USDCAD": {
@@ -3292,11 +3292,11 @@
       },
       "2026-10": {
         "status": "Semi-Trend",
-        "efficiencyRatio": 0.376792,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.377294,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "AUDUSD": {
@@ -3565,12 +3565,12 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Semi-Trend",
-        "efficiencyRatio": 0.318407,
-        "dailyBars": 20,
+        "status": "Ranging",
+        "efficiencyRatio": 0.224904,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "NZDUSD": {
@@ -3840,11 +3840,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.075371,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.082939,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "EURGBP": {
@@ -4114,11 +4114,11 @@
       },
       "2026-10": {
         "status": "Trending/Rally",
-        "efficiencyRatio": 0.641777,
-        "dailyBars": 20,
+        "efficiencyRatio": 0.657165,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "EURNZD": {
@@ -4387,12 +4387,12 @@
         "provisional": false
       },
       "2026-10": {
-        "status": "Semi-Trend",
-        "efficiencyRatio": 0.305101,
-        "dailyBars": 20,
+        "status": "Ranging",
+        "efficiencyRatio": 0.249693,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-29",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     }
   },
@@ -4404,7 +4404,7 @@
     {
       "pair": "XAUUSD",
       "year": 2026,
-      "error": "The read operation timed out"
+      "error": "HTTP Error 503: Service Unavailable"
     }
   ],
   "sources": {
