@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-02T09:25:01.122540+00:00",
+  "updatedAt": "2026-11-03T09:28:13.350776+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -2196,11 +2196,11 @@
       },
       "2026-10": {
         "status": "Ranging",
-        "efficiencyRatio": 0.009731,
-        "dailyBars": 19,
+        "efficiencyRatio": 0.017645,
+        "dailyBars": 21,
         "start": "2026-10-01",
-        "end": "2026-10-28",
-        "provisional": true
+        "end": "2026-10-30",
+        "provisional": false
       }
     },
     "GBPUSD": {
@@ -4397,10 +4397,6 @@
     }
   },
   "errors": [
-    {
-      "pair": "USDJPY",
-      "error": "Unexpected symbol"
-    },
     {
       "pair": "XAUUSD",
       "year": 2026,
