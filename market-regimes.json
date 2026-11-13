@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updatedAt": "2026-11-12T09:44:45.559092+00:00",
+  "updatedAt": "2026-11-13T09:27:51.708573+00:00",
   "source": "Dukascopy daily BID candles",
   "sourceUrl": "https://www.dukascopy.com/swiss/english/marketwatch/historical/",
   "method": {
@@ -560,10 +560,10 @@
       },
       "2026-11": {
         "status": "Semi-Trend",
-        "efficiencyRatio": 0.453811,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.359528,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -841,11 +841,11 @@
         "provisional": false
       },
       "2026-11": {
-        "status": "Semi-Trend",
-        "efficiencyRatio": 0.26033,
-        "dailyBars": 8,
+        "status": "Ranging",
+        "efficiencyRatio": 0.150756,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -1124,10 +1124,10 @@
       },
       "2026-11": {
         "status": "Semi-Trend",
-        "efficiencyRatio": 0.50893,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.341807,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -1406,10 +1406,10 @@
       },
       "2026-11": {
         "status": "Ranging",
-        "efficiencyRatio": 0.138233,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.170756,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -1688,10 +1688,10 @@
       },
       "2026-11": {
         "status": "Semi-Trend",
-        "efficiencyRatio": 0.307535,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.298561,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -1970,10 +1970,10 @@
       },
       "2026-11": {
         "status": "Ranging",
-        "efficiencyRatio": 0.108226,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.063343,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -2251,11 +2251,11 @@
         "provisional": false
       },
       "2026-11": {
-        "status": "Ranging",
-        "efficiencyRatio": 0.106769,
-        "dailyBars": 7,
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.445527,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-10",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -2534,10 +2534,10 @@
       },
       "2026-11": {
         "status": "Ranging",
-        "efficiencyRatio": 0.096668,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.239652,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -2816,10 +2816,10 @@
       },
       "2026-11": {
         "status": "Ranging",
-        "efficiencyRatio": 0.041046,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.167428,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -3097,11 +3097,11 @@
         "provisional": false
       },
       "2026-11": {
-        "status": "Ranging",
-        "efficiencyRatio": 0.006235,
-        "dailyBars": 8,
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.266289,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -3380,10 +3380,10 @@
       },
       "2026-11": {
         "status": "Trending/Rally",
-        "efficiencyRatio": 0.765704,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.807913,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -3662,10 +3662,10 @@
       },
       "2026-11": {
         "status": "Semi-Trend",
-        "efficiencyRatio": 0.473642,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.512576,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -3944,10 +3944,10 @@
       },
       "2026-11": {
         "status": "Ranging",
-        "efficiencyRatio": 0.076577,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.220542,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -4225,11 +4225,11 @@
         "provisional": false
       },
       "2026-11": {
-        "status": "Trending/Rally",
-        "efficiencyRatio": 0.603092,
-        "dailyBars": 8,
+        "status": "Semi-Trend",
+        "efficiencyRatio": 0.352853,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     },
@@ -4508,23 +4508,19 @@
       },
       "2026-11": {
         "status": "Ranging",
-        "efficiencyRatio": 0.167679,
-        "dailyBars": 8,
+        "efficiencyRatio": 0.202327,
+        "dailyBars": 9,
         "start": "2026-11-02",
-        "end": "2026-11-11",
+        "end": "2026-11-12",
         "provisional": true
       }
     }
   },
   "errors": [
     {
-      "pair": "USDJPY",
-      "error": "Unexpected symbol"
-    },
-    {
       "pair": "XAUUSD",
       "year": 2026,
-      "error": "<urlopen error timed out>"
+      "error": "HTTP Error 404: Not Found"
     }
   ],
   "sources": {
