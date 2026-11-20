@@ -1,0 +1,38 @@
+name: Publish REV580 multi-analyst groups
+on:
+  push:
+    branches: [main]
+    paths: ['release-staging/REV580/READY']
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build verified plugin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/rev580/src
+          gh release download v1.18.92 --repo "$GITHUB_REPOSITORY" --pattern TF_Extension_PC_MAC_REV579_MULTI_LINK.zip --output /tmp/rev580/base.zip
+          echo '5aec8e7fd49879da09b25707ac7639de4c301bc87b5d6ee043c2c345de361572  /tmp/rev580/base.zip' | sha256sum -c -
+          unzip -q /tmp/rev580/base.zip -d /tmp/rev580/src
+          node release-staging/REV580/patch.cjs /tmp/rev580/src
+          node --check /tmp/rev580/src/multi-scanner/duplicate.js
+          (cd /tmp/rev580/src && zip -qr /tmp/TF_Extension_PC_MAC_REV580_MULTI_LINK.zip .)
+      - name: Publish plugin release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create v1.18.93 /tmp/TF_Extension_PC_MAC_REV580_MULTI_LINK.zip --repo "$GITHUB_REPOSITORY" --title 'TF Multi-Analyst Scanner v1.18.93 — REV580' --notes 'Perbaikan kelompok kemiripan sinyal: tabel mendukung lebih dari dua analis. Formulir laporan tetap per pasangan. Hash integritas diperbarui dan diverifikasi.' --latest
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/v1.18.93" > /tmp/release580.json
+          jq '{schema:1,available:true,revision:580,tag_name:.tag_name,release_url:.html_url,published_at:.published_at,asset:(.assets[]|select(.name=="TF_Extension_PC_MAC_REV580_MULTI_LINK.zip")|{id,name,url:.browser_download_url,size,digest,updated_at})}' /tmp/release580.json > /tmp/latest580.json
+          SHA=$(gh api "repos/$GITHUB_REPOSITORY/contents/latest.json" --jq .sha)
+          jq -n --arg sha "$SHA" --arg content "$(base64 -w0 /tmp/latest580.json)" '{message:"Update plugin metadata to REV580",sha:$sha,content:$content}' > /tmp/request580.json
+          gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/latest.json" --input /tmp/request580.json
